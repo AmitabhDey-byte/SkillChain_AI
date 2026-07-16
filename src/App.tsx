@@ -12,9 +12,12 @@ import {
   X,
 } from 'lucide-react'
 import { useState } from 'react'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Dashboard } from './components/Dashboard'
 import { OnboardingFlow } from './components/OnboardingFlow'
 import { WalletModal } from './components/WalletModal'
 import { useWallet } from './hooks/useWallet'
+import { hasCompletedOnboarding, loadOnboardingDraft, type OnboardingProfile } from './lib/onboarding'
 import { isTestnet, shortenAddress } from './lib/wallet'
 
 const steps = [
@@ -45,35 +48,57 @@ const skills = [
 ]
 
 function App() {
+  const location = useLocation()
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [walletModalOpen, setWalletModalOpen] = useState(false)
   const [onboardingOpen, setOnboardingOpen] = useState(false)
   const [profileCreated, setProfileCreated] = useState(false)
+  const [onboardingComplete, setOnboardingComplete] = useState(hasCompletedOnboarding)
+  const [profile, setProfile] = useState(loadOnboardingDraft)
   const wallet = useWallet()
 
-  const openWalletModal = () => {
+  const openPrimaryFlow = () => {
     setMenuOpen(false)
     if (wallet.status === 'connected') {
-      setOnboardingOpen(true)
+      if (onboardingComplete) navigate('/dashboard')
+      else setOnboardingOpen(true)
       return
     }
 
     setWalletModalOpen(true)
   }
 
-  const startOnboarding = () => {
+  const continueFromWallet = () => {
     setWalletModalOpen(false)
-    setOnboardingOpen(true)
+    if (onboardingComplete) navigate('/dashboard')
+    else setOnboardingOpen(true)
   }
 
-  const handleProfileComplete = () => {
+  const handleProfileComplete = (completedProfile: OnboardingProfile) => {
+    setProfile(completedProfile)
+    setOnboardingComplete(true)
     setOnboardingOpen(false)
     setProfileCreated(true)
+    navigate('/dashboard')
     window.setTimeout(() => setProfileCreated(false), 4500)
   }
 
+  const disconnectAndExit = () => {
+    wallet.disconnect()
+    navigate('/')
+  }
+
   return (
-    <main>
+    <>
+      {location.pathname === '/dashboard' ? (
+        onboardingComplete ? (
+          <Dashboard profile={profile} connection={wallet.connection} onOpenWallet={() => setWalletModalOpen(true)} onDisconnect={disconnectAndExit} />
+        ) : (
+          <Navigate to="/" replace />
+        )
+      ) : (
+      <main>
       <header className="site-header">
         <a className="brand" href="#top" aria-label="SkillChain AI home">
           <span className="brand-mark"><Blocks size={21} /></span>
@@ -84,7 +109,7 @@ function App() {
           <a href="#how-it-works" onClick={() => setMenuOpen(false)}>How it works</a>
           <a href="#credentials" onClick={() => setMenuOpen(false)}>Credentials</a>
           <a href="#for-recruiters" onClick={() => setMenuOpen(false)}>For recruiters</a>
-          <button className="button button--small button--outline" type="button" onClick={openWalletModal}>
+          <button className="button button--small button--outline" type="button" onClick={() => setWalletModalOpen(true)}>
             {wallet.status === 'connected' && wallet.connection ? (
               <><span className={isTestnet(wallet.connection.network) ? 'wallet-dot' : 'wallet-dot wallet-dot--warning'} /> {shortenAddress(wallet.connection.address)}</>
             ) : (
@@ -114,7 +139,7 @@ function App() {
             Turn your real work into trusted, portable credentials. SkillChain AI verifies what you can do—not just what your résumé says.
           </p>
           <div className="hero-actions">
-            <button className="button button--primary" type="button" onClick={openWalletModal}>Verify my skills <ArrowRight size={18} /></button>
+            <button className="button button--primary" type="button" onClick={openPrimaryFlow}>{onboardingComplete ? 'Open dashboard' : 'Verify my skills'} <ArrowRight size={18} /></button>
             <a className="text-link" href="#how-it-works">See how it works <span>↓</span></a>
           </div>
           <div className="trust-row">
@@ -192,6 +217,8 @@ function App() {
           <button className="button button--light">Explore recruiter tools <ArrowRight size={18} /></button>
         </div>
       </section>
+      </main>
+      )}
 
       <WalletModal
         open={walletModalOpen}
@@ -199,7 +226,7 @@ function App() {
         connection={wallet.connection}
         error={wallet.error}
         onClose={() => setWalletModalOpen(false)}
-        onContinue={startOnboarding}
+        onContinue={continueFromWallet}
         onConnect={wallet.connect}
         onDisconnect={wallet.disconnect}
       />
@@ -211,7 +238,7 @@ function App() {
       {profileCreated && (
         <div className="success-toast" role="status"><Check size={17} /> Profile created. Your skill passport is ready to build.</div>
       )}
-    </main>
+    </>
   )
 }
 

@@ -4,7 +4,7 @@ AI-powered technical skill verification and portable on-chain credentials on Ste
 
 ## Current milestone
 
-The application currently includes the React and TypeScript frontend, responsive visual system, public product landing experience, example credential preview, Freighter wallet authentication on Stellar, and a persistent first-time user onboarding flow.
+The application currently includes the React and TypeScript frontend, responsive visual system, public product landing experience, example credential preview, Freighter wallet authentication on Stellar, persistent first-time onboarding, and an authenticated user workspace.
 
 ## Local development
 
@@ -31,6 +31,10 @@ Wallet sign-in uses the official `@stellar/freighter-api` package. The applicati
 ## User onboarding
 
 After wallet authentication, users choose their platform role, create a public professional profile, and link their GitHub identity. The onboarding flow validates each step, saves unfinished drafts locally, clearly explains GitHub analysis consent, and adapts to mobile screens.
+
+## User dashboard
+
+Completed onboarding routes users into a responsive workspace that shows trust readiness, evidence sources, assessment status, credential progress, connected wallet details, public profile data, and recent account activity. Returning users can resume directly from the landing page.
 
 Secrets such as the Gemini API key will live only in the backend environment and must never use the `VITE_` prefix or be committed to source control.
 

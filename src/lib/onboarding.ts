@@ -32,6 +32,10 @@ export function loadOnboardingDraft() {
   }
 }
 
+export function hasCompletedOnboarding() {
+  return localStorage.getItem(ONBOARDING_COMPLETE_KEY) === 'true'
+}
+
 export function saveOnboardingDraft(profile: OnboardingProfile) {
   localStorage.setItem(ONBOARDING_DRAFT_KEY, JSON.stringify(profile))
 }
@@ -40,4 +44,3 @@ export function completeOnboarding(profile: OnboardingProfile) {
   localStorage.setItem(ONBOARDING_DRAFT_KEY, JSON.stringify(profile))
   localStorage.setItem(ONBOARDING_COMPLETE_KEY, 'true')
 }
-
