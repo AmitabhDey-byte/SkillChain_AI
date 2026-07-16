@@ -4,7 +4,7 @@ AI-powered technical skill verification and portable on-chain credentials on Ste
 
 ## Current milestone
 
-The first development milestone establishes the React and TypeScript frontend, responsive visual system, public product landing experience, and example credential preview.
+The application currently includes the React and TypeScript frontend, responsive visual system, public product landing experience, example credential preview, and Freighter wallet authentication on Stellar.
 
 ## Local development
 
@@ -23,6 +23,10 @@ The frontend runs at `http://localhost:5173` by default.
 | `VITE_API_BASE_URL` | FastAPI service base URL |
 | `VITE_STELLAR_NETWORK` | Stellar network name |
 | `VITE_STELLAR_NETWORK_PASSPHRASE` | Stellar network passphrase |
+
+## Wallet authentication
+
+Wallet sign-in uses the official `@stellar/freighter-api` package. The application requests only the user's public address and transaction signatures, validates the active network, warns when the wallet is not on testnet, and stores only a local session preference. Private keys never leave Freighter.
 
 Secrets such as the Gemini API key will live only in the backend environment and must never use the `VITE_` prefix or be committed to source control.
 
@@ -43,4 +47,3 @@ Secrets such as the Gemini API key will live only in the backend environment and
 6. Public credential verification portal
 7. Recruiter dashboard and milestone payments
 8. Analytics, monitoring, testing, and deployment
-

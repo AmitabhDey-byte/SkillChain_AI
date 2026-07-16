@@ -12,6 +12,9 @@ import {
   X,
 } from 'lucide-react'
 import { useState } from 'react'
+import { WalletModal } from './components/WalletModal'
+import { useWallet } from './hooks/useWallet'
+import { isTestnet, shortenAddress } from './lib/wallet'
 
 const steps = [
   {
@@ -42,6 +45,13 @@ const skills = [
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [walletModalOpen, setWalletModalOpen] = useState(false)
+  const wallet = useWallet()
+
+  const openWalletModal = () => {
+    setMenuOpen(false)
+    setWalletModalOpen(true)
+  }
 
   return (
     <main>
@@ -55,8 +65,12 @@ function App() {
           <a href="#how-it-works" onClick={() => setMenuOpen(false)}>How it works</a>
           <a href="#credentials" onClick={() => setMenuOpen(false)}>Credentials</a>
           <a href="#for-recruiters" onClick={() => setMenuOpen(false)}>For recruiters</a>
-          <button className="button button--small button--outline">
-            <Wallet size={16} /> Connect wallet
+          <button className="button button--small button--outline" type="button" onClick={openWalletModal}>
+            {wallet.status === 'connected' && wallet.connection ? (
+              <><span className={isTestnet(wallet.connection.network) ? 'wallet-dot' : 'wallet-dot wallet-dot--warning'} /> {shortenAddress(wallet.connection.address)}</>
+            ) : (
+              <><Wallet size={16} /> Connect wallet</>
+            )}
           </button>
         </nav>
 
@@ -81,7 +95,7 @@ function App() {
             Turn your real work into trusted, portable credentials. SkillChain AI verifies what you can do—not just what your résumé says.
           </p>
           <div className="hero-actions">
-            <button className="button button--primary">Verify my skills <ArrowRight size={18} /></button>
+            <button className="button button--primary" type="button" onClick={openWalletModal}>Verify my skills <ArrowRight size={18} /></button>
             <a className="text-link" href="#how-it-works">See how it works <span>↓</span></a>
           </div>
           <div className="trust-row">
@@ -159,6 +173,16 @@ function App() {
           <button className="button button--light">Explore recruiter tools <ArrowRight size={18} /></button>
         </div>
       </section>
+
+      <WalletModal
+        open={walletModalOpen}
+        status={wallet.status}
+        connection={wallet.connection}
+        error={wallet.error}
+        onClose={() => setWalletModalOpen(false)}
+        onConnect={wallet.connect}
+        onDisconnect={wallet.disconnect}
+      />
     </main>
   )
 }
