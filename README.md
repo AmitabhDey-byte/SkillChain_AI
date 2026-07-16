@@ -70,6 +70,19 @@ The backend consumes GitHub REST API version `2026-03-10` through a typed server
 
 The dashboard repository picker consumes these endpoints directly. It includes profile sync, repository search, source and language filters, loading skeletons, retryable failures, archived-repository safeguards, a five-repository assessment limit, GitHub rate-limit visibility, and persistent local assessment drafts.
 
+## AI assessment
+
+`POST /api/v1/assessments/preview` submits bounded repository evidence to Gemini using a strict structured-output schema. The server applies prompt-injection protections, validates every response, retries transient failures, handles safety blocks, records token usage, and recomputes the final score and level from a transparent rubric.
+
+| Dimension | Weight |
+| --- | ---: |
+| Code quality | 25% |
+| Architecture | 20% |
+| Documentation | 15% |
+| Consistency | 15% |
+| Complexity | 15% |
+| Impact | 10% |
+
 ## Wallet authentication
 
 Wallet sign-in uses the official `@stellar/freighter-api` package. The application requests only the user's public address and transaction signatures, validates the active network, warns when the wallet is not on testnet, and stores only a local session preference. Private keys never leave Freighter.

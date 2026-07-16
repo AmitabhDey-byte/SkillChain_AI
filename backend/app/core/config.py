@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     database_url: SecretStr = SecretStr("postgresql+asyncpg://postgres:postgres@localhost:5432/skillchain")
     gemini_api_key: SecretStr | None = None
     gemini_model: str = "gemini-2.5-flash"
+    gemini_timeout_seconds: float = 45
     github_client_id: str | None = None
     github_client_secret: SecretStr | None = None
     github_token: SecretStr | None = None

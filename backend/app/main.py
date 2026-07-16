@@ -38,6 +38,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     application.state.settings = active_settings
+    application.dependency_overrides[get_settings] = lambda: active_settings
     application.add_middleware(RequestContextMiddleware)
     application.add_middleware(
         CORSMiddleware,
