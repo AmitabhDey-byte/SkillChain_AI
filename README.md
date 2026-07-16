@@ -16,6 +16,14 @@ npm run dev
 
 The frontend runs at `http://localhost:5173` by default.
 
+Start the API in a second terminal:
+
+```bash
+npm run backend:dev
+```
+
+The API runs at `http://localhost:8000`, with interactive documentation available at `http://localhost:8000/docs` outside production.
+
 ## Environment variables
 
 | Variable | Purpose |
@@ -23,6 +31,22 @@ The frontend runs at `http://localhost:5173` by default.
 | `VITE_API_BASE_URL` | FastAPI service base URL |
 | `VITE_STELLAR_NETWORK` | Stellar network name |
 | `VITE_STELLAR_NETWORK_PASSPHRASE` | Stellar network passphrase |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `GEMINI_API_KEY` | Server-only Gemini credential |
+| `GEMINI_MODEL` | Gemini model used for assessments |
+| `CORS_ORIGINS` | JSON array of permitted frontend origins |
+| `GITHUB_CLIENT_ID` | GitHub OAuth application identifier |
+| `GITHUB_CLIENT_SECRET` | Server-only GitHub OAuth secret |
+| `STELLAR_RPC_URL` | Soroban JSON-RPC endpoint |
+| `STELLAR_CONTRACT_ID` | Deployed SkillChain contract identifier |
+
+## Backend foundation
+
+The FastAPI service uses typed environment configuration, explicit CORS policy, request correlation IDs, processing-time headers, centralized safe error responses, production-aware API documentation, liveness and readiness probes, and an application factory for isolated testing.
+
+```bash
+npm run backend:test
+```
 
 ## Wallet authentication
 

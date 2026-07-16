@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "backend:dev": "python -m uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000",
+    "backend:test": "python -m unittest discover -s backend/tests -v"
   },
   "dependencies": {
     "@stellar/freighter-api": "^6.0.1",
