@@ -12,6 +12,7 @@ import {
   X,
 } from 'lucide-react'
 import { useState } from 'react'
+import { OnboardingFlow } from './components/OnboardingFlow'
 import { WalletModal } from './components/WalletModal'
 import { useWallet } from './hooks/useWallet'
 import { isTestnet, shortenAddress } from './lib/wallet'
@@ -46,11 +47,29 @@ const skills = [
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [walletModalOpen, setWalletModalOpen] = useState(false)
+  const [onboardingOpen, setOnboardingOpen] = useState(false)
+  const [profileCreated, setProfileCreated] = useState(false)
   const wallet = useWallet()
 
   const openWalletModal = () => {
     setMenuOpen(false)
+    if (wallet.status === 'connected') {
+      setOnboardingOpen(true)
+      return
+    }
+
     setWalletModalOpen(true)
+  }
+
+  const startOnboarding = () => {
+    setWalletModalOpen(false)
+    setOnboardingOpen(true)
+  }
+
+  const handleProfileComplete = () => {
+    setOnboardingOpen(false)
+    setProfileCreated(true)
+    window.setTimeout(() => setProfileCreated(false), 4500)
   }
 
   return (
@@ -180,9 +199,18 @@ function App() {
         connection={wallet.connection}
         error={wallet.error}
         onClose={() => setWalletModalOpen(false)}
+        onContinue={startOnboarding}
         onConnect={wallet.connect}
         onDisconnect={wallet.disconnect}
       />
+      <OnboardingFlow
+        open={onboardingOpen}
+        onClose={() => setOnboardingOpen(false)}
+        onComplete={handleProfileComplete}
+      />
+      {profileCreated && (
+        <div className="success-toast" role="status"><Check size={17} /> Profile created. Your skill passport is ready to build.</div>
+      )}
     </main>
   )
 }

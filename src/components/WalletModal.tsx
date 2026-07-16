@@ -7,6 +7,7 @@ type WalletModalProps = {
   connection: WalletConnection | null
   error: string | null
   onClose: () => void
+  onContinue: () => void
   onConnect: () => Promise<boolean>
   onDisconnect: () => void
 }
@@ -17,6 +18,7 @@ export function WalletModal({
   connection,
   error,
   onClose,
+  onContinue,
   onConnect,
   onDisconnect,
 }: WalletModalProps) {
@@ -65,7 +67,7 @@ export function WalletModal({
             )}
 
             <div className="modal-actions">
-              <button className="button button--primary button--wide" type="button" onClick={onClose}>
+              <button className="button button--primary button--wide" type="button" onClick={onContinue}>
                 Continue to SkillChain <ArrowUpRight size={17} />
               </button>
               <button className="disconnect-button" type="button" onClick={onDisconnect}>Disconnect wallet</button>
@@ -110,4 +112,3 @@ export function WalletModal({
     </div>
   )
 }
-
