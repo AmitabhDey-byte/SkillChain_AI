@@ -67,8 +67,12 @@ The backend consumes GitHub REST API version `2026-03-10` through a typed server
 | --- | --- |
 | `GET /api/v1/github/users/{username}` | Fetch a normalized public profile |
 | `GET /api/v1/github/users/{username}/repositories` | List owned public repositories |
+| `GET /api/v1/github/repos/{owner}/{repository}/evidence` | Collect analysis-ready repository evidence |
+| `POST /api/v1/github/evidence` | Collect evidence for up to five repositories |
 
 The dashboard repository picker consumes these endpoints directly. It includes profile sync, repository search, source and language filters, loading skeletons, retryable failures, archived-repository safeguards, a five-repository assessment limit, GitHub rate-limit visibility, and persistent local assessment drafts.
+
+Assessment evidence combines normalized language percentages, an 8,000-character README excerpt, twenty recent commits, contributor counts, repository metadata, and file-tree signals for tests and documentation. Batch collection limits concurrency and returns successful repositories even when another selected repository or optional evidence source fails.
 
 ## AI assessment
 

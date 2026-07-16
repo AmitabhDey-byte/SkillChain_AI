@@ -2,6 +2,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
+from backend.app.schemas.assessment import RepositoryEvidence
+
 
 class GithubProfileResponse(BaseModel):
     github_user_id: int
@@ -55,3 +57,31 @@ class RepositoryListResponse(BaseModel):
     repositories: list[GithubRepositoryResponse]
     meta: RepositoryPageMeta
 
+
+class RepositoryReference(BaseModel):
+    owner: str = Field(min_length=1, max_length=39, pattern=r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$")
+    repository: str = Field(min_length=1, max_length=100, pattern=r"^[A-Za-z0-9._-]+$")
+
+
+class EvidenceBatchRequest(BaseModel):
+    repositories: list[RepositoryReference] = Field(min_length=1, max_length=5)
+
+
+class RepositoryEvidenceBundle(BaseModel):
+    evidence: RepositoryEvidence
+    unavailable_sources: list[str]
+
+
+class EvidenceBatchItem(BaseModel):
+    owner: str
+    repository: str
+    status: str
+    evidence: RepositoryEvidence | None = None
+    unavailable_sources: list[str] = Field(default_factory=list)
+    error: str | None = None
+
+
+class EvidenceBatchResponse(BaseModel):
+    items: list[EvidenceBatchItem]
+    successful: int = Field(ge=0)
+    failed: int = Field(ge=0)

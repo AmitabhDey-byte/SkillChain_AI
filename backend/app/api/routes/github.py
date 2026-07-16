@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query
 
 from backend.app.integrations.github import GithubService, get_github_service
-from backend.app.schemas.github import GithubProfileResponse, RepositoryListResponse
+from backend.app.schemas.github import EvidenceBatchRequest, EvidenceBatchResponse, GithubProfileResponse, RepositoryEvidenceBundle, RepositoryListResponse
 
 
 router = APIRouter()
@@ -11,6 +11,7 @@ GithubUsername = Annotated[
     str,
     Path(min_length=1, max_length=39, pattern=r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$"),
 ]
+RepositoryName = Annotated[str, Path(min_length=1, max_length=100, pattern=r"^[A-Za-z0-9._-]+$")]
 
 
 @router.get("/users/{username}", response_model=GithubProfileResponse, summary="Get a public GitHub profile")
@@ -27,3 +28,19 @@ async def list_repositories(
 ) -> RepositoryListResponse:
     return await service.list_repositories(username, page, per_page)
 
+
+@router.get("/repos/{owner}/{repository}/evidence", response_model=RepositoryEvidenceBundle, summary="Collect repository assessment evidence")
+async def collect_repository_evidence(
+    owner: GithubUsername,
+    repository: RepositoryName,
+    service: GithubService = Depends(get_github_service),
+) -> RepositoryEvidenceBundle:
+    return await service.collect_evidence(owner, repository)
+
+
+@router.post("/evidence", response_model=EvidenceBatchResponse, summary="Collect evidence for selected repositories")
+async def collect_evidence_batch(
+    request: EvidenceBatchRequest,
+    service: GithubService = Depends(get_github_service),
+) -> EvidenceBatchResponse:
+    return await service.collect_evidence_batch(request.repositories)
