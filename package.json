@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "backend:dev": "python -m uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000",
-    "backend:test": "python -m unittest discover -s backend/tests -v"
+    "backend:test": "python -m unittest discover -s backend/tests -v",
+    "backend:migrate": "python -m alembic -c backend/alembic.ini upgrade head"
   },
   "dependencies": {
     "@stellar/freighter-api": "^6.0.1",

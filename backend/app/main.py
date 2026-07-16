@@ -11,6 +11,7 @@ from backend.app.core.config import Settings, get_settings
 from backend.app.core.errors import AppError, app_error_handler, unexpected_error_handler, validation_error_handler
 from backend.app.core.logging import configure_logging
 from backend.app.core.middleware import RequestContextMiddleware
+from backend.app.db.session import dispose_engine
 
 
 logger = logging.getLogger("skillchain.api")
@@ -24,6 +25,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         logger.info("api_started version=%s environment=%s", active_settings.app_version, active_settings.environment)
         yield
+        await dispose_engine()
         logger.info("api_stopped")
 
     application = FastAPI(
@@ -62,4 +64,3 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
 
 app = create_app()
-

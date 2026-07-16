@@ -19,6 +19,7 @@ The frontend runs at `http://localhost:5173` by default.
 Start the API in a second terminal:
 
 ```bash
+python -m pip install -e "backend[dev]"
 npm run backend:dev
 ```
 
@@ -46,6 +47,14 @@ The FastAPI service uses typed environment configuration, explicit CORS policy, 
 
 ```bash
 npm run backend:test
+```
+
+## Database
+
+PostgreSQL persistence uses SQLAlchemy 2 with async sessions and Alembic migrations. The core schema stores wallet-owned users, GitHub identities, wallet interaction proof, and structured user feedback. Models use UUID primary keys, explicit foreign-key deletion behavior, stable enum values, indexed lookup paths, timestamps, and database constraints.
+
+```bash
+npm run backend:migrate
 ```
 
 ## Wallet authentication

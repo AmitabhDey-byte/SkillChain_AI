@@ -1,0 +1,60 @@
+import unittest
+
+from sqlalchemy import create_engine, inspect, select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
+
+from backend.app.db.base import Base
+from backend.app.db.models import Feedback, GithubProfile, InteractionType, User, UserRole, WalletInteraction
+
+
+class DatabaseModelTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.engine = create_engine("sqlite+pysqlite:///:memory:")
+        Base.metadata.create_all(self.engine)
+
+    def tearDown(self) -> None:
+        self.engine.dispose()
+
+    def test_expected_tables_are_registered(self) -> None:
+        table_names = set(inspect(self.engine).get_table_names())
+        self.assertEqual(table_names, {"feedback", "github_profiles", "users", "wallet_interactions"})
+
+    def test_user_github_and_wallet_relationships(self) -> None:
+        user = User(
+            wallet_address="GABCDEFGHIJKLMNOPQRSTUVWXYZ234567ABCDEFGHIJKLMNOPQRSTUVWXYZ2",
+            role=UserRole.TALENT,
+            display_name="Aisha Kapoor",
+            headline="Stellar developer",
+            onboarding_complete=True,
+        )
+        user.github_profile = GithubProfile(
+            username="aisha-builds",
+            profile_url="https://github.com/aisha-builds",
+            public_repositories=12,
+        )
+        user.wallet_interactions.append(
+            WalletInteraction(
+                wallet_address=user.wallet_address,
+                interaction_type=InteractionType.WALLET_CONNECTED,
+                network="testnet",
+            )
+        )
+
+        with Session(self.engine) as session:
+            session.add(user)
+            session.commit()
+            stored_user = session.scalar(select(User).where(User.wallet_address == user.wallet_address))
+            self.assertIsNotNone(stored_user)
+            self.assertEqual(stored_user.github_profile.username, "aisha-builds")
+            self.assertEqual(len(stored_user.wallet_interactions), 1)
+
+    def test_feedback_rating_constraint(self) -> None:
+        with Session(self.engine) as session:
+            session.add(Feedback(rating=6, category="onboarding", message="Invalid rating"))
+            with self.assertRaises(IntegrityError):
+                session.commit()
+
+
+if __name__ == "__main__":
+    unittest.main()
