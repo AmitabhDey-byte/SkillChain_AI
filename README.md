@@ -68,6 +68,8 @@ The backend consumes GitHub REST API version `2026-03-10` through a typed server
 | `GET /api/v1/github/users/{username}` | Fetch a normalized public profile |
 | `GET /api/v1/github/users/{username}/repositories` | List owned public repositories |
 
+The dashboard repository picker consumes these endpoints directly. It includes profile sync, repository search, source and language filters, loading skeletons, retryable failures, archived-repository safeguards, a five-repository assessment limit, GitHub rate-limit visibility, and persistent local assessment drafts.
+
 ## Wallet authentication
 
 Wallet sign-in uses the official `@stellar/freighter-api` package. The application requests only the user's public address and transaction signatures, validates the active network, warns when the wallet is not on testnet, and stores only a local session preference. Private keys never leave Freighter.
