@@ -5,6 +5,7 @@ description = "Production API for SkillChain AI"
 requires-python = ">=3.12,<3.14"
 dependencies = [
   "fastapi>=0.115.0,<1.0.0",
+  "httpx>=0.28.0,<1.0.0",
   "sqlalchemy>=2.0.36,<3.0.0",
   "asyncpg>=0.30.0,<1.0.0",
   "alembic>=1.14.0,<2.0.0",
@@ -14,7 +15,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-  "httpx>=0.28.0,<1.0.0",
+  "respx>=0.22.0,<1.0.0",
 ]
 
 [build-system]

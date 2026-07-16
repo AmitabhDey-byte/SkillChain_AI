@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     gemini_model: str = "gemini-2.5-flash"
     github_client_id: str | None = None
     github_client_secret: SecretStr | None = None
+    github_token: SecretStr | None = None
+    github_api_version: str = "2026-03-10"
     stellar_network: Literal["testnet", "mainnet"] = "testnet"
     stellar_rpc_url: str = "https://soroban-testnet.stellar.org"
     stellar_contract_id: str | None = None
@@ -38,4 +40,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-

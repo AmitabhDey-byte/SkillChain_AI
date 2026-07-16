@@ -38,6 +38,8 @@ The API runs at `http://localhost:8000`, with interactive documentation availabl
 | `CORS_ORIGINS` | JSON array of permitted frontend origins |
 | `GITHUB_CLIENT_ID` | GitHub OAuth application identifier |
 | `GITHUB_CLIENT_SECRET` | Server-only GitHub OAuth secret |
+| `GITHUB_TOKEN` | Optional server token for higher public API limits |
+| `GITHUB_API_VERSION` | Pinned GitHub REST API version |
 | `STELLAR_RPC_URL` | Soroban JSON-RPC endpoint |
 | `STELLAR_CONTRACT_ID` | Deployed SkillChain contract identifier |
 
@@ -56,6 +58,15 @@ PostgreSQL persistence uses SQLAlchemy 2 with async sessions and Alembic migrati
 ```bash
 npm run backend:migrate
 ```
+
+## GitHub integration
+
+The backend consumes GitHub REST API version `2026-03-10` through a typed server-side client. Public profile and repository endpoints include bounded pagination, normalized response models, rate-limit metadata, timeouts, connection failure handling, and safe upstream errors. An optional server token increases GitHub API limits without exposing credentials to the browser.
+
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /api/v1/github/users/{username}` | Fetch a normalized public profile |
+| `GET /api/v1/github/users/{username}/repositories` | List owned public repositories |
 
 ## Wallet authentication
 
