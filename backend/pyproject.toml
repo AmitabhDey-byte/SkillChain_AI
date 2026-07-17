@@ -10,6 +10,7 @@ dependencies = [
   "asyncpg>=0.30.0,<1.0.0",
   "alembic>=1.14.0,<2.0.0",
   "pydantic-settings>=2.7.0,<3.0.0",
+  "stellar-sdk>=14.1.0,<15.0.0",
   "uvicorn[standard]>=0.34.0,<1.0.0",
 ]
 

@@ -39,6 +39,10 @@ npm run backend:dev
 | `GITHUB_CLIENT_SECRET` | Server-only GitHub OAuth secret |
 | `GITHUB_TOKEN` | Optional server token for higher public API limits |
 | `GITHUB_API_VERSION` | Pinned GitHub REST API version |
+| `STELLAR_RPC_URL` | Stellar RPC endpoint |
+| `STELLAR_CONTRACT_ID` | Deployed credential contract address |
+| `STELLAR_ISSUER_SECRET` | Server-only issuer signing key |
+| `CREDENTIAL_ATTESTATION_SECRET` | Server-only HMAC key protecting AI reports |
 | `STELLAR_RPC_URL` | Soroban JSON-RPC endpoint |
 | `STELLAR_CONTRACT_ID` | Deployed SkillChain contract identifier |
 
@@ -102,6 +106,15 @@ npm run contracts:build
 ```
 
 The optimized contract artifact is ready for Stellar testnet deployment. Deployment and interface instructions are available in `contracts/README.md`.
+
+The backend exposes production issuance and verification boundaries:
+
+| Endpoint | Purpose |
+| --- | --- |
+| `POST /api/v1/credentials` | Validate the signed AI report and issue its wallet-owned credential |
+| `GET /api/v1/credentials/{credential_id}/verify` | Verify credential ownership and active status against Stellar |
+
+Assessment responses include a server-generated HMAC attestation. Issuance rejects modified scores or reports before preparing a Stellar transaction. The issuer secret remains server-only, and public verification uses a read-only contract simulation.
 
 ## User onboarding
 

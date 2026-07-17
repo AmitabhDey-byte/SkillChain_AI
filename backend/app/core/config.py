@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     stellar_network: Literal["testnet", "mainnet"] = "testnet"
     stellar_rpc_url: str = "https://soroban-testnet.stellar.org"
     stellar_contract_id: str | None = None
+    stellar_issuer_secret: SecretStr | None = None
+    stellar_transaction_timeout_seconds: int = 45
+    credential_attestation_secret: SecretStr | None = None
 
     model_config = SettingsConfigDict(
         env_file=(".env", ".env.local"),

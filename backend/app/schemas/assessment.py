@@ -114,4 +114,4 @@ class AssessmentPreviewResponse(BaseModel):
     rubric_version: str
     assessment: SkillAssessment
     usage: GeminiUsage
-
+    attestation: str = Field(pattern=r"^[a-f0-9]{64}$")

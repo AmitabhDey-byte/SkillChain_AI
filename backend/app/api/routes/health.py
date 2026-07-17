@@ -21,11 +21,18 @@ async def live(settings: Settings = Depends(get_settings)) -> LiveResponse:
 
 @router.get("/ready", response_model=ReadyResponse, summary="Check service readiness")
 async def ready(settings: Settings = Depends(get_settings)) -> ReadyResponse:
+    stellar_configured = bool(
+        settings.stellar_rpc_url
+        and settings.stellar_contract_id
+        and settings.stellar_issuer_secret
+        and settings.stellar_issuer_secret.get_secret_value()
+        and settings.credential_attestation_secret
+        and len(settings.credential_attestation_secret.get_secret_value()) >= 32
+    )
     dependencies = DependencyStatus(
         database="configured" if settings.database_url.get_secret_value() else "missing",
         gemini="configured" if settings.gemini_api_key and settings.gemini_api_key.get_secret_value() else "pending",
-        stellar="configured" if settings.stellar_rpc_url else "missing",
+        stellar="configured" if stellar_configured else "missing",
     )
     status = "ready" if dependencies.database == "configured" and dependencies.stellar == "configured" else "degraded"
     return ReadyResponse(status=status, environment=settings.environment, dependencies=dependencies)
-

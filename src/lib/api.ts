@@ -210,6 +210,7 @@ export type AssessmentPreviewResponse = {
   model: string
   rubric_version: string
   assessment: SkillAssessment
+  attestation: string
   usage: {
     prompt_tokens: number
     output_tokens: number
@@ -246,4 +247,47 @@ export function previewSkillAssessment(githubUsername: string, repositories: Rep
     body: { github_username: githubUsername, repositories },
     signal,
   })
+}
+
+export type CredentialIssueResponse = {
+  credential_id: string
+  report_hash: string
+  owner: string
+  score: number
+  level: SkillLevel
+  transaction_hash: string
+  ledger_sequence: number | null
+  contract_id: string
+  network: string
+}
+
+export type CredentialVerificationResponse = {
+  credential_id: string
+  owner: string
+  active: boolean
+  contract_id: string
+  network: string
+}
+
+export function issueCredential(walletAddress: string, result: AssessmentRunResult, signal?: AbortSignal) {
+  return apiRequest<CredentialIssueResponse>('/credentials', {
+    method: 'POST',
+    body: {
+      wallet_address: walletAddress,
+      model: result.model,
+      rubric_version: result.rubric_version,
+      repository_ids: result.repository_ids,
+      assessment: result.assessment,
+      attestation: result.attestation,
+    },
+    signal,
+  })
+}
+
+export function verifyCredential(credentialId: string, owner: string, signal?: AbortSignal) {
+  const query = new URLSearchParams({ owner })
+  return apiRequest<CredentialVerificationResponse>(
+    `/credentials/${encodeURIComponent(credentialId)}/verify?${query.toString()}`,
+    { signal },
+  )
 }

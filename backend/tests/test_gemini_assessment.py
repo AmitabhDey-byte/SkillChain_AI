@@ -132,13 +132,14 @@ class GeminiAssessmentServiceTests(unittest.IsolatedAsyncioTestCase):
             return httpx.Response(200, json=gemini_response())
 
         async with httpx.AsyncClient(base_url="https://generativelanguage.googleapis.com", transport=httpx.MockTransport(handler)) as client:
-            result = await GeminiAssessmentService(client, "test-key", "gemini-2.5-flash").assess(
+            result = await GeminiAssessmentService(client, "test-key", "gemini-2.5-flash", "attestation-key").assess(
                 AssessmentPreviewRequest.model_validate(evidence_request())
             )
 
         self.assertEqual(result.assessment.overall_score, 73)
         self.assertEqual(result.rubric_version, "skillchain-v1")
         self.assertEqual(result.usage.total_tokens, 1560)
+        self.assertEqual(len(result.attestation), 64)
 
     async def test_retryable_response_is_retried(self) -> None:
         attempts = 0
@@ -151,7 +152,13 @@ class GeminiAssessmentServiceTests(unittest.IsolatedAsyncioTestCase):
             return httpx.Response(200, json=gemini_response())
 
         async with httpx.AsyncClient(base_url="https://generativelanguage.googleapis.com", transport=httpx.MockTransport(handler)) as client:
-            await GeminiAssessmentService(client, "test-key", "gemini-2.5-flash", retry_delays=(0,)).assess(
+            await GeminiAssessmentService(
+                client,
+                "test-key",
+                "gemini-2.5-flash",
+                "attestation-key",
+                retry_delays=(0,),
+            ).assess(
                 AssessmentPreviewRequest.model_validate(evidence_request())
             )
         self.assertEqual(attempts, 2)
@@ -161,7 +168,7 @@ class GeminiAssessmentServiceTests(unittest.IsolatedAsyncioTestCase):
         transport = httpx.MockTransport(lambda _: httpx.Response(200, json=response))
         async with httpx.AsyncClient(base_url="https://generativelanguage.googleapis.com", transport=transport) as client:
             with self.assertRaises(AppError) as context:
-                await GeminiAssessmentService(client, "test-key", "gemini-2.5-flash").assess(
+                await GeminiAssessmentService(client, "test-key", "gemini-2.5-flash", "attestation-key").assess(
                     AssessmentPreviewRequest.model_validate(evidence_request())
                 )
         self.assertEqual(context.exception.code, "gemini_invalid_response")
@@ -170,7 +177,7 @@ class GeminiAssessmentServiceTests(unittest.IsolatedAsyncioTestCase):
         transport = httpx.MockTransport(lambda _: httpx.Response(200, json={"promptFeedback": {"blockReason": "SAFETY"}}))
         async with httpx.AsyncClient(base_url="https://generativelanguage.googleapis.com", transport=transport) as client:
             with self.assertRaises(AppError) as context:
-                await GeminiAssessmentService(client, "test-key", "gemini-2.5-flash").assess(
+                await GeminiAssessmentService(client, "test-key", "gemini-2.5-flash", "attestation-key").assess(
                     AssessmentPreviewRequest.model_validate(evidence_request())
                 )
         self.assertEqual(context.exception.status_code, 422)
@@ -183,6 +190,7 @@ class FakeAssessmentService:
             rubric_version="skillchain-v1",
             assessment=assessment_payload(),
             usage={"prompt_tokens": 100, "output_tokens": 100, "total_tokens": 200},
+            attestation="a" * 64,
         )
 
 

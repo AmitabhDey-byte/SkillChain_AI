@@ -7,6 +7,7 @@ import httpx
 from fastapi import Depends
 from pydantic import ValidationError
 
+from backend.app.core.attestation import sign_assessment
 from backend.app.core.config import Settings, get_settings
 from backend.app.core.errors import AppError
 from backend.app.schemas.assessment import AssessmentPreviewRequest, AssessmentPreviewResponse, GeminiUsage, SkillAssessment, SkillLevel
@@ -26,10 +27,18 @@ SYSTEM_INSTRUCTION = """You are SkillChain's technical portfolio evaluator. Anal
 
 
 class GeminiAssessmentService:
-    def __init__(self, client: httpx.AsyncClient, api_key: str, model: str, retry_delays: tuple[float, ...] = (0.3, 1.0)) -> None:
+    def __init__(
+        self,
+        client: httpx.AsyncClient,
+        api_key: str,
+        model: str,
+        attestation_secret: str,
+        retry_delays: tuple[float, ...] = (0.3, 1.0),
+    ) -> None:
         self.client = client
         self.api_key = api_key
         self.model = model
+        self.attestation_secret = attestation_secret
         self.retry_delays = retry_delays
 
     async def assess(self, request: AssessmentPreviewRequest) -> AssessmentPreviewResponse:
@@ -54,7 +63,20 @@ class GeminiAssessmentService:
             output_tokens=usage_data.get("candidatesTokenCount", 0),
             total_tokens=usage_data.get("totalTokenCount", 0),
         )
-        return AssessmentPreviewResponse(model=self.model, rubric_version=RUBRIC_VERSION, assessment=normalized_assessment, usage=usage)
+        attestation = sign_assessment(
+            self.model,
+            RUBRIC_VERSION,
+            [repository.github_repository_id for repository in request.repositories],
+            normalized_assessment.model_dump(mode="json"),
+            self.attestation_secret,
+        )
+        return AssessmentPreviewResponse(
+            model=self.model,
+            rubric_version=RUBRIC_VERSION,
+            assessment=normalized_assessment,
+            usage=usage,
+            attestation=attestation,
+        )
 
     async def _generate(self, payload: dict[str, Any]) -> httpx.Response:
         attempts = len(self.retry_delays) + 1
@@ -159,7 +181,17 @@ class GeminiAssessmentService:
 async def get_gemini_assessment_service(settings: Settings = Depends(get_settings)) -> AsyncIterator[GeminiAssessmentService]:
     if not settings.gemini_api_key or not settings.gemini_api_key.get_secret_value():
         raise AppError("Gemini is not configured on this server.", "gemini_not_configured", 503)
+    if (
+        not settings.credential_attestation_secret
+        or len(settings.credential_attestation_secret.get_secret_value()) < 32
+    ):
+        raise AppError("Credential attestations are not configured on this server.", "credential_attestation_not_configured", 503)
     timeout = httpx.Timeout(settings.gemini_timeout_seconds, connect=10)
     limits = httpx.Limits(max_connections=20, max_keepalive_connections=10)
     async with httpx.AsyncClient(base_url="https://generativelanguage.googleapis.com", timeout=timeout, limits=limits) as client:
-        yield GeminiAssessmentService(client, settings.gemini_api_key.get_secret_value(), settings.gemini_model)
+        yield GeminiAssessmentService(
+            client,
+            settings.gemini_api_key.get_secret_value(),
+            settings.gemini_model,
+            settings.credential_attestation_secret.get_secret_value(),
+        )

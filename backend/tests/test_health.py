@@ -16,6 +16,9 @@ class HealthEndpointTests(unittest.TestCase):
             database_url=SecretStr("postgresql+asyncpg://test:test@localhost/skillchain_test"),
             gemini_api_key=None,
             stellar_rpc_url="https://soroban-testnet.stellar.org",
+            stellar_contract_id="CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2KM",
+            stellar_issuer_secret=SecretStr("SAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
+            credential_attestation_secret=SecretStr("a" * 32),
         )
         cls.client = TestClient(create_app(settings))
 
