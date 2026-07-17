@@ -16,6 +16,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Dashboard } from './components/Dashboard'
 import { OnboardingFlow } from './components/OnboardingFlow'
 import { PublicVerification } from './components/PublicVerification'
+import { RecruiterPortal } from './components/RecruiterPortal'
 import { WalletModal } from './components/WalletModal'
 import { useWallet } from './hooks/useWallet'
 import { hasCompletedOnboarding, loadOnboardingDraft, type OnboardingProfile } from './lib/onboarding'
@@ -94,6 +95,8 @@ function App() {
     <>
       {location.pathname === '/verify' ? (
         <PublicVerification />
+      ) : location.pathname === '/recruiters' ? (
+        <RecruiterPortal />
       ) : location.pathname === '/dashboard' ? (
         onboardingComplete ? (
           <Dashboard profile={profile} connection={wallet.connection} onOpenWallet={() => setWalletModalOpen(true)} onDisconnect={disconnectAndExit} />
@@ -218,7 +221,7 @@ function App() {
         </div>
         <div>
           <p>Verify candidate credentials instantly and spend your interview time on what matters: potential, fit, and impact.</p>
-          <button className="button button--light">Explore recruiter tools <ArrowRight size={18} /></button>
+          <button className="button button--light" type="button" onClick={() => navigate('/recruiters')}>Explore recruiter tools <ArrowRight size={18} /></button>
         </div>
       </section>
       </main>

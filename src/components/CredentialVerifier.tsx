@@ -1,5 +1,5 @@
 import { ArrowRight, BadgeCheck, CircleAlert, Download, ExternalLink, LoaderCircle, Search, Wallet } from 'lucide-react'
-import { type FormEvent, useEffect, useRef, useState } from 'react'
+import { type FormEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { ApiError, verifyCredential, type CredentialVerificationResponse } from '../lib/api'
 import { buildContractExplorerUrl, createVerificationReceipt, downloadJson } from '../lib/credentialSharing'
 import { shortenAddress } from '../lib/wallet'
@@ -8,12 +8,14 @@ type CredentialVerifierProps = {
   initialCredentialId?: string
   initialOwner?: string
   autoVerify?: boolean
+  onVerified?: (result: CredentialVerificationResponse) => void
 }
 
 export function CredentialVerifier({
   initialCredentialId = '',
   initialOwner = '',
   autoVerify = false,
+  onVerified,
 }: CredentialVerifierProps) {
   const [credentialId, setCredentialId] = useState(initialCredentialId)
   const [owner, setOwner] = useState(initialOwner)
@@ -23,7 +25,7 @@ export function CredentialVerifier({
   const [verifiedAt, setVerifiedAt] = useState('')
   const autoVerifyStarted = useRef(false)
 
-  const runVerification = async (candidateCredentialId: string, candidateOwner: string) => {
+  const runVerification = useCallback(async (candidateCredentialId: string, candidateOwner: string) => {
     if (!candidateCredentialId.trim() || !candidateOwner.trim()) return
     setStatus('loading')
     setMessage('')
@@ -34,18 +36,19 @@ export function CredentialVerifier({
       setResult(verification)
       setVerifiedAt(new Date().toISOString())
       setStatus(verification.active ? 'verified' : 'inactive')
+      if (verification.active) onVerified?.(verification)
     } catch (caughtError) {
       const apiError = caughtError instanceof ApiError ? caughtError : null
       setMessage(caughtError instanceof Error ? caughtError.message : 'Credential verification could not be completed.')
       setStatus(apiError?.status === 404 ? 'inactive' : 'error')
     }
-  }
+  }, [onVerified])
 
   useEffect(() => {
     if (!autoVerify || autoVerifyStarted.current || !initialCredentialId || !initialOwner) return
     autoVerifyStarted.current = true
     void runVerification(initialCredentialId, initialOwner)
-  }, [autoVerify, initialCredentialId, initialOwner])
+  }, [autoVerify, initialCredentialId, initialOwner, runVerification])
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
