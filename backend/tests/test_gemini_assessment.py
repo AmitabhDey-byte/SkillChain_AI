@@ -127,8 +127,11 @@ class GeminiAssessmentServiceTests(unittest.IsolatedAsyncioTestCase):
             payload = json.loads(request.content)
             self.assertEqual(payload["generationConfig"]["responseMimeType"], "application/json")
             self.assertIn("properties", payload["generationConfig"]["responseJsonSchema"])
-            self.assertNotIn("minLength", json.dumps(payload["generationConfig"]["responseJsonSchema"]))
+            compact_schema = json.dumps(payload["generationConfig"]["responseJsonSchema"])
+            for removed_constraint in ("minLength", "maxItems", "minimum", "maximum", "format", "title"):
+                self.assertNotIn(removed_constraint, compact_schema)
             self.assertIn("untrusted data", payload["systemInstruction"]["parts"][0]["text"])
+            self.assertIn("integer from 0 to 100", payload["contents"][0]["parts"][0]["text"])
             return httpx.Response(200, json=gemini_response())
 
         async with httpx.AsyncClient(base_url="https://generativelanguage.googleapis.com", transport=httpx.MockTransport(handler)) as client:
@@ -172,6 +175,33 @@ class GeminiAssessmentServiceTests(unittest.IsolatedAsyncioTestCase):
                     AssessmentPreviewRequest.model_validate(evidence_request())
                 )
         self.assertEqual(context.exception.code, "gemini_invalid_response")
+
+    async def test_invalid_structure_is_repaired_once(self) -> None:
+        attempts = 0
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            nonlocal attempts
+            attempts += 1
+            if attempts == 1:
+                invalid = assessment_payload()
+                invalid["skills"] = []
+                return httpx.Response(200, json=gemini_response(invalid))
+            repair_payload = json.loads(request.content)
+            self.assertEqual(repair_payload["generationConfig"]["temperature"], 0.05)
+            self.assertIn("validation_errors", repair_payload["contents"][-1]["parts"][0]["text"])
+            return httpx.Response(200, json=gemini_response())
+
+        async with httpx.AsyncClient(base_url="https://generativelanguage.googleapis.com", transport=httpx.MockTransport(handler)) as client:
+            result = await GeminiAssessmentService(
+                client,
+                "test-key",
+                "gemini-2.5-flash",
+                "attestation-key",
+                retry_delays=(),
+            ).assess(AssessmentPreviewRequest.model_validate(evidence_request()))
+
+        self.assertEqual(attempts, 2)
+        self.assertEqual(result.assessment.overall_score, 73)
 
     async def test_safety_block_becomes_domain_error(self) -> None:
         transport = httpx.MockTransport(lambda _: httpx.Response(200, json={"promptFeedback": {"blockReason": "SAFETY"}}))

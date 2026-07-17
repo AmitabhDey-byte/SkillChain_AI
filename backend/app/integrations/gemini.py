@@ -52,9 +52,40 @@ class GeminiAssessmentService:
                 "maxOutputTokens": 8192,
             },
         }
-        response = await self._generate(payload)
-        response_data = response.json()
-        assessment = self._parse_assessment(response_data)
+        response_data: dict[str, Any] = {}
+        assessment: SkillAssessment | None = None
+
+        for structure_attempt in range(2):
+            response = await self._generate(payload)
+            response_data = response.json()
+            try:
+                assessment = self._parse_assessment(response_data)
+                break
+            except AppError as error:
+                if error.code != "gemini_invalid_response" or structure_attempt == 1:
+                    raise
+                payload["contents"].append(
+                    {
+                        "role": "user",
+                        "parts": [
+                            {
+                                "text": json.dumps(
+                                    {
+                                        "task": "Regenerate the complete assessment JSON.",
+                                        "correction": "The previous response failed server validation.",
+                                        "validation_errors": error.details,
+                                    },
+                                    separators=(",", ":"),
+                                )
+                            }
+                        ],
+                    }
+                )
+                payload["generationConfig"]["temperature"] = 0.05
+
+        if assessment is None:
+            raise AppError("Gemini did not return a valid assessment.", "gemini_invalid_response", 502)
+
         weighted_score = self._weighted_score(assessment)
         normalized_assessment = assessment.model_copy(update={"overall_score": weighted_score, "level": self._level_for_score(weighted_score)})
         usage_data = response_data.get("usageMetadata") or {}
@@ -126,8 +157,23 @@ class GeminiAssessmentService:
 
         try:
             return SkillAssessment.model_validate_json(text)
-        except (ValidationError, json.JSONDecodeError) as error:
-            raise AppError("Gemini returned an invalid assessment structure.", "gemini_invalid_response", 502) from error
+        except ValidationError as error:
+            details = [
+                {
+                    "field": ".".join(str(part) for part in issue["loc"]),
+                    "message": issue["msg"],
+                    "type": issue["type"],
+                }
+                for issue in error.errors(include_input=False)[:12]
+            ]
+            raise AppError("Gemini returned an invalid assessment structure.", "gemini_invalid_response", 502, details) from error
+        except json.JSONDecodeError as error:
+            raise AppError(
+                "Gemini returned an invalid assessment structure.",
+                "gemini_invalid_response",
+                502,
+                [{"field": "response", "message": "Response was not valid JSON.", "type": "json_invalid"}],
+            ) from error
 
     @staticmethod
     def _weighted_score(assessment: SkillAssessment) -> int:
@@ -146,11 +192,25 @@ class GeminiAssessmentService:
 
     @staticmethod
     def _response_schema() -> dict[str, Any]:
-        unsupported = {"minLength", "maxLength"}
+        serving_constraints = {
+            "default",
+            "description",
+            "examples",
+            "exclusiveMaximum",
+            "exclusiveMinimum",
+            "format",
+            "maxItems",
+            "maxLength",
+            "maximum",
+            "minItems",
+            "minLength",
+            "minimum",
+            "title",
+        }
 
         def clean(value: Any) -> Any:
             if isinstance(value, dict):
-                return {key: clean(item) for key, item in value.items() if key not in unsupported}
+                return {key: clean(item) for key, item in value.items() if key not in serving_constraints}
             if isinstance(value, list):
                 return [clean(item) for item in value]
             return value
@@ -172,6 +232,15 @@ class GeminiAssessmentService:
                     "Identify technologies only when supported by languages, topics, documentation, or commits.",
                     "Keep recommendations actionable and proportional to the demonstrated level.",
                 ],
+                "field_contract": {
+                    "dimension_scores": "Every dimension score must be an integer from 0 to 100.",
+                    "overall_score": "Return an integer from 0 to 100. The server will recompute it from dimension weights.",
+                    "confidence": "Overall and skill confidence values must be decimals from 0 to 1.",
+                    "complexity_score": "Every repository complexity score must be an integer from 0 to 100.",
+                    "skill_level": "Use exactly one of beginner, intermediate, advanced, or expert.",
+                    "evidence": "Keep each evidence list between one and five concise items.",
+                    "skills": "Return between one and fifteen evidence-supported skills.",
+                },
                 "portfolio_evidence": evidence["repositories"],
             },
             separators=(",", ":"),
