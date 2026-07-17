@@ -11,7 +11,10 @@
     "preview": "vite preview",
     "backend:dev": "python -m uvicorn backend.app.main:app --reload --reload-dir backend --host 0.0.0.0 --port 8000",
     "backend:test": "python -m unittest discover -s backend/tests -v",
-    "backend:migrate": "python -m alembic -c backend/alembic.ini upgrade head"
+    "backend:migrate": "python -m alembic -c backend/alembic.ini upgrade head",
+    "contracts:test": "cargo test --manifest-path contracts/Cargo.toml",
+    "contracts:build": "stellar contract build --manifest-path contracts/Cargo.toml --package skillchain-credential --optimize",
+    "contracts:deploy:testnet": "powershell -ExecutionPolicy Bypass -File contracts/scripts/deploy-testnet.ps1"
   },
   "dependencies": {
     "@stellar/freighter-api": "^6.0.1",
