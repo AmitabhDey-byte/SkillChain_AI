@@ -26,6 +26,7 @@ import {
 import { useState } from 'react'
 import { RepositorySelector } from './RepositorySelector'
 import { AssessmentExperience } from './AssessmentExperience'
+import { DashboardSection, type DashboardSectionName } from './DashboardSection'
 import { loadAssessmentRepositories, saveAssessmentRepositories } from '../lib/assessmentDraft'
 import { clearAssessmentResult, loadAssessmentResult } from '../lib/assessmentResult'
 import type { AssessmentRunResult, GithubRepository } from '../lib/api'
@@ -40,11 +41,11 @@ type DashboardProps = {
 }
 
 const navItems = [
-  { label: 'Overview', icon: Home, active: true },
+  { label: 'Overview', icon: Home },
   { label: 'Assessments', icon: Sparkles, badge: '1' },
   { label: 'Credentials', icon: BadgeCheck },
   { label: 'Verification', icon: Search },
-]
+] satisfies Array<{ label: DashboardSectionName; icon: typeof Home; badge?: string }>
 
 const journeySteps = [
   { label: 'Wallet connected', complete: true },
@@ -55,6 +56,7 @@ const journeySteps = [
 
 export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: DashboardProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState<DashboardSectionName>('Overview')
   const [selectorOpen, setSelectorOpen] = useState(false)
   const [assessmentOpen, setAssessmentOpen] = useState(false)
   const [assessmentReady, setAssessmentReady] = useState(false)
@@ -84,6 +86,11 @@ export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: D
 
   const currentJourneySteps = journeySteps.map((item, index) => index === 2 && assessmentResult ? { ...item, complete: true } : item)
 
+  const selectSection = (section: DashboardSectionName) => {
+    setActiveSection(section)
+    setSidebarOpen(false)
+  }
+
   return (
     <main className="dashboard-layout">
       <aside className={sidebarOpen ? 'dashboard-sidebar dashboard-sidebar--open' : 'dashboard-sidebar'}>
@@ -91,12 +98,12 @@ export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: D
         <button className="sidebar-close" type="button" aria-label="Close navigation" onClick={() => setSidebarOpen(false)}><X size={19} /></button>
         <nav className="dashboard-nav" aria-label="Dashboard navigation">
           <p>WORKSPACE</p>
-          {navItems.map(({ label, icon: Icon, active, badge }) => (
-            <button className={active ? 'active' : ''} type="button" key={label}><Icon size={17} /><span>{label}</span>{badge && <small>{badge}</small>}</button>
+          {navItems.map(({ label, icon: Icon, badge }) => (
+            <button className={activeSection === label ? 'active' : ''} type="button" key={label} onClick={() => selectSection(label)}><Icon size={17} /><span>{label}</span>{badge && <small>{assessmentResult ? '1' : badge}</small>}</button>
           ))}
           <p>ACCOUNT</p>
-          <button type="button"><CircleUserRound size={17} /><span>Public profile</span></button>
-          <button type="button"><Settings size={17} /><span>Settings</span></button>
+          <button className={activeSection === 'Public profile' ? 'active' : ''} type="button" onClick={() => selectSection('Public profile')}><CircleUserRound size={17} /><span>Public profile</span></button>
+          <button className={activeSection === 'Settings' ? 'active' : ''} type="button" onClick={() => selectSection('Settings')}><Settings size={17} /><span>Settings</span></button>
         </nav>
         <div className="sidebar-wallet">
           <div><span className={connection && isTestnet(connection.network) ? 'wallet-dot' : 'wallet-dot wallet-dot--warning'} /><small>{connection?.network || 'Wallet offline'}</small></div>
@@ -112,15 +119,17 @@ export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: D
         <header className="dashboard-topbar">
           <div>
             <button className="dashboard-menu" type="button" aria-label="Open navigation" onClick={() => setSidebarOpen(true)}><Menu size={20} /></button>
-            <span className="dashboard-breadcrumb">Workspace <ChevronRight size={13} /> Overview</span>
+            <span className="dashboard-breadcrumb">Workspace <ChevronRight size={13} /> {activeSection}</span>
           </div>
           <div className="topbar-actions">
-            <button type="button" aria-label="Notifications"><Bell size={18} /><span /></button>
-            <button className="profile-chip" type="button"><span>{profile.displayName.slice(0, 2).toUpperCase() || 'SC'}</span><div><strong>{profile.displayName || 'SkillChain user'}</strong><small>{profile.role || 'Member'}</small></div></button>
+            <button type="button" aria-label="Open assessment notifications" onClick={() => selectSection('Assessments')}><Bell size={18} /><span /></button>
+            <button className="profile-chip" type="button" onClick={() => selectSection('Public profile')}><span>{profile.displayName.slice(0, 2).toUpperCase() || 'SC'}</span><div><strong>{profile.displayName || 'SkillChain user'}</strong><small>{profile.role || 'Member'}</small></div></button>
           </div>
         </header>
 
         <div className="dashboard-content">
+          {activeSection === 'Overview' ? (
+          <>
           <div className="dashboard-welcome">
             <div><p className="overline">YOUR SKILL WORKSPACE</p><h1>Welcome back, {firstName}.</h1><p>Complete your first assessment to turn public work into verified proof.</p></div>
             <button className="button button--primary" type="button" onClick={() => setSelectorOpen(true)}><Plus size={17} /> New assessment</button>
@@ -150,17 +159,17 @@ export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: D
             </article>
 
             <article className="dashboard-card profile-summary">
-              <div className="card-heading"><div><p className="overline">PUBLIC IDENTITY</p><h2>Your profile</h2></div><button type="button"><Settings size={16} /></button></div>
+              <div className="card-heading"><div><p className="overline">PUBLIC IDENTITY</p><h2>Your profile</h2></div><button type="button" onClick={() => selectSection('Settings')}><Settings size={16} /></button></div>
               <div className="profile-summary__identity"><span>{profile.displayName.slice(0, 2).toUpperCase() || 'SC'}</span><div><strong>{profile.displayName || 'SkillChain user'}</strong><small>{profile.headline || 'Verified professional'}</small></div></div>
               <dl><div><dt>Role</dt><dd>{profile.role || 'Member'}</dd></div><div><dt>Location</dt><dd>{profile.location || 'Not specified'}</dd></div><div><dt>Profile status</dt><dd className="status-value"><span /> Ready</dd></div></dl>
-              <button className="card-action card-action--muted" type="button">View public profile <ArrowRight size={16} /></button>
+              <button className="card-action card-action--muted" type="button" onClick={() => selectSection('Public profile')}>View public profile <ArrowRight size={16} /></button>
             </article>
 
             <article className="dashboard-card source-card">
               <div className="card-heading"><div><p className="overline">EVIDENCE SOURCES</p><h2>Connected accounts</h2></div><span className="connected-label"><span /> LIVE</span></div>
               <div className="source-account"><span className="source-logo"><GitBranch size={21} /></span><div><strong>GitHub</strong><small>@{profile.githubUsername || 'not-linked'}</small></div><a href={githubUrl} target="_blank" rel="noreferrer">View <ArrowRight size={14} /></a></div>
               <div className="source-details"><span><Code2 size={15} /> Public repositories</span><span><FileCheck2 size={15} /> Contribution history</span></div>
-              <button className="card-action card-action--muted" type="button">Manage sources <ArrowRight size={16} /></button>
+              <button className="card-action card-action--muted" type="button" onClick={() => setSelectorOpen(true)}>Manage sources <ArrowRight size={16} /></button>
             </article>
 
             <article className="dashboard-card activity-card">
@@ -168,6 +177,19 @@ export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: D
               <div className="activity-list"><div><span><Wallet size={16} /></span><div><strong>Stellar wallet connected</strong><small>Identity ownership established</small></div><time>Today</time></div><div><span><GitBranch size={16} /></span><div><strong>GitHub profile added</strong><small>@{profile.githubUsername || 'not-linked'}</small></div><time>Today</time></div><div><span><PanelLeftClose size={16} /></span><div><strong>Profile created</strong><small>Your SkillChain workspace is live</small></div><time>Today</time></div></div>
             </article>
           </div>
+          </>
+          ) : (
+            <DashboardSection
+              section={activeSection}
+              profile={profile}
+              connection={connection}
+              assessmentResult={assessmentResult}
+              repositories={selectedRepositories}
+              onNewAssessment={() => setSelectorOpen(true)}
+              onViewAssessment={() => assessmentResult ? setAssessmentOpen(true) : setSelectorOpen(true)}
+              onOpenWallet={onOpenWallet}
+            />
+          )}
         </div>
       </section>
       {selectorOpen && (

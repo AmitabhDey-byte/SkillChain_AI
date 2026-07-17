@@ -10,20 +10,19 @@ The application currently includes the React and TypeScript frontend, responsive
 
 ```bash
 npm install
+python -m pip install -e "backend[dev]"
 cp .env.example .env
 npm run dev
 ```
 
-The frontend runs at `http://localhost:5173` by default.
+The combined development command starts the frontend at `http://localhost:5173` and the API at `http://localhost:8000`. Interactive API documentation is available at `http://localhost:8000/docs` outside production.
 
-Start the API in a second terminal:
+To run either service separately:
 
 ```bash
-python -m pip install -e "backend[dev]"
+npm run frontend:dev
 npm run backend:dev
 ```
-
-The API runs at `http://localhost:8000`, with interactive documentation available at `http://localhost:8000/docs` outside production.
 
 ## Environment variables
 
