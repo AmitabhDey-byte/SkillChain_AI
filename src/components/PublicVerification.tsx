@@ -1,9 +1,13 @@
 import { ArrowLeft, BadgeCheck, Blocks, ShieldCheck } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CredentialVerifier } from './CredentialVerifier'
 
 export function PublicVerification() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const credentialId = searchParams.get('credential') || ''
+  const owner = searchParams.get('owner') || ''
+  const hasSharedCredential = credentialId.length === 64 && owner.length === 56
 
   return (
     <main className="public-verification-page">
@@ -20,7 +24,7 @@ export function PublicVerification() {
         </div>
         <div className="public-verification-panel">
           <div><BadgeCheck size={18} /><span><strong>Cryptographic proof</strong><small>No account or wallet connection required</small></span></div>
-          <CredentialVerifier />
+          <CredentialVerifier initialCredentialId={credentialId} initialOwner={owner} autoVerify={hasSharedCredential} />
         </div>
       </section>
     </main>

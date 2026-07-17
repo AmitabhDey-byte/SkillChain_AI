@@ -5,6 +5,7 @@ import {
   CircleAlert,
   Clipboard,
   Code2,
+  Download,
   ExternalLink,
   FileCheck2,
   GitBranch,
@@ -12,6 +13,7 @@ import {
   LockKeyhole,
   LoaderCircle,
   ShieldCheck,
+  Share2,
   Sparkles,
   Wallet,
 } from 'lucide-react'
@@ -22,6 +24,7 @@ import {
   type CredentialIssueResponse,
   type GithubRepository,
 } from '../lib/api'
+import { buildVerificationUrl, createCredentialPassport, downloadJson } from '../lib/credentialSharing'
 import type { OnboardingProfile } from '../lib/onboarding'
 import { shortenAddress, type WalletConnection } from '../lib/wallet'
 import { CredentialVerifier } from './CredentialVerifier'
@@ -76,6 +79,7 @@ function CredentialsSection({
   const [status, setStatus] = useState<'idle' | 'issuing' | 'error'>('idle')
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [shared, setShared] = useState(false)
   const legacyAssessment = assessmentResult && !assessmentResult.attestation
 
   const issue = async () => {
@@ -100,6 +104,35 @@ function CredentialsSection({
     window.setTimeout(() => setCopied(false), 1800)
   }
 
+  const shareCredential = async () => {
+    if (!credential) return
+    const url = buildVerificationUrl(credential.credential_id, credential.owner)
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: 'SkillChain verified credential',
+          text: `Verify my ${credential.level} technical credential on Stellar.`,
+          url,
+        })
+      } else {
+        await navigator.clipboard.writeText(url)
+      }
+    } catch (caughtError) {
+      if (caughtError instanceof DOMException && caughtError.name === 'AbortError') return
+      await navigator.clipboard.writeText(url)
+    }
+    setShared(true)
+    window.setTimeout(() => setShared(false), 1800)
+  }
+
+  const downloadPassport = () => {
+    if (!credential) return
+    downloadJson(
+      `skillchain-passport-${credential.credential_id.slice(0, 12)}.json`,
+      createCredentialPassport(credential),
+    )
+  }
+
   if (credential) {
     const explorerUrl = `https://stellar.expert/explorer/${credential.network}/tx/${credential.transaction_hash}`
     return (
@@ -108,7 +141,12 @@ function CredentialsSection({
         <article className="credential-issued-card">
           <div className="credential-issued-header"><span><BadgeCheck size={31} /></span><div><p className="overline">ON-CHAIN CREDENTIAL ACTIVE</p><h2>{credential.level} technical credential</h2><p>Issued to {shortenAddress(credential.owner)} with a verified score of {credential.score}/100.</p></div><strong>{credential.score}</strong></div>
           <dl><div><dt>Credential ID</dt><dd>{credential.credential_id}</dd></div><div><dt>Transaction</dt><dd>{credential.transaction_hash}</dd></div><div><dt>Network</dt><dd>{credential.network}</dd></div><div><dt>Ledger</dt><dd>{credential.ledger_sequence || 'Confirmed'}</dd></div></dl>
-          <div className="credential-issued-actions"><button className="button button--workspace" type="button" onClick={() => void copyCredentialId()}><Clipboard size={15} /> {copied ? 'Copied' : 'Copy credential ID'}</button><a className="button button--primary" href={explorerUrl} target="_blank" rel="noreferrer">View transaction <ExternalLink size={15} /></a></div>
+          <div className="credential-share-callout"><Share2 size={19} /><div><strong>Recruiter-ready proof</strong><span>Share a link that automatically checks this credential against Stellar.</span></div><button type="button" onClick={() => void shareCredential()}>{shared ? <><Check size={14} /> Shared</> : <><Share2 size={14} /> Share verification</>}</button></div>
+          <div className="credential-issued-actions">
+            <button className="button button--workspace" type="button" onClick={() => void copyCredentialId()}><Clipboard size={15} /> {copied ? 'Copied' : 'Copy ID'}</button>
+            <button className="button button--workspace" type="button" onClick={downloadPassport}><Download size={15} /> Download passport</button>
+            <a className="button button--primary" href={explorerUrl} target="_blank" rel="noreferrer">View transaction <ExternalLink size={15} /></a>
+          </div>
         </article>
       </>
     )

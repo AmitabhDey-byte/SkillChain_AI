@@ -716,6 +716,12 @@ h1 em { color: var(--green-bright); font-style: normal; }
 .credential-issued-card dd { overflow: hidden; color: #405147; margin: 0; font-family: 'DM Mono', monospace; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
 .credential-issued-actions { display: flex; justify-content: flex-end; gap: 9px; padding: 18px 27px 24px; }
 .credential-issued-actions a { text-decoration: none; }
+.credential-share-callout { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; color: #315d3d; background: #e4f1df; border-bottom: 1px solid #cdddc9; margin: 0 27px; padding: 15px 17px; }
+.credential-share-callout > svg { color: #3e8453; }
+.credential-share-callout > div { display: flex; flex-direction: column; gap: 3px; }
+.credential-share-callout strong { font-size: 10px; }
+.credential-share-callout span { color: #6a7d6e; font-size: 8px; }
+.credential-share-callout button { display: inline-flex; align-items: center; gap: 5px; color: #245d36; border: 1px solid #b9d1b8; background: #f8fbf6; padding: 9px 11px; font-size: 8px; font-weight: 700; }
 .credential-error { display: flex; align-items: flex-start; gap: 10px; color: #8a4c3d; border: 1px solid #dfc0b7; background: #f5e3dd; padding: 14px 16px; margin-top: 10px; }
 .credential-error div { display: flex; flex-direction: column; gap: 3px; }
 .credential-error strong { font-size: 9px; }
@@ -742,6 +748,13 @@ h1 em { color: var(--green-bright); font-style: normal; }
 .verification-result > div { display: flex; flex-direction: column; gap: 4px; }
 .verification-result strong { color: #285738; font-size: 13px; }
 .verification-result span { color: #5f7766; font-size: 9px; }
+.verification-result .verification-result__content { width: min(100%, 560px); gap: 5px; }
+.verification-result__content dl { display: grid; grid-template-columns: .7fr 1.5fr 1fr; border-top: 1px solid #c7dac4; margin: 10px 0 0; padding-top: 10px; }
+.verification-result__content dl > div { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.verification-result__content dt { color: #76907c; font-size: 7px; text-transform: uppercase; }
+.verification-result__content dd { overflow: hidden; color: #3b5d44; margin: 0; font-family: 'DM Mono', monospace; font-size: 7px; text-overflow: ellipsis; white-space: nowrap; }
+.verification-result__actions { display: flex; gap: 14px; margin-top: 8px; }
+.verification-result__actions button, .verification-result__actions a { display: inline-flex; align-items: center; gap: 5px; color: #347148; border: 0; background: transparent; padding: 0; font-size: 8px; font-weight: 700; }
 .verification-result--inactive { color: #9a5a42; border-color: #dfc7bd; background: #f4e4dd; }
 .verification-result--inactive strong { color: #744534; }
 .verification-result--inactive span { color: #81685e; }
@@ -815,10 +828,14 @@ h1 em { color: var(--green-bright); font-style: normal; }
   .credential-issued-card dl > div:nth-child(odd), .credential-issued-card dl > div:nth-child(even) { border-left: 0; padding-left: 0; padding-right: 0; }
   .credential-issued-actions { align-items: stretch; flex-direction: column; padding: 15px 18px 20px; }
   .credential-issued-actions .button { width: 100%; }
+  .credential-share-callout { grid-template-columns: auto 1fr; margin: 0 18px; }
+  .credential-share-callout button { grid-column: 1 / -1; justify-content: center; width: 100%; }
   .verification-search { grid-template-columns: auto 1fr; }
   .verification-search .button { grid-column: 1 / -1; width: 100%; }
   .verification-form { grid-template-columns: 1fr; }
   .verification-form .button { width: 100%; }
+  .verification-result { align-items: flex-start; }
+  .verification-result__content dl { grid-template-columns: 1fr; gap: 8px; }
   .public-profile-body { padding: 0 18px 20px; }
   .public-profile-title { flex-direction: column; }
   .public-profile-title > div:last-child { align-items: flex-start; }
