@@ -25,13 +25,21 @@ export class ApiError extends Error {
   }
 }
 
-async function apiRequest<T>(path: string, signal?: AbortSignal): Promise<T> {
+type ApiRequestOptions = {
+  method?: 'GET' | 'POST'
+  body?: unknown
+  signal?: AbortSignal
+}
+
+async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
   let response: Response
 
   try {
     response = await fetch(`${apiBaseUrl}${path}`, {
-      headers: { Accept: 'application/json' },
-      signal,
+      method: options.method || 'GET',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: options.body === undefined ? undefined : JSON.stringify(options.body),
+      signal: options.signal,
     })
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') throw error
@@ -95,10 +103,147 @@ export type RepositoryList = {
 }
 
 export function getGithubProfile(username: string, signal?: AbortSignal) {
-  return apiRequest<GithubProfile>(`/github/users/${encodeURIComponent(username)}`, signal)
+  return apiRequest<GithubProfile>(`/github/users/${encodeURIComponent(username)}`, { signal })
 }
 
 export function getGithubRepositories(username: string, signal?: AbortSignal) {
-  return apiRequest<RepositoryList>(`/github/users/${encodeURIComponent(username)}/repositories?per_page=100`, signal)
+  return apiRequest<RepositoryList>(`/github/users/${encodeURIComponent(username)}/repositories?per_page=100`, { signal })
 }
 
+export type CommitEvidence = {
+  sha: string
+  message: string
+  authored_at: string | null
+  additions: number
+  deletions: number
+  files_changed: number
+}
+
+export type RepositoryEvidence = {
+  github_repository_id: number
+  name: string
+  full_name: string
+  description: string | null
+  repository_url: string
+  language: string | null
+  languages: Record<string, number>
+  topics: string[]
+  stars: number
+  forks: number
+  open_issues: number
+  contributors: number
+  size_kb: number
+  default_branch: string
+  license: string | null
+  readme_excerpt: string | null
+  recent_commits: CommitEvidence[]
+  has_tests: boolean
+  has_documentation: boolean
+  is_fork: boolean
+  is_archived: boolean
+  pushed_at: string | null
+}
+
+export type EvidenceBatchItem = {
+  owner: string
+  repository: string
+  status: string
+  evidence: RepositoryEvidence | null
+  unavailable_sources: string[]
+  error: string | null
+}
+
+export type EvidenceBatchResponse = {
+  items: EvidenceBatchItem[]
+  successful: number
+  failed: number
+}
+
+export type SkillLevel = 'beginner' | 'intermediate' | 'advanced' | 'expert'
+
+export type DimensionScore = {
+  score: number
+  rationale: string
+  evidence: string[]
+}
+
+export type AssessmentDimensions = {
+  code_quality: DimensionScore
+  architecture: DimensionScore
+  documentation: DimensionScore
+  consistency: DimensionScore
+  complexity: DimensionScore
+  impact: DimensionScore
+}
+
+export type SkillSignal = {
+  name: string
+  category: string
+  level: SkillLevel
+  confidence: number
+  evidence: string[]
+}
+
+export type RepositoryFinding = {
+  repository: string
+  complexity_score: number
+  technologies: string[]
+  strengths: string[]
+  improvements: string[]
+}
+
+export type SkillAssessment = {
+  overall_score: number
+  confidence: number
+  level: SkillLevel
+  summary: string
+  dimensions: AssessmentDimensions
+  skills: SkillSignal[]
+  repository_findings: RepositoryFinding[]
+  portfolio_strengths: string[]
+  risk_flags: string[]
+  next_steps: string[]
+  methodology: string
+}
+
+export type AssessmentPreviewResponse = {
+  model: string
+  rubric_version: string
+  assessment: SkillAssessment
+  usage: {
+    prompt_tokens: number
+    output_tokens: number
+    total_tokens: number
+  }
+}
+
+export type AssessmentRunResult = AssessmentPreviewResponse & {
+  evidence_summary: {
+    successful: number
+    failed: number
+    unavailable_sources: string[]
+  }
+  repository_ids: number[]
+  completed_at: string
+}
+
+export function collectGithubEvidence(repositories: GithubRepository[], signal?: AbortSignal) {
+  return apiRequest<EvidenceBatchResponse>('/github/evidence', {
+    method: 'POST',
+    body: {
+      repositories: repositories.map((repository) => {
+        const [owner, ...nameParts] = repository.full_name.split('/')
+        return { owner, repository: nameParts.join('/') }
+      }),
+    },
+    signal,
+  })
+}
+
+export function previewSkillAssessment(githubUsername: string, repositories: RepositoryEvidence[], signal?: AbortSignal) {
+  return apiRequest<AssessmentPreviewResponse>('/assessments/preview', {
+    method: 'POST',
+    body: { github_username: githubUsername, repositories },
+    signal,
+  })
+}

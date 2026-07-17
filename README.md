@@ -87,6 +87,8 @@ Assessment evidence combines normalized language percentages, an 8,000-character
 | Complexity | 15% |
 | Impact | 10% |
 
+The frontend now runs the complete assessment pipeline from the dashboard. It collects evidence for the selected repositories, submits successful evidence to Gemini, displays distinct collection and analysis phases, supports safe retries, persists the validated report locally, and lets returning users reopen results without triggering another model request. Reports expose dimension rationales, cited evidence, skill confidence, repository findings, strengths, limitations, recommendations, methodology, and model usage.
+
 ## Wallet authentication
 
 Wallet sign-in uses the official `@stellar/freighter-api` package. The application requests only the user's public address and transaction signatures, validates the active network, warns when the wallet is not on testnet, and stores only a local session preference. Private keys never leave Freighter.

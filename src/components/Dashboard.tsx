@@ -25,8 +25,10 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { RepositorySelector } from './RepositorySelector'
+import { AssessmentExperience } from './AssessmentExperience'
 import { loadAssessmentRepositories, saveAssessmentRepositories } from '../lib/assessmentDraft'
-import type { GithubRepository } from '../lib/api'
+import { clearAssessmentResult, loadAssessmentResult } from '../lib/assessmentResult'
+import type { AssessmentRunResult, GithubRepository } from '../lib/api'
 import type { OnboardingProfile } from '../lib/onboarding'
 import { isTestnet, shortenAddress, type WalletConnection } from '../lib/wallet'
 
@@ -54,17 +56,33 @@ const journeySteps = [
 export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: DashboardProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [selectorOpen, setSelectorOpen] = useState(false)
+  const [assessmentOpen, setAssessmentOpen] = useState(false)
   const [assessmentReady, setAssessmentReady] = useState(false)
   const [selectedRepositories, setSelectedRepositories] = useState(loadAssessmentRepositories)
+  const [assessmentResult, setAssessmentResult] = useState(loadAssessmentResult)
   const firstName = profile.displayName.trim().split(' ')[0] || 'Builder'
   const githubUrl = `https://github.com/${profile.githubUsername}`
 
   const confirmRepositories = (repositories: GithubRepository[]) => {
     saveAssessmentRepositories(repositories)
+    clearAssessmentResult()
     setSelectedRepositories(repositories)
+    setAssessmentResult(null)
     setSelectorOpen(false)
+    setAssessmentReady(false)
+    setAssessmentOpen(true)
+  }
+
+  const handleAssessmentComplete = (result: AssessmentRunResult) => {
+    setAssessmentResult(result)
+  }
+
+  const continueToCredential = () => {
+    setAssessmentOpen(false)
     setAssessmentReady(true)
   }
+
+  const currentJourneySteps = journeySteps.map((item, index) => index === 2 && assessmentResult ? { ...item, complete: true } : item)
 
   return (
     <main className="dashboard-layout">
@@ -109,26 +127,26 @@ export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: D
           </div>
 
           {assessmentReady && (
-            <div className="dashboard-notice" role="status"><Sparkles size={18} /><div><strong>Assessment draft prepared.</strong><span>{selectedRepositories.length} {selectedRepositories.length === 1 ? 'repository is' : 'repositories are'} ready for AI analysis.</span></div><button type="button" onClick={() => setAssessmentReady(false)}><X size={16} /></button></div>
+            <div className="dashboard-notice" role="status"><Sparkles size={18} /><div><strong>AI assessment complete.</strong><span>Your score of {assessmentResult?.assessment.overall_score} is ready for on-chain credential issuance.</span></div><button type="button" onClick={() => setAssessmentReady(false)}><X size={16} /></button></div>
           )}
 
           <div className="metric-grid">
-            <article><div className="metric-icon metric-icon--green"><ShieldCheck size={19} /></div><div><span>Trust readiness</span><strong>50%</strong><small><BarChart3 size={12} /> 2 of 4 steps complete</small></div></article>
+            <article><div className="metric-icon metric-icon--green"><ShieldCheck size={19} /></div><div><span>{assessmentResult ? 'AI skill score' : 'Trust readiness'}</span><strong>{assessmentResult ? assessmentResult.assessment.overall_score : '50%'}</strong><small><BarChart3 size={12} /> {assessmentResult ? `${assessmentResult.assessment.level} profile` : '2 of 4 steps complete'}</small></div></article>
             <article><div className="metric-icon metric-icon--blue"><GitBranch size={19} /></div><div><span>Evidence sources</span><strong>1</strong><small><Check size={12} /> GitHub connected</small></div></article>
-            <article><div className="metric-icon metric-icon--amber"><Clock3 size={19} /></div><div><span>Active assessments</span><strong>{selectedRepositories.length ? 1 : 0}</strong><small>{selectedRepositories.length ? `${selectedRepositories.length} repositories selected` : 'Ready to start'}</small></div></article>
+            <article><div className="metric-icon metric-icon--amber"><Clock3 size={19} /></div><div><span>Active assessments</span><strong>{assessmentResult ? 0 : selectedRepositories.length ? 1 : 0}</strong><small>{assessmentResult ? 'Latest report completed' : selectedRepositories.length ? `${selectedRepositories.length} repositories selected` : 'Ready to start'}</small></div></article>
             <article><div className="metric-icon metric-icon--violet"><BadgeCheck size={19} /></div><div><span>Credentials</span><strong>0</strong><small>Issued on Stellar</small></div></article>
           </div>
 
           <div className="dashboard-grid">
             <article className="dashboard-card journey-card">
-              <div className="card-heading"><div><p className="overline">VERIFICATION JOURNEY</p><h2>Your path to trusted proof</h2></div><span>2 / 4 complete</span></div>
-              <div className="journey-progress"><span /></div>
+              <div className="card-heading"><div><p className="overline">VERIFICATION JOURNEY</p><h2>Your path to trusted proof</h2></div><span>{assessmentResult ? 3 : 2} / 4 complete</span></div>
+              <div className="journey-progress"><span style={{ width: assessmentResult ? '75%' : '50%' }} /></div>
               <div className="journey-list">
-                {journeySteps.map((item, index) => (
+                {currentJourneySteps.map((item, index) => (
                   <div className={item.complete ? 'complete' : ''} key={item.label}><span>{item.complete ? <Check size={14} /> : index + 1}</span><strong>{item.label}</strong>{!item.complete && index === 2 && <small>Next step</small>}</div>
                 ))}
               </div>
-              <button className="card-action" type="button" onClick={() => setSelectorOpen(true)}>{selectedRepositories.length ? 'Edit assessment draft' : 'Continue verification'} <ArrowRight size={16} /></button>
+              <button className="card-action" type="button" onClick={() => assessmentResult ? setAssessmentOpen(true) : setSelectorOpen(true)}>{assessmentResult ? 'View AI assessment report' : selectedRepositories.length ? 'Edit assessment draft' : 'Continue verification'} <ArrowRight size={16} /></button>
             </article>
 
             <article className="dashboard-card profile-summary">
@@ -158,6 +176,16 @@ export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: D
           initialSelection={selectedRepositories}
           onClose={() => setSelectorOpen(false)}
           onConfirm={confirmRepositories}
+        />
+      )}
+      {assessmentOpen && (
+        <AssessmentExperience
+          githubUsername={profile.githubUsername}
+          repositories={selectedRepositories}
+          existingResult={assessmentResult}
+          onClose={() => setAssessmentOpen(false)}
+          onComplete={handleAssessmentComplete}
+          onCredentialStep={continueToCredential}
         />
       )}
     </main>
