@@ -17,6 +17,8 @@ npm run dev
 
 The combined development command starts the frontend at `http://localhost:5173` and the API at `http://localhost:8000`. Interactive API documentation is available at `http://localhost:8000/docs` outside production.
 
+Store real credentials only in the ignored `.env` file. `.env.example` documents required variable names and must never contain API keys or signing secrets.
+
 To run either service separately:
 
 ```bash
@@ -115,6 +117,8 @@ The backend exposes production issuance and verification boundaries:
 | `GET /api/v1/credentials/{credential_id}/verify` | Verify credential ownership and active status against Stellar |
 
 Assessment responses include a server-generated HMAC attestation. Issuance rejects modified scores or reports before preparing a Stellar transaction. The issuer secret remains server-only, and public verification uses a read-only contract simulation.
+
+Completed reports now continue into a responsive issuance experience with transaction progress, safe retry errors, persisted credential details, Stellar Expert links, and copyable credential IDs. Recruiters can verify a credential without connecting a wallet or creating an account at `/verify`.
 
 ## User onboarding
 

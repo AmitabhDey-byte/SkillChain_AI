@@ -15,6 +15,7 @@ import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Dashboard } from './components/Dashboard'
 import { OnboardingFlow } from './components/OnboardingFlow'
+import { PublicVerification } from './components/PublicVerification'
 import { WalletModal } from './components/WalletModal'
 import { useWallet } from './hooks/useWallet'
 import { hasCompletedOnboarding, loadOnboardingDraft, type OnboardingProfile } from './lib/onboarding'
@@ -91,7 +92,9 @@ function App() {
 
   return (
     <>
-      {location.pathname === '/dashboard' ? (
+      {location.pathname === '/verify' ? (
+        <PublicVerification />
+      ) : location.pathname === '/dashboard' ? (
         onboardingComplete ? (
           <Dashboard profile={profile} connection={wallet.connection} onOpenWallet={() => setWalletModalOpen(true)} onDisconnect={disconnectAndExit} />
         ) : (
@@ -109,6 +112,7 @@ function App() {
           <a href="#how-it-works" onClick={() => setMenuOpen(false)}>How it works</a>
           <a href="#credentials" onClick={() => setMenuOpen(false)}>Credentials</a>
           <a href="#for-recruiters" onClick={() => setMenuOpen(false)}>For recruiters</a>
+          <button type="button" onClick={() => navigate('/verify')}>Verify credential</button>
           <button className="button button--small button--outline" type="button" onClick={() => setWalletModalOpen(true)}>
             {wallet.status === 'connected' && wallet.connection ? (
               <><span className={isTestnet(wallet.connection.network) ? 'wallet-dot' : 'wallet-dot wallet-dot--warning'} /> {shortenAddress(wallet.connection.address)}</>

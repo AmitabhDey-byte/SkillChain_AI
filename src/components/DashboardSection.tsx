@@ -5,19 +5,26 @@ import {
   CircleAlert,
   Clipboard,
   Code2,
+  ExternalLink,
   FileCheck2,
   GitBranch,
   Globe2,
   LockKeyhole,
-  Search,
+  LoaderCircle,
   ShieldCheck,
   Sparkles,
   Wallet,
 } from 'lucide-react'
-import { type FormEvent, useState } from 'react'
-import type { AssessmentRunResult, GithubRepository } from '../lib/api'
+import { useState } from 'react'
+import {
+  issueCredential,
+  type AssessmentRunResult,
+  type CredentialIssueResponse,
+  type GithubRepository,
+} from '../lib/api'
 import type { OnboardingProfile } from '../lib/onboarding'
 import { shortenAddress, type WalletConnection } from '../lib/wallet'
+import { CredentialVerifier } from './CredentialVerifier'
 
 export type DashboardSectionName = 'Overview' | 'Assessments' | 'Credentials' | 'Verification' | 'Public profile' | 'Settings'
 
@@ -26,10 +33,12 @@ type DashboardSectionProps = {
   profile: OnboardingProfile
   connection: WalletConnection | null
   assessmentResult: AssessmentRunResult | null
+  credential: CredentialIssueResponse | null
   repositories: GithubRepository[]
   onNewAssessment: () => void
   onViewAssessment: () => void
   onOpenWallet: () => void
+  onCredentialIssued: (credential: CredentialIssueResponse) => void
 }
 
 function AssessmentsSection({
@@ -56,36 +65,78 @@ function AssessmentsSection({
 
 function CredentialsSection({
   assessmentResult,
-  onViewAssessment,
-}: Pick<DashboardSectionProps, 'assessmentResult' | 'onViewAssessment'>) {
+  connection,
+  credential,
+  onNewAssessment,
+  onCredentialIssued,
+}: Pick<
+  DashboardSectionProps,
+  'assessmentResult' | 'connection' | 'credential' | 'onNewAssessment' | 'onCredentialIssued'
+>) {
+  const [status, setStatus] = useState<'idle' | 'issuing' | 'error'>('idle')
+  const [error, setError] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+  const legacyAssessment = assessmentResult && !assessmentResult.attestation
+
+  const issue = async () => {
+    if (!assessmentResult || !connection) return
+    setStatus('issuing')
+    setError(null)
+
+    try {
+      const issuedCredential = await issueCredential(connection.address, assessmentResult)
+      onCredentialIssued(issuedCredential)
+      setStatus('idle')
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : 'Credential issuance could not be completed.')
+      setStatus('error')
+    }
+  }
+
+  const copyCredentialId = async () => {
+    if (!credential) return
+    await navigator.clipboard.writeText(credential.credential_id)
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1800)
+  }
+
+  if (credential) {
+    const explorerUrl = `https://stellar.expert/explorer/${credential.network}/tx/${credential.transaction_hash}`
+    return (
+      <>
+        <div className="workspace-heading"><div><p className="overline">STELLAR CREDENTIALS</p><h1>Credentials</h1><p>Your verified skill credential is active and publicly verifiable on Stellar.</p></div></div>
+        <article className="credential-issued-card">
+          <div className="credential-issued-header"><span><BadgeCheck size={31} /></span><div><p className="overline">ON-CHAIN CREDENTIAL ACTIVE</p><h2>{credential.level} technical credential</h2><p>Issued to {shortenAddress(credential.owner)} with a verified score of {credential.score}/100.</p></div><strong>{credential.score}</strong></div>
+          <dl><div><dt>Credential ID</dt><dd>{credential.credential_id}</dd></div><div><dt>Transaction</dt><dd>{credential.transaction_hash}</dd></div><div><dt>Network</dt><dd>{credential.network}</dd></div><div><dt>Ledger</dt><dd>{credential.ledger_sequence || 'Confirmed'}</dd></div></dl>
+          <div className="credential-issued-actions"><button className="button button--workspace" type="button" onClick={() => void copyCredentialId()}><Clipboard size={15} /> {copied ? 'Copied' : 'Copy credential ID'}</button><a className="button button--primary" href={explorerUrl} target="_blank" rel="noreferrer">View transaction <ExternalLink size={15} /></a></div>
+        </article>
+      </>
+    )
+  }
+
   return (
     <>
       <div className="workspace-heading"><div><p className="overline">STELLAR CREDENTIALS</p><h1>Credentials</h1><p>Manage portable, tamper-proof skill credentials owned by your Stellar wallet.</p></div></div>
       <article className={assessmentResult ? 'credential-readiness credential-readiness--ready' : 'credential-readiness'}>
         <span>{assessmentResult ? <BadgeCheck size={29} /> : <LockKeyhole size={29} />}</span>
-        <div><p className="overline">{assessmentResult ? 'READY FOR ISSUANCE' : 'ASSESSMENT REQUIRED'}</p><h2>{assessmentResult ? 'Your AI report is credential-ready.' : 'Complete verification before issuing.'}</h2><p>{assessmentResult ? `The validated score of ${assessmentResult.assessment.overall_score}/100 can be anchored to your connected Stellar identity in the credential issuance step.` : 'On-chain credentials require a completed, validated SkillChain AI assessment.'}</p></div>
-        <button className="button button--workspace" type="button" onClick={onViewAssessment} disabled={!assessmentResult}>{assessmentResult ? 'Review issuance report' : 'Credential locked'} <ArrowRight size={16} /></button>
+        <div><p className="overline">{legacyAssessment ? 'NEW ASSESSMENT REQUIRED' : assessmentResult ? 'READY FOR ISSUANCE' : 'ASSESSMENT REQUIRED'}</p><h2>{legacyAssessment ? 'Refresh your report for secure issuance.' : assessmentResult ? 'Your AI report is credential-ready.' : 'Complete verification before issuing.'}</h2><p>{legacyAssessment ? 'This report predates signed assessment attestations. Run a fresh assessment before issuing it on-chain.' : assessmentResult ? `The validated score of ${assessmentResult.assessment.overall_score}/100 will be anchored to ${connection ? shortenAddress(connection.address) : 'your connected wallet'}.` : 'On-chain credentials require a completed, validated SkillChain AI assessment.'}</p></div>
+        {legacyAssessment ? <button className="button button--workspace" type="button" onClick={onNewAssessment}>Run fresh assessment <ArrowRight size={16} /></button> : assessmentResult ? <button className="button button--primary" type="button" onClick={() => void issue()} disabled={status === 'issuing' || !connection}>{status === 'issuing' ? <><LoaderCircle className="spin" size={16} /> Issuing on Stellar</> : <>Issue credential <ArrowRight size={16} /></>}</button> : <button className="button button--workspace" type="button" disabled>Credential locked</button>}
       </article>
+      {error && <div className="credential-error" role="alert"><CircleAlert size={18} /><div><strong>Issuance was not completed</strong><span>{error}</span></div></div>}
       <div className="credential-benefit-grid"><article><ShieldCheck /><strong>Tamper-proof</strong><span>Verification data is anchored to Stellar.</span></article><article><Wallet /><strong>Wallet-owned</strong><span>Your professional identity remains portable.</span></article><article><Globe2 /><strong>Publicly verifiable</strong><span>Recruiters can validate it instantly.</span></article></div>
     </>
   )
 }
 
-function VerificationSection() {
-  const [query, setQuery] = useState('')
-  const [submitted, setSubmitted] = useState(false)
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault()
-    if (!query.trim()) return
-    setSubmitted(true)
-  }
-
+function VerificationSection({
+  connection,
+  credential,
+}: Pick<DashboardSectionProps, 'connection' | 'credential'>) {
   return (
     <>
-      <div className="workspace-heading"><div><p className="overline">PUBLIC VERIFICATION</p><h1>Verify a credential</h1><p>Look up a SkillChain credential using its public ID, transaction hash, or Stellar wallet.</p></div></div>
-      <form className="verification-search" onSubmit={submit}><Search size={19} /><input value={query} onChange={(event) => { setQuery(event.target.value); setSubmitted(false) }} placeholder="Credential ID, transaction hash, or G... wallet address" /><button className="button button--primary" type="submit">Verify</button></form>
-      {submitted ? <div className="verification-message"><CircleAlert size={19} /><div><strong>No issued credential found</strong><span>This workspace has not issued an on-chain credential matching “{query.trim()}” yet.</span></div></div> : <div className="verification-guide"><FileCheck2 size={24} /><div><strong>Instant cryptographic verification</strong><p>Once credential issuance is enabled, this search validates ownership, issuer, assessment score, transaction status, and revocation state directly against Stellar.</p></div></div>}
+      <div className="workspace-heading"><div><p className="overline">PUBLIC VERIFICATION</p><h1>Verify a credential</h1><p>Check a SkillChain credential ID against its Stellar wallet owner.</p></div></div>
+      <CredentialVerifier initialCredentialId={credential?.credential_id} initialOwner={credential?.owner || connection?.address} />
+      <div className="verification-guide"><FileCheck2 size={24} /><div><strong>Instant cryptographic verification</strong><p>The verification gateway checks ownership and revocation status directly against the configured Stellar credential contract.</p></div></div>
     </>
   )
 }
@@ -147,7 +198,7 @@ function SettingsSection({
 export function DashboardSection(props: DashboardSectionProps) {
   if (props.section === 'Assessments') return <AssessmentsSection {...props} />
   if (props.section === 'Credentials') return <CredentialsSection {...props} />
-  if (props.section === 'Verification') return <VerificationSection />
+  if (props.section === 'Verification') return <VerificationSection {...props} />
   if (props.section === 'Public profile') return <PublicProfileSection {...props} />
   return <SettingsSection {...props} />
 }
