@@ -894,7 +894,7 @@ h1 em { color: var(--green-bright); font-style: normal; }
 .admin-clear-key { margin-top: 12px; }
 .admin-activity-card { margin-top: 14px; }
 .admin-table-wrap { overflow-x: auto; margin-top: 16px; }
-.admin-activity-table { width: 100%; min-width: 730px; border-collapse: collapse; text-align: left; }
+.admin-activity-table { width: 100%; min-width: 780px; border-collapse: collapse; text-align: left; }
 .admin-activity-table th { color: #8b938d; border-bottom: 1px solid #dce2dc; padding: 9px 10px; font-size: 7px; letter-spacing: .08em; text-transform: uppercase; }
 .admin-activity-table td { color: #566159; border-bottom: 1px solid #e7eae7; padding: 12px 10px; font-size: 8px; }
 .admin-activity-table code { color: #323a34; font-family: 'DM Mono', monospace; }

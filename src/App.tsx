@@ -114,7 +114,7 @@ function App() {
       ) : location.pathname === '/recruiters' ? (
         <RecruiterPortal />
       ) : location.pathname === '/admin' ? (
-        <AdminDashboard connection={wallet.connection} onOpenWallet={() => setWalletModalOpen(true)} onDisconnect={disconnectAndExit} />
+        <AdminDashboard connection={wallet.connection} onDisconnect={disconnectAndExit} />
       ) : location.pathname === '/recruiter-dashboard' ? (
         onboardingComplete && profile.role === 'recruiter' ? (
           <RecruiterDashboard profile={profile} connection={wallet.connection} onOpenWallet={() => setWalletModalOpen(true)} onDisconnect={disconnectAndExit} />

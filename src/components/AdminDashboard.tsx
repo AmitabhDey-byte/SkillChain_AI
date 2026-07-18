@@ -1,12 +1,10 @@
-import { Activity, Blocks, Bot, ChevronRight, CircleAlert, Database, KeyRound, LoaderCircle, LockKeyhole, LogOut, Menu, RefreshCw, ServerCog, ShieldCheck, Users, Wallet, X } from 'lucide-react'
+import { Activity, Blocks, Bot, ChevronRight, CircleAlert, Database, KeyRound, LoaderCircle, LogOut, Menu, RefreshCw, ServerCog, ShieldCheck, Users, Wallet, X } from 'lucide-react'
 import { type FormEvent, useEffect, useState } from 'react'
 import { ApiError, getAdminOverview, getLiveHealth, getReadyHealth, type AdminOverviewResponse, type LiveHealthResponse, type ReadyHealthResponse } from '../lib/api'
-import { isAdminWallet } from '../lib/adminAccess'
 import { shortenAddress, type WalletConnection } from '../lib/wallet'
 
 type AdminDashboardProps = {
   connection: WalletConnection | null
-  onOpenWallet: () => void
   onDisconnect: () => void
 }
 
@@ -20,7 +18,7 @@ function formatTimestamp(value: string) {
   return new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value))
 }
 
-export function AdminDashboard({ connection, onOpenWallet, onDisconnect }: AdminDashboardProps) {
+export function AdminDashboard({ connection, onDisconnect }: AdminDashboardProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [live, setLive] = useState<LiveHealthResponse | null>(null)
   const [ready, setReady] = useState<ReadyHealthResponse | null>(null)
@@ -29,8 +27,6 @@ export function AdminDashboard({ connection, onOpenWallet, onDisconnect }: Admin
   const [keyInput, setKeyInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const allowed = isAdminWallet(connection?.address)
-
   const loadDashboard = async (key: string, signal?: AbortSignal) => {
     setLoading(true)
     setError(null)
@@ -74,34 +70,25 @@ export function AdminDashboard({ connection, onOpenWallet, onDisconnect }: Admin
   }
 
   useEffect(() => {
-    if (!allowed || !adminKey) return
+    if (!adminKey) return
     const controller = new AbortController()
     queueMicrotask(() => void loadDashboard(adminKey, controller.signal))
     return () => controller.abort()
-  }, [allowed, adminKey])
-
-  if (!allowed) {
-    return (
-      <main className="admin-access-page">
-        <section><span><LockKeyhole size={31} /></span><p className="overline">ADMIN ACCESS</p><h1>Authorized wallet required.</h1><p>Connect a Stellar wallet listed in <code>VITE_ADMIN_WALLETS</code> to open platform operations.</p><button className="button button--primary" type="button" onClick={onOpenWallet}><Wallet size={17} /> {connection ? 'Switch wallet' : 'Connect admin wallet'}</button></section>
-      </main>
-    )
-  }
+  }, [adminKey])
 
   if (!adminKey) {
     return (
       <main className="admin-access-page">
         <section>
           <span><KeyRound size={31} /></span>
-          <p className="overline">SECOND-FACTOR ACCESS</p>
+          <p className="overline">PRIVATE ADMIN ACCESS</p>
           <h1>Enter your admin key.</h1>
-          <p>Your wallet is authorized. The private server key is also required and remains in this browser tab only.</p>
+          <p>Your candidate or recruiter profile does not affect this route. The private key remains in this browser tab only.</p>
           <form className="admin-key-form" onSubmit={submitKey}>
             <input type="password" value={keyInput} onChange={(event) => setKeyInput(event.target.value)} placeholder="ADMIN_API_KEY" autoComplete="off" aria-label="Admin access key" />
             <button className="button button--primary" type="submit" disabled={!keyInput.trim()}><ShieldCheck size={17} /> Open control center</button>
           </form>
           {error && <p className="admin-key-error">{error}</p>}
-          <button className="admin-switch-wallet" type="button" onClick={onOpenWallet}>Use another wallet</button>
         </section>
       </main>
     )
@@ -116,8 +103,8 @@ export function AdminDashboard({ connection, onOpenWallet, onDisconnect }: Admin
         <div className="dashboard-brand"><span><Blocks size={19} /></span> SkillChain <strong>Ops</strong></div>
         <button className="sidebar-close" type="button" aria-label="Close navigation" onClick={() => setSidebarOpen(false)}><X size={19} /></button>
         <nav className="dashboard-nav" aria-label="Admin navigation"><p>OPERATIONS</p><button className="active" type="button"><Activity size={17} /><span>Platform activity</span></button><button type="button" onClick={() => void loadDashboard(adminKey)}><RefreshCw size={17} /><span>Refresh data</span></button></nav>
-        <div className="sidebar-wallet"><div><span className="wallet-dot" /><small>ADMIN WALLET</small></div><strong>{shortenAddress(connection!.address)}</strong><button type="button" onClick={onOpenWallet}>Manage wallet <ChevronRight size={13} /></button></div>
-        <button className="sidebar-signout" type="button" onClick={onDisconnect}><LogOut size={15} /> Disconnect admin</button>
+        <div className="sidebar-wallet"><div><span className="wallet-dot" /><small>CURRENT WALLET</small></div><strong>{connection ? shortenAddress(connection.address) : 'Not connected'}</strong></div>
+        {connection && <button className="sidebar-signout" type="button" onClick={onDisconnect}><LogOut size={15} /> Disconnect wallet</button>}
       </aside>
 
       {sidebarOpen && <button className="sidebar-scrim" type="button" aria-label="Close navigation" onClick={() => setSidebarOpen(false)} />}
@@ -138,13 +125,13 @@ export function AdminDashboard({ connection, onOpenWallet, onDisconnect }: Admin
             <div className="card-heading"><div><p className="overline">AUDIT TRAIL</p><h2>Recent platform activity</h2></div><span className="workspace-status workspace-status--complete">{overview?.recent_activity.length ?? 0} events</span></div>
             <div className="admin-table-wrap">
               <table className="admin-activity-table">
-                <thead><tr><th>Event</th><th>Wallet</th><th>Network</th><th>Transaction ID</th><th>Time</th></tr></thead>
+                <thead><tr><th>Event</th><th>Wallet</th><th>Proof ID</th><th>Transaction ID</th><th>Time</th></tr></thead>
                 <tbody>
                   {overview?.recent_activity.map((item) => (
                     <tr key={item.id}>
                       <td><span className={item.success ? 'admin-event-status admin-event-status--success' : 'admin-event-status'}>{formatActivityType(item.interaction_type)}</span></td>
                       <td><code title={item.wallet_address}>{shortenAddress(item.wallet_address)}</code></td>
-                      <td>{item.network}</td>
+                      <td><code title={item.id}>{item.id.slice(0, 8)}…</code></td>
                       <td>{item.transaction_hash ? <a href={`${explorerBase}${item.transaction_hash}`} target="_blank" rel="noreferrer" title={item.transaction_hash}>{item.transaction_hash.slice(0, 10)}…</a> : '—'}</td>
                       <td>{formatTimestamp(item.created_at)}</td>
                     </tr>
@@ -157,7 +144,7 @@ export function AdminDashboard({ connection, onOpenWallet, onDisconnect }: Admin
 
           <div className="admin-operations-grid">
             <article className="dashboard-card"><div className="card-heading"><div><p className="overline">SERVICE READINESS</p><h2>Production dependencies</h2></div><span className={ready?.status === 'ready' ? 'workspace-status workspace-status--complete' : 'workspace-status'}>{ready?.status || 'Loading'}</span></div><div className="admin-dependency-list"><div><Database size={17} /><span><strong>PostgreSQL</strong><small>Application metadata store</small></span><b>{dependencies?.database || 'checking'}</b></div><div><Bot size={17} /><span><strong>Gemini</strong><small>Portfolio evaluation service</small></span><b>{dependencies?.gemini || 'checking'}</b></div><div><ShieldCheck size={17} /><span><strong>Stellar testnet</strong><small>Soroban credential contract</small></span><b>{dependencies?.stellar || 'checking'}</b></div></div></article>
-            <article className="dashboard-card"><div className="card-heading"><div><p className="overline">PRIVATE API</p><h2>Runtime identity</h2></div><ServerCog size={19} /></div><dl className="admin-runtime-list"><div><dt>API status</dt><dd>{live?.status || 'Loading'}</dd></div><div><dt>Environment</dt><dd>{ready?.environment || 'Loading'}</dd></div><div><dt>Last heartbeat</dt><dd>{live ? formatTimestamp(live.timestamp) : 'Loading'}</dd></div><div><dt>Endpoint</dt><dd>/api/v1/admin/overview</dd></div></dl><div className="admin-security-note"><KeyRound size={16} /><span>Protected by your wallet allowlist and the server-side <code>ADMIN_API_KEY</code>.</span></div><button className="admin-clear-key" type="button" onClick={clearKey}>Clear access key</button></article>
+            <article className="dashboard-card"><div className="card-heading"><div><p className="overline">PRIVATE API</p><h2>Runtime identity</h2></div><ServerCog size={19} /></div><dl className="admin-runtime-list"><div><dt>API status</dt><dd>{live?.status || 'Loading'}</dd></div><div><dt>Environment</dt><dd>{ready?.environment || 'Loading'}</dd></div><div><dt>Last heartbeat</dt><dd>{live ? formatTimestamp(live.timestamp) : 'Loading'}</dd></div><div><dt>Endpoint</dt><dd>/api/v1/admin/overview</dd></div></dl><div className="admin-security-note"><KeyRound size={16} /><span>Protected by the server-side <code>ADMIN_API_KEY</code>. Wallet joins receive proof IDs; on-chain credentials include Stellar transaction IDs.</span></div><button className="admin-clear-key" type="button" onClick={clearKey}>Clear access key</button></article>
           </div>
         </div>
       </section>
