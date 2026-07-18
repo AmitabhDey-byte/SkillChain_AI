@@ -4,6 +4,7 @@ import {
   BarChart3,
   Bell,
   Blocks,
+  BriefcaseBusiness,
   Check,
   ChevronRight,
   CircleUserRound,
@@ -43,6 +44,7 @@ type DashboardProps = {
 
 const navItems = [
   { label: 'Overview', icon: Home },
+  { label: 'Opportunities', icon: BriefcaseBusiness, badge: '50' },
   { label: 'Assessments', icon: Sparkles, badge: '1' },
   { label: 'Credentials', icon: BadgeCheck },
   { label: 'Verification', icon: Search },
@@ -110,7 +112,7 @@ export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: D
         <nav className="dashboard-nav" aria-label="Dashboard navigation">
           <p>WORKSPACE</p>
           {navItems.map(({ label, icon: Icon, badge }) => (
-            <button className={activeSection === label ? 'active' : ''} type="button" key={label} onClick={() => selectSection(label)}><Icon size={17} /><span>{label}</span>{badge && <small>{assessmentResult ? '1' : badge}</small>}</button>
+            <button className={activeSection === label ? 'active' : ''} type="button" key={label} onClick={() => selectSection(label)}><Icon size={17} /><span>{label}</span>{badge && <small>{label === 'Assessments' && assessmentResult ? '1' : badge}</small>}</button>
           ))}
           <p>ACCOUNT</p>
           <button className={activeSection === 'Public profile' ? 'active' : ''} type="button" onClick={() => selectSection('Public profile')}><CircleUserRound size={17} /><span>Public profile</span></button>

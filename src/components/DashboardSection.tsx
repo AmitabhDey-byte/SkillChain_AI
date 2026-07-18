@@ -28,8 +28,9 @@ import { buildVerificationUrl, createCredentialPassport, downloadJson } from '..
 import type { OnboardingProfile } from '../lib/onboarding'
 import { shortenAddress, type WalletConnection } from '../lib/wallet'
 import { CredentialVerifier } from './CredentialVerifier'
+import { JobMarketplace } from './JobMarketplace'
 
-export type DashboardSectionName = 'Overview' | 'Assessments' | 'Credentials' | 'Verification' | 'Public profile' | 'Settings'
+export type DashboardSectionName = 'Overview' | 'Opportunities' | 'Assessments' | 'Credentials' | 'Verification' | 'Public profile' | 'Settings'
 
 type DashboardSectionProps = {
   section: Exclude<DashboardSectionName, 'Overview'>
@@ -234,6 +235,7 @@ function SettingsSection({
 }
 
 export function DashboardSection(props: DashboardSectionProps) {
+  if (props.section === 'Opportunities') return <JobMarketplace />
   if (props.section === 'Assessments') return <AssessmentsSection {...props} />
   if (props.section === 'Credentials') return <CredentialsSection {...props} />
   if (props.section === 'Verification') return <VerificationSection {...props} />

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { recordWalletConnection } from '../lib/api'
 import {
   connectFreighter,
   restoreFreighterSession,
@@ -43,6 +44,7 @@ export function useWallet() {
       localStorage.setItem(WALLET_SESSION_KEY, 'true')
       setConnection(nextConnection)
       setStatus('connected')
+      void recordWalletConnection(nextConnection.address, nextConnection.network).catch(() => undefined)
       return true
     } catch (caughtError) {
       setConnection(null)

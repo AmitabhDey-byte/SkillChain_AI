@@ -7,6 +7,7 @@ from stellar_sdk import Keypair
 
 from backend.app.core.attestation import sign_assessment
 from backend.app.core.config import Settings
+from backend.app.db.session import get_database_session
 from backend.app.integrations.stellar import StellarCredentialService, get_stellar_credential_service
 from backend.app.main import create_app
 from backend.app.schemas.credential import CredentialIssueRequest, CredentialIssueResponse, CredentialVerificationResponse
@@ -144,6 +145,21 @@ class FakeCredentialService:
         )
 
 
+class FakeDatabaseSession:
+    def add(self, item) -> None:
+        self.item = item
+
+    async def commit(self) -> None:
+        return None
+
+    async def rollback(self) -> None:
+        return None
+
+
+async def fake_database_session():
+    yield FakeDatabaseSession()
+
+
 class StellarCredentialRouteTests(unittest.TestCase):
     def setUp(self) -> None:
         application = create_app(
@@ -155,6 +171,7 @@ class StellarCredentialRouteTests(unittest.TestCase):
             )
         )
         application.dependency_overrides[get_stellar_credential_service] = FakeCredentialService
+        application.dependency_overrides[get_database_session] = fake_database_session
         self.client = TestClient(application)
 
     def test_issue_route(self) -> None:

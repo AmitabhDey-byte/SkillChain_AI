@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     stellar_issuer_secret: SecretStr | None = None
     stellar_transaction_timeout_seconds: int = 45
     credential_attestation_secret: SecretStr | None = None
+    admin_api_key: SecretStr | None = None
 
     model_config = SettingsConfigDict(
         env_file=(".env", ".env.local"),

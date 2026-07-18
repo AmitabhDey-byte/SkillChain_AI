@@ -30,6 +30,7 @@ type ApiRequestOptions = {
   method?: 'GET' | 'POST'
   body?: unknown
   signal?: AbortSignal
+  headers?: Record<string, string>
 }
 
 async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
@@ -38,7 +39,7 @@ async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Pro
   try {
     response = await fetch(`${apiBaseUrl}${path}`, {
       method: options.method || 'GET',
-      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json', ...options.headers },
       body: options.body === undefined ? undefined : JSON.stringify(options.body),
       signal: options.signal,
     })
@@ -316,4 +317,39 @@ export function getLiveHealth(signal?: AbortSignal) {
 
 export function getReadyHealth(signal?: AbortSignal) {
   return apiRequest<ReadyHealthResponse>('/health/ready', { signal })
+}
+
+export function recordWalletConnection(walletAddress: string, network: string) {
+  return apiRequest<{ accepted: boolean }>('/activity/wallet-connections', {
+    method: 'POST',
+    body: { wallet_address: walletAddress, network },
+  })
+}
+
+export type AdminActivityItem = {
+  id: string
+  wallet_address: string
+  interaction_type: string
+  network: string
+  transaction_hash: string | null
+  ledger_sequence: number | null
+  success: boolean
+  interaction_data: Record<string, unknown>
+  created_at: string
+}
+
+export type AdminOverviewResponse = {
+  unique_wallets: number
+  wallet_connections: number
+  credentials_issued: number
+  credentials_verified: number
+  recent_activity: AdminActivityItem[]
+  recent_transactions: AdminActivityItem[]
+}
+
+export function getAdminOverview(adminKey: string, signal?: AbortSignal) {
+  return apiRequest<AdminOverviewResponse>('/admin/overview', {
+    signal,
+    headers: { 'X-Admin-Key': adminKey },
+  })
 }
