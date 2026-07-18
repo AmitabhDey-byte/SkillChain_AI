@@ -292,3 +292,28 @@ export function verifyCredential(credentialId: string, owner: string, signal?: A
     { signal },
   )
 }
+
+export type LiveHealthResponse = {
+  status: 'ok'
+  service: string
+  version: string
+  timestamp: string
+}
+
+export type ReadyHealthResponse = {
+  status: 'ready' | 'degraded'
+  environment: string
+  dependencies: {
+    database: 'configured' | 'missing'
+    gemini: 'configured' | 'pending'
+    stellar: 'configured' | 'missing'
+  }
+}
+
+export function getLiveHealth(signal?: AbortSignal) {
+  return apiRequest<LiveHealthResponse>('/health/live', { signal })
+}
+
+export function getReadyHealth(signal?: AbortSignal) {
+  return apiRequest<ReadyHealthResponse>('/health/ready', { signal })
+}

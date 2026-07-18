@@ -54,8 +54,6 @@ const roleOptions: Array<{
   },
 ]
 
-const stepLabels = ['Your path', 'Your profile', 'Connect GitHub']
-
 function cleanGithubUsername(value: string) {
   return value
     .trim()
@@ -69,6 +67,8 @@ export function OnboardingFlow({ open, onClose, onComplete }: OnboardingFlowProp
   const [profile, setProfile] = useState<OnboardingProfile>(loadOnboardingDraft)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const recruiterFlow = profile.role === 'recruiter'
+  const stepLabels = recruiterFlow ? ['Your path', 'Organization', 'Start reviewing'] : ['Your path', 'Your profile', 'Connect GitHub']
 
   if (!open) return null
 
@@ -96,6 +96,21 @@ export function OnboardingFlow({ open, onClose, onComplete }: OnboardingFlowProp
 
   const finishOnboarding = async (event: FormEvent) => {
     event.preventDefault()
+    if (recruiterFlow) {
+      if (!profile.organization.trim()) {
+        setError('Add your company or organization name.')
+        return
+      }
+
+      setSubmitting(true)
+      setError(null)
+      await new Promise((resolve) => window.setTimeout(resolve, 450))
+      completeOnboarding(profile)
+      setSubmitting(false)
+      onComplete(profile)
+      return
+    }
+
     const githubUsername = cleanGithubUsername(profile.githubUsername)
 
     if (!githubUsername) {
@@ -129,8 +144,8 @@ export function OnboardingFlow({ open, onClose, onComplete }: OnboardingFlowProp
         <aside className="onboarding-sidebar">
           <div className="onboarding-sidebar__brand"><Sparkles size={18} /> SKILLCHAIN AI</div>
           <div>
-            <p className="overline">SET UP YOUR PASSPORT</p>
-            <h2>Build trust from the work you already do.</h2>
+            <p className="overline">{recruiterFlow ? 'SET UP YOUR HIRING DESK' : 'SET UP YOUR PASSPORT'}</p>
+            <h2>{recruiterFlow ? 'Review technical proof with confidence.' : 'Build trust from the work you already do.'}</h2>
           </div>
           <ol className="onboarding-steps">
             {stepLabels.map((label, index) => (
@@ -166,18 +181,29 @@ export function OnboardingFlow({ open, onClose, onComplete }: OnboardingFlowProp
 
           {step === 1 && (
             <div className="onboarding-panel">
-              <p className="overline onboarding-kicker">MAKE IT YOURS</p>
-              <h2 id="onboarding-title">Create your public profile.</h2>
-              <p className="onboarding-lead">These details appear beside your verified skills and credentials.</p>
+              <p className="overline onboarding-kicker">{recruiterFlow ? 'YOUR HIRING IDENTITY' : 'MAKE IT YOURS'}</p>
+              <h2 id="onboarding-title">{recruiterFlow ? 'Set up your recruiter profile.' : 'Create your public profile.'}</h2>
+              <p className="onboarding-lead">{recruiterFlow ? 'These details personalize your private candidate review workspace.' : 'These details appear beside your verified skills and credentials.'}</p>
               <div className="form-grid">
                 <label className="field field--full"><span>Display name</span><div><UserRound size={17} /><input value={profile.displayName} onChange={(event) => updateProfile({ displayName: event.target.value })} placeholder="e.g. Aisha Kapoor" autoFocus /></div></label>
-                <label className="field field--full"><span>Professional headline</span><div><Code2 size={17} /><input value={profile.headline} onChange={(event) => updateProfile({ headline: event.target.value })} placeholder="e.g. Full-stack developer building on Stellar" /></div></label>
+                <label className="field field--full"><span>{recruiterFlow ? 'Role or title' : 'Professional headline'}</span><div>{recruiterFlow ? <BriefcaseBusiness size={17} /> : <Code2 size={17} />}<input value={profile.headline} onChange={(event) => updateProfile({ headline: event.target.value })} placeholder={recruiterFlow ? 'e.g. Technical recruiter' : 'e.g. Full-stack developer building on Stellar'} /></div></label>
+                {recruiterFlow && <label className="field field--full"><span>Company or organization</span><div><Building2 size={17} /><input value={profile.organization} onChange={(event) => updateProfile({ organization: event.target.value })} placeholder="e.g. Stellar Labs" /></div></label>}
                 <label className="field field--full"><span>Location <small>Optional</small></span><div><MapPin size={17} /><input value={profile.location} onChange={(event) => updateProfile({ location: event.target.value })} placeholder="e.g. Bengaluru, India" /></div></label>
               </div>
             </div>
           )}
 
-          {step === 2 && (
+          {step === 2 && recruiterFlow && (
+            <div className="onboarding-panel recruiter-onboarding-ready">
+              <span><ShieldCheck size={31} /></span>
+              <p className="overline onboarding-kicker">RECRUITER WORKSPACE READY</p>
+              <h2 id="onboarding-title">Start reviewing verified talent.</h2>
+              <p className="onboarding-lead">Your dashboard is designed for credential verification, candidate review history, and trusted hiring decisions. GitHub access is not required for recruiter accounts.</p>
+              <div className="analysis-preview"><strong>Your recruiter tools</strong><div className="analysis-tags"><span>Live Stellar verification</span><span>Candidate review history</span><span>Downloadable proof</span><span>Shareable verification links</span></div></div>
+            </div>
+          )}
+
+          {step === 2 && !recruiterFlow && (
             <div className="onboarding-panel">
               <p className="overline onboarding-kicker">PROOF FROM REAL WORK</p>
               <h2 id="onboarding-title">Connect your GitHub identity.</h2>
@@ -192,7 +218,7 @@ export function OnboardingFlow({ open, onClose, onComplete }: OnboardingFlowProp
             <div>{error && <span className="form-error">{error}</span>}</div>
             <div className="onboarding-footer__actions">
               {step > 0 && <button className="back-button" type="button" onClick={() => { setError(null); setStep((current) => current - 1) }}><ArrowLeft size={16} /> Back</button>}
-              {step < stepLabels.length - 1 ? <button className="button button--primary" type="button" onClick={goNext}>Continue <ArrowRight size={17} /></button> : <button className="button button--primary" type="submit" disabled={submitting}>{submitting ? <><LoaderCircle className="spin" size={17} /> Creating profile</> : <>Create my profile <ArrowRight size={17} /></>}</button>}
+              {step < stepLabels.length - 1 ? <button className="button button--primary" type="button" onClick={goNext}>Continue <ArrowRight size={17} /></button> : <button className="button button--primary" type="submit" disabled={submitting}>{submitting ? <><LoaderCircle className="spin" size={17} /> Creating workspace</> : <>{recruiterFlow ? 'Open recruiter dashboard' : 'Create my profile'} <ArrowRight size={17} /></>}</button>}
             </div>
           </div>
         </form>

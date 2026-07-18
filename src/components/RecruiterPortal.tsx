@@ -3,40 +3,20 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { CredentialVerificationResponse } from '../lib/api'
 import { buildVerificationUrl } from '../lib/credentialSharing'
+import { clearRecruiterHistory, loadRecruiterHistory, recordRecruiterVerification } from '../lib/recruiterHistory'
 import { shortenAddress } from '../lib/wallet'
 import { CredentialVerifier } from './CredentialVerifier'
 
-type VerificationHistoryItem = CredentialVerificationResponse & {
-  verified_at: string
-}
-
-const HISTORY_KEY = 'skillchain.recruiter.verificationHistory'
-
-function loadHistory(): VerificationHistoryItem[] {
-  const saved = localStorage.getItem(HISTORY_KEY)
-  if (!saved) return []
-
-  try {
-    const history = JSON.parse(saved) as VerificationHistoryItem[]
-    return Array.isArray(history) ? history.slice(0, 5) : []
-  } catch {
-    return []
-  }
-}
-
 export function RecruiterPortal() {
   const navigate = useNavigate()
-  const [history, setHistory] = useState(loadHistory)
+  const [history, setHistory] = useState(loadRecruiterHistory)
 
   const recordVerification = (result: CredentialVerificationResponse) => {
-    const nextItem = { ...result, verified_at: new Date().toISOString() }
-    const nextHistory = [nextItem, ...history.filter((item) => item.credential_id !== result.credential_id)].slice(0, 5)
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(nextHistory))
-    setHistory(nextHistory)
+    setHistory(recordRecruiterVerification(result))
   }
 
   const clearHistory = () => {
-    localStorage.removeItem(HISTORY_KEY)
+    clearRecruiterHistory()
     setHistory([])
   }
 

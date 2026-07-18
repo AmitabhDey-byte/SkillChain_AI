@@ -14,11 +14,14 @@ import {
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Dashboard } from './components/Dashboard'
+import { AdminDashboard } from './components/AdminDashboard'
 import { OnboardingFlow } from './components/OnboardingFlow'
 import { PublicVerification } from './components/PublicVerification'
+import { RecruiterDashboard } from './components/RecruiterDashboard'
 import { RecruiterPortal } from './components/RecruiterPortal'
 import { WalletModal } from './components/WalletModal'
 import { useWallet } from './hooks/useWallet'
+import { isAdminWallet } from './lib/adminAccess'
 import { hasCompletedOnboarding, loadOnboardingDraft, type OnboardingProfile } from './lib/onboarding'
 import { isTestnet, shortenAddress } from './lib/wallet'
 
@@ -49,6 +52,10 @@ const skills = [
   { name: 'Smart Contracts', score: 84 },
 ]
 
+function dashboardPath(profile: OnboardingProfile) {
+  return profile.role === 'recruiter' ? '/recruiter-dashboard' : '/dashboard'
+}
+
 function App() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -60,10 +67,18 @@ function App() {
   const [profile, setProfile] = useState(loadOnboardingDraft)
   const wallet = useWallet()
 
+  const openSavedDashboard = () => {
+    if (isAdminWallet(wallet.connection?.address)) {
+      navigate('/admin')
+      return
+    }
+    navigate(dashboardPath(profile))
+  }
+
   const openPrimaryFlow = () => {
     setMenuOpen(false)
     if (wallet.status === 'connected') {
-      if (onboardingComplete) navigate('/dashboard')
+      if (onboardingComplete) openSavedDashboard()
       else setOnboardingOpen(true)
       return
     }
@@ -73,7 +88,8 @@ function App() {
 
   const continueFromWallet = () => {
     setWalletModalOpen(false)
-    if (onboardingComplete) navigate('/dashboard')
+    if (isAdminWallet(wallet.connection?.address)) navigate('/admin')
+    else if (onboardingComplete) navigate(dashboardPath(profile))
     else setOnboardingOpen(true)
   }
 
@@ -82,7 +98,7 @@ function App() {
     setOnboardingComplete(true)
     setOnboardingOpen(false)
     setProfileCreated(true)
-    navigate('/dashboard')
+    navigate(dashboardPath(completedProfile))
     window.setTimeout(() => setProfileCreated(false), 4500)
   }
 
@@ -97,8 +113,16 @@ function App() {
         <PublicVerification />
       ) : location.pathname === '/recruiters' ? (
         <RecruiterPortal />
+      ) : location.pathname === '/admin' ? (
+        <AdminDashboard connection={wallet.connection} onOpenWallet={() => setWalletModalOpen(true)} onDisconnect={disconnectAndExit} />
+      ) : location.pathname === '/recruiter-dashboard' ? (
+        onboardingComplete && profile.role === 'recruiter' ? (
+          <RecruiterDashboard profile={profile} connection={wallet.connection} onOpenWallet={() => setWalletModalOpen(true)} onDisconnect={disconnectAndExit} />
+        ) : (
+          <Navigate to="/" replace />
+        )
       ) : location.pathname === '/dashboard' ? (
-        onboardingComplete ? (
+        onboardingComplete && profile.role !== 'recruiter' ? (
           <Dashboard profile={profile} connection={wallet.connection} onOpenWallet={() => setWalletModalOpen(true)} onDisconnect={disconnectAndExit} />
         ) : (
           <Navigate to="/" replace />
@@ -146,7 +170,7 @@ function App() {
             Turn your real work into trusted, portable credentials. SkillChain AI verifies what you can do—not just what your résumé says.
           </p>
           <div className="hero-actions">
-            <button className="button button--primary" type="button" onClick={openPrimaryFlow}>{onboardingComplete ? 'Open dashboard' : 'Verify my skills'} <ArrowRight size={18} /></button>
+            <button className="button button--primary" type="button" onClick={openPrimaryFlow}>{onboardingComplete ? profile.role === 'recruiter' ? 'Open hiring desk' : 'Open dashboard' : 'Verify my skills'} <ArrowRight size={18} /></button>
             <a className="text-link" href="#how-it-works">See how it works <span>↓</span></a>
           </div>
           <div className="trust-row">
@@ -243,7 +267,7 @@ function App() {
         onComplete={handleProfileComplete}
       />
       {profileCreated && (
-        <div className="success-toast" role="status"><Check size={17} /> Profile created. Your skill passport is ready to build.</div>
+        <div className="success-toast" role="status"><Check size={17} /> {profile.role === 'recruiter' ? 'Recruiter workspace created. Start reviewing talent.' : 'Profile created. Your skill passport is ready to build.'}</div>
       )}
     </>
   )

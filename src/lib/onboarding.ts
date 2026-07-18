@@ -8,6 +8,7 @@ export type OnboardingProfile = {
   displayName: string
   headline: string
   location: string
+  organization: string
   githubUsername: string
   githubConsent: boolean
 }
@@ -17,6 +18,7 @@ export const emptyOnboardingProfile: OnboardingProfile = {
   displayName: '',
   headline: '',
   location: '',
+  organization: '',
   githubUsername: '',
   githubConsent: false,
 }
