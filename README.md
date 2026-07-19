@@ -30,7 +30,7 @@ npm run backend:dev
 
 | Variable | Purpose |
 | --- | --- |
-| `VITE_API_BASE_URL` | FastAPI service base URL |
+| `VITE_API_BASE_URL` | Optional local API URL; production always uses same-origin `/api/v1` |
 | `VITE_STELLAR_NETWORK` | Stellar network name |
 | `VITE_STELLAR_NETWORK_PASSPHRASE` | Stellar network passphrase |
 | `DATABASE_URL` | PostgreSQL connection string |

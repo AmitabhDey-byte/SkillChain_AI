@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently --kill-others --names API,WEB --prefix-colors green,cyan \"npm:backend:dev\" \"npm:frontend:dev\"",
     "frontend:dev": "vite",
-    "frontend:test": "node --experimental-strip-types --test tests/jobs.test.ts",
+    "frontend:test": "node --experimental-strip-types --test tests/jobs.test.ts tests/apiConfig.test.ts",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

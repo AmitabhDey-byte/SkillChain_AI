@@ -1,5 +1,6 @@
-const defaultApiBaseUrl = import.meta.env.PROD ? '/api/v1' : 'http://localhost:8000/api/v1'
-const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || defaultApiBaseUrl).replace(/\/$/, '')
+import { resolveApiBaseUrl } from './apiConfig'
+
+const apiBaseUrl = resolveApiBaseUrl(import.meta.env.PROD, import.meta.env.VITE_API_BASE_URL)
 
 type ApiErrorPayload = {
   error?: {
