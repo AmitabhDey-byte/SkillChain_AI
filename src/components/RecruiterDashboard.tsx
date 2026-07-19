@@ -12,6 +12,7 @@ import {
   Search,
   ShieldCheck,
   Trash2,
+  UserRoundSearch,
   UsersRound,
   X,
 } from 'lucide-react'
@@ -22,6 +23,9 @@ import type { OnboardingProfile } from '../lib/onboarding'
 import { clearRecruiterHistory, loadRecruiterHistory, recordRecruiterVerification } from '../lib/recruiterHistory'
 import { isTestnet, shortenAddress, type WalletConnection } from '../lib/wallet'
 import { CredentialVerifier } from './CredentialVerifier'
+import { RecruiterApplications } from './RecruiterApplications'
+import { TalentMarketplace } from './TalentMarketplace'
+import { UniversalSearch } from './UniversalSearch'
 
 type RecruiterDashboardProps = {
   profile: OnboardingProfile
@@ -30,10 +34,12 @@ type RecruiterDashboardProps = {
   onDisconnect: () => void
 }
 
-type RecruiterSection = 'Overview' | 'Verify candidates' | 'Review history'
+type RecruiterSection = 'Overview' | 'Talent marketplace' | 'Applications' | 'Verify candidates' | 'Review history'
 
 const recruiterNav = [
   { label: 'Overview', icon: Home },
+  { label: 'Talent marketplace', icon: UserRoundSearch },
+  { label: 'Applications', icon: BriefcaseBusiness },
   { label: 'Verify candidates', icon: Search },
   { label: 'Review history', icon: UsersRound },
 ] satisfies Array<{ label: RecruiterSection; icon: typeof Home }>
@@ -42,6 +48,7 @@ export function RecruiterDashboard({ profile, connection, onOpenWallet, onDiscon
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [activeSection, setActiveSection] = useState<RecruiterSection>('Overview')
   const [history, setHistory] = useState(loadRecruiterHistory)
+  const [talentSearch, setTalentSearch] = useState({ query: '', key: 0 })
   const firstName = profile.displayName.trim().split(' ')[0] || 'Recruiter'
 
   const recordVerification = (result: CredentialVerificationResponse) => {
@@ -56,6 +63,11 @@ export function RecruiterDashboard({ profile, connection, onOpenWallet, onDiscon
   const selectSection = (section: RecruiterSection) => {
     setActiveSection(section)
     setSidebarOpen(false)
+  }
+
+  const openTalentSearch = (query: string) => {
+    setTalentSearch((current) => ({ query, key: current.key + 1 }))
+    selectSection('Talent marketplace')
   }
 
   const historyList = history.length > 0 ? (
@@ -95,6 +107,7 @@ export function RecruiterDashboard({ profile, connection, onOpenWallet, onDiscon
       <section className="dashboard-main">
         <header className="dashboard-topbar">
           <div><button className="dashboard-menu" type="button" aria-label="Open navigation" onClick={() => setSidebarOpen(true)}><Menu size={20} /></button><span className="dashboard-breadcrumb">Hiring desk <ChevronRight size={13} /> {activeSection}</span></div>
+          <UniversalSearch audience="recruiter" onOpenJobs={() => selectSection('Applications')} onOpenTalent={openTalentSearch} />
           <div className="topbar-actions"><button className="profile-chip" type="button" onClick={() => selectSection('Overview')}><span>{profile.displayName.slice(0, 2).toUpperCase() || 'HR'}</span><div><strong>{profile.displayName || 'Recruiter'}</strong><small>{profile.organization || profile.headline}</small></div></button></div>
         </header>
 
@@ -114,6 +127,10 @@ export function RecruiterDashboard({ profile, connection, onOpenWallet, onDiscon
               </div>
             </>
           )}
+
+          {activeSection === 'Talent marketplace' && <TalentMarketplace key={talentSearch.key} initialQuery={talentSearch.query} />}
+
+          {activeSection === 'Applications' && <RecruiterApplications />}
 
           {activeSection === 'Verify candidates' && (
             <><div className="workspace-heading"><div><p className="overline">LIVE STELLAR CHECK</p><h1>Verify candidates</h1><p>Validate credential ownership and status without accessing a candidate’s private accounts.</p></div></div><CredentialVerifier onVerified={recordVerification} /><div className="verification-guide"><ShieldCheck size={24} /><div><strong>Evidence-backed hiring</strong><p>Every successful check is saved to your recruiter review history in this browser.</p></div></div></>

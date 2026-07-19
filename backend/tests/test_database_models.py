@@ -18,7 +18,7 @@ class DatabaseModelTests(unittest.TestCase):
 
     def test_expected_tables_are_registered(self) -> None:
         table_names = set(inspect(self.engine).get_table_names())
-        self.assertEqual(table_names, {"feedback", "github_profiles", "users", "wallet_interactions"})
+        self.assertEqual(table_names, {"feedback", "github_profiles", "job_applications", "users", "wallet_interactions"})
 
     def test_user_github_and_wallet_relationships(self) -> None:
         user = User(

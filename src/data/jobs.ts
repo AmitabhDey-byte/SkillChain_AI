@@ -1,5 +1,8 @@
+import { marketplaceCompanies } from './companies.ts'
+
 export type JobVacancy = {
   id: string
+  companyId: string
   title: string
   client: string
   clientInitials: string
@@ -13,29 +16,6 @@ export type JobVacancy = {
   verifiedClient: boolean
   stellarPayments: boolean
 }
-
-const clients = [
-  'NovaLedger Labs',
-  'OrbitPay',
-  'DevHarbor',
-  'Lumina Protocol',
-  'ChainCraft Studio',
-  'PixelMint',
-  'AsterWorks',
-  'OpenMesh Foundation',
-  'BrightNode',
-  'KiteStack',
-  'CloudSprint',
-  'Veridian Systems',
-  'StellarBridge',
-  'Northstar Digital',
-  'Cobalt Finance',
-  'BuildSphere',
-  'QuantaGrid',
-  'Atlas Freelance',
-  'SignalForge',
-  'LaunchDock',
-]
 
 const roles = [
   { title: 'Frontend Engineer', skills: ['React', 'TypeScript', 'Vite'], summary: 'Build polished user workflows for a fast-growing developer platform.' },
@@ -57,13 +37,14 @@ const compensations = ['$70k–$95k', '$4k–$7k / month', '$35–$60 / hour', '
 
 export const jobVacancies: JobVacancy[] = Array.from({ length: 50 }, (_, index) => {
   const role = roles[index % roles.length]
-  const client = clients[index % clients.length]
+  const company = marketplaceCompanies[index]
 
   return {
     id: `demo-job-${String(index + 1).padStart(2, '0')}`,
+    companyId: company.id,
     title: role.title,
-    client,
-    clientInitials: client.split(' ').map((word) => word[0]).join('').slice(0, 2),
+    client: company.name,
+    clientInitials: company.initials,
     location: locations[index % locations.length],
     workMode: workModes[index % workModes.length],
     engagement: engagements[index % engagements.length],
@@ -71,7 +52,7 @@ export const jobVacancies: JobVacancy[] = Array.from({ length: 50 }, (_, index) 
     skills: role.skills,
     summary: role.summary,
     postedDaysAgo: (index % 12) + 1,
-    verifiedClient: index % 4 !== 3,
+    verifiedClient: company.verified,
     stellarPayments: index % 3 !== 2,
   }
 })

@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import { marketplaceCompanies, searchCompanies } from '../src/data/companies.ts'
 import { filterJobVacancies, jobVacancies } from '../src/data/jobs.ts'
+import { searchTalent, talentProfiles } from '../src/data/talent.ts'
 
 test('provides fifty unique demo vacancies', () => {
   assert.equal(jobVacancies.length, 50)
   assert.equal(new Set(jobVacancies.map((job) => job.id)).size, 50)
+  assert.equal(new Set(jobVacancies.map((job) => job.client)).size, 50)
 })
 
 test('searches across roles, clients, skills, and locations', () => {
@@ -17,4 +20,17 @@ test('combines work mode and engagement filters', () => {
   const matches = filterJobVacancies(jobVacancies, '', 'Hybrid', 'Contract')
   assert.ok(matches.length > 0)
   assert.ok(matches.every((job) => job.workMode === 'Hybrid' && job.engagement === 'Contract'))
+})
+
+test('provides fifty searchable companies', () => {
+  assert.equal(marketplaceCompanies.length, 50)
+  assert.equal(new Set(marketplaceCompanies.map((company) => company.id)).size, 50)
+  assert.ok(searchCompanies('Payments').length > 0)
+})
+
+test('provides fifty skill-searchable talent profiles', () => {
+  assert.equal(talentProfiles.length, 50)
+  assert.equal(new Set(talentProfiles.map((profile) => profile.id)).size, 50)
+  assert.ok(searchTalent('Soroban').length > 0)
+  assert.ok(searchTalent('', 'React').every((profile) => profile.skills.includes('React')))
 })

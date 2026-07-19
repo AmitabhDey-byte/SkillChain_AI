@@ -1,5 +1,6 @@
 from backend.app.db.models.feedback import Feedback
 from backend.app.db.models.github_profile import GithubProfile
+from backend.app.db.models.job_application import ApplicationStatus, JobApplication
 from backend.app.db.models.user import User, UserRole, UserStatus
 from backend.app.db.models.wallet_interaction import InteractionType, WalletInteraction
 
@@ -7,10 +8,11 @@ from backend.app.db.models.wallet_interaction import InteractionType, WalletInte
 __all__ = [
     "Feedback",
     "GithubProfile",
+    "ApplicationStatus",
     "InteractionType",
+    "JobApplication",
     "User",
     "UserRole",
     "UserStatus",
     "WalletInteraction",
 ]
-

@@ -34,6 +34,7 @@ import type { AssessmentRunResult, CredentialIssueResponse, GithubRepository } f
 import { clearCredential, loadCredential, saveCredential } from '../lib/credential'
 import type { OnboardingProfile } from '../lib/onboarding'
 import { isTestnet, shortenAddress, type WalletConnection } from '../lib/wallet'
+import { UniversalSearch } from './UniversalSearch'
 
 type DashboardProps = {
   profile: OnboardingProfile
@@ -65,6 +66,7 @@ export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: D
   const [selectedRepositories, setSelectedRepositories] = useState(loadAssessmentRepositories)
   const [assessmentResult, setAssessmentResult] = useState(loadAssessmentResult)
   const [credential, setCredential] = useState(loadCredential)
+  const [opportunitySearch, setOpportunitySearch] = useState({ query: '', key: 0 })
   const firstName = profile.displayName.trim().split(' ')[0] || 'Builder'
   const githubUrl = `https://github.com/${profile.githubUsername}`
 
@@ -104,6 +106,11 @@ export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: D
     setSidebarOpen(false)
   }
 
+  const openOpportunitySearch = (query: string) => {
+    setOpportunitySearch((current) => ({ query, key: current.key + 1 }))
+    selectSection('Opportunities')
+  }
+
   return (
     <main className="dashboard-layout">
       <aside className={sidebarOpen ? 'dashboard-sidebar dashboard-sidebar--open' : 'dashboard-sidebar'}>
@@ -134,6 +141,7 @@ export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: D
             <button className="dashboard-menu" type="button" aria-label="Open navigation" onClick={() => setSidebarOpen(true)}><Menu size={20} /></button>
             <span className="dashboard-breadcrumb">Workspace <ChevronRight size={13} /> {activeSection}</span>
           </div>
+          <UniversalSearch audience="talent" onOpenJobs={openOpportunitySearch} />
           <div className="topbar-actions">
             <button type="button" aria-label="Open assessment notifications" onClick={() => selectSection('Assessments')}><Bell size={18} /><span /></button>
             <button className="profile-chip" type="button" onClick={() => selectSection('Public profile')}><span>{profile.displayName.slice(0, 2).toUpperCase() || 'SC'}</span><div><strong>{profile.displayName || 'SkillChain user'}</strong><small>{profile.role || 'Member'}</small></div></button>
@@ -199,6 +207,8 @@ export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: D
               onViewAssessment={() => assessmentResult ? setAssessmentOpen(true) : setSelectorOpen(true)}
               onOpenWallet={onOpenWallet}
               onCredentialIssued={handleCredentialIssued}
+              opportunityQuery={opportunitySearch.query}
+              opportunitySearchKey={opportunitySearch.key}
             />
           )}
         </div>

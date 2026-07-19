@@ -43,6 +43,8 @@ type DashboardSectionProps = {
   onViewAssessment: () => void
   onOpenWallet: () => void
   onCredentialIssued: (credential: CredentialIssueResponse) => void
+  opportunityQuery: string
+  opportunitySearchKey: number
 }
 
 function AssessmentsSection({
@@ -235,7 +237,7 @@ function SettingsSection({
 }
 
 export function DashboardSection(props: DashboardSectionProps) {
-  if (props.section === 'Opportunities') return <JobMarketplace />
+  if (props.section === 'Opportunities') return <JobMarketplace key={props.opportunitySearchKey} profile={props.profile} connection={props.connection} assessmentResult={props.assessmentResult} initialQuery={props.opportunityQuery} />
   if (props.section === 'Assessments') return <AssessmentsSection {...props} />
   if (props.section === 'Credentials') return <CredentialsSection {...props} />
   if (props.section === 'Verification') return <VerificationSection {...props} />

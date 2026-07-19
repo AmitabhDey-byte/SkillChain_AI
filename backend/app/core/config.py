@@ -1,8 +1,25 @@
 from functools import lru_cache
 from typing import Literal
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def normalize_async_database_url(database_url: str) -> str:
+    normalized = database_url.strip()
+    for prefix in ("postgres://", "postgresql://", "postgresql+psycopg2://", "postgresql+psycopg://"):
+        if normalized.startswith(prefix):
+            normalized = f"postgresql+asyncpg://{normalized[len(prefix):]}"
+            break
+
+    parts = urlsplit(normalized)
+    query = []
+    for key, value in parse_qsl(parts.query, keep_blank_values=True):
+        if key == "channel_binding":
+            continue
+        query.append(("ssl" if key == "sslmode" else key, value))
+    return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
 
 
 class Settings(BaseSettings):
@@ -40,6 +57,10 @@ class Settings(BaseSettings):
     @property
     def docs_enabled(self) -> bool:
         return self.environment != "production" or self.debug
+
+    @property
+    def async_database_url(self) -> str:
+        return normalize_async_database_url(self.database_url.get_secret_value())
 
 
 @lru_cache

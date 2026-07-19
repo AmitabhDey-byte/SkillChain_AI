@@ -27,7 +27,7 @@ export class ApiError extends Error {
 }
 
 type ApiRequestOptions = {
-  method?: 'GET' | 'POST'
+  method?: 'GET' | 'POST' | 'PATCH'
   body?: unknown
   signal?: AbortSignal
   headers?: Record<string, string>
@@ -351,5 +351,60 @@ export function getAdminOverview(adminKey: string, signal?: AbortSignal) {
   return apiRequest<AdminOverviewResponse>('/admin/overview', {
     signal,
     headers: { 'X-Admin-Key': adminKey },
+  })
+}
+
+export type AssistantMessage = {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+export function chatWithAlbedo(message: string, role: string, history: AssistantMessage[], signal?: AbortSignal) {
+  return apiRequest<{ reply: string; model: string }>('/assistant/chat', {
+    method: 'POST',
+    body: { message, role, history: history.slice(-10) },
+    signal,
+  })
+}
+
+export type JobApplicationStatus = 'pending' | 'reviewing' | 'shortlisted' | 'declined'
+
+export type JobApplication = {
+  id: string
+  job_id: string
+  company_id: string
+  company_name: string
+  job_title: string
+  applicant_wallet: string
+  applicant_name: string
+  applicant_headline: string
+  applicant_role: string
+  skills: string[]
+  message: string
+  status: JobApplicationStatus
+  created_at: string
+  updated_at: string
+}
+
+export type JobApplicationCreate = Omit<JobApplication, 'id' | 'status' | 'created_at' | 'updated_at'>
+
+export function submitJobApplication(application: JobApplicationCreate, signal?: AbortSignal) {
+  return apiRequest<JobApplication>('/marketplace/applications', {
+    method: 'POST',
+    body: application,
+    signal,
+  })
+}
+
+export function getJobApplications(companyId?: string, signal?: AbortSignal) {
+  const query = companyId ? `?company_id=${encodeURIComponent(companyId)}` : ''
+  return apiRequest<{ applications: JobApplication[]; total: number }>(`/marketplace/applications${query}`, { signal })
+}
+
+export function updateJobApplication(applicationId: string, status: JobApplicationStatus, signal?: AbortSignal) {
+  return apiRequest<JobApplication>(`/marketplace/applications/${encodeURIComponent(applicationId)}`, {
+    method: 'PATCH',
+    body: { status },
+    signal,
   })
 }

@@ -4,7 +4,7 @@ AI-powered technical skill verification and portable on-chain credentials on Ste
 
 ## Current milestone
 
-The application currently includes the React and TypeScript frontend, responsive visual system, public product landing experience, example credential preview, Freighter wallet authentication on Stellar, persistent first-time onboarding, and an authenticated user workspace.
+The application includes role-specific React dashboards, Freighter wallet authentication, GitHub evidence analysis, Gemini skill assessment, Stellar credentials, a searchable jobs and talent marketplace, PostgreSQL-backed applications, and the Gemini-powered Albedo blockchain assistant.
 
 ## Local development
 
@@ -45,8 +45,6 @@ npm run backend:dev
 | `STELLAR_CONTRACT_ID` | Deployed credential contract address |
 | `STELLAR_ISSUER_SECRET` | Server-only issuer signing key |
 | `CREDENTIAL_ATTESTATION_SECRET` | Server-only HMAC key protecting AI reports |
-| `STELLAR_RPC_URL` | Soroban JSON-RPC endpoint |
-| `STELLAR_CONTRACT_ID` | Deployed SkillChain contract identifier |
 
 ## Backend foundation
 
@@ -58,11 +56,33 @@ npm run backend:test
 
 ## Database
 
-PostgreSQL persistence uses SQLAlchemy 2 with async sessions and Alembic migrations. The core schema stores wallet-owned users, GitHub identities, wallet interaction proof, and structured user feedback. Models use UUID primary keys, explicit foreign-key deletion behavior, stable enum values, indexed lookup paths, timestamps, and database constraints.
+PostgreSQL persistence uses SQLAlchemy 2 with async sessions and Alembic migrations. The schema stores wallet-owned users, GitHub identities, wallet interaction proof, feedback, and cross-device marketplace applications. Models use UUID primary keys, stable enum values, indexed lookup paths, timestamps, and database constraints.
 
 ```bash
 npm run backend:migrate
 ```
+
+Run the migration command against the production `DATABASE_URL` after every deployment containing a new migration. The `20260719_0002` migration creates the recruiter application inbox.
+
+## Marketplace
+
+Talent accounts can search 50 distinct demonstration companies and vacancies, filter by work mode or engagement, save opportunities, and submit wallet-linked application requests. Recruiters receive those requests in a persistent inbox and can move them through pending, reviewing, shortlisted, and declined states.
+
+Recruiters can also search 50 developer and freelancer profiles by skill, role, location, availability, and AI skill score. The universal dashboard search adapts its result priority to the current account role.
+
+| Endpoint | Purpose |
+| --- | --- |
+| `POST /api/v1/marketplace/applications` | Submit a job application |
+| `GET /api/v1/marketplace/applications` | Read recruiter application requests |
+| `PATCH /api/v1/marketplace/applications/{id}` | Update recruiter review status |
+
+## Albedo assistant
+
+Albedo is a floating Gemini-powered assistant available throughout the product. It answers practical questions about Stellar, Soroban, wallets, credentials, blockchain careers, and SkillChain workflows. Server-side guardrails prevent requests for secrets and clearly separate testnet assets from real funds.
+
+| Endpoint | Purpose |
+| --- | --- |
+| `POST /api/v1/assistant/chat` | Send a bounded conversation to Albedo |
 
 ## GitHub integration
 

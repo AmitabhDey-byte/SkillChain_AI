@@ -10,7 +10,7 @@ from backend.app.core.config import get_settings
 def get_engine() -> AsyncEngine:
     settings = get_settings()
     return create_async_engine(
-        settings.database_url.get_secret_value(),
+        settings.async_database_url,
         echo=settings.debug,
         pool_pre_ping=True,
         pool_size=10,
@@ -39,4 +39,3 @@ async def dispose_engine() -> None:
         await get_engine().dispose()
     get_session_factory.cache_clear()
     get_engine.cache_clear()
-

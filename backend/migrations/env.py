@@ -13,7 +13,7 @@ from backend.app.db import models
 
 config = context.config
 settings = get_settings()
-config.set_main_option("sqlalchemy.url", settings.database_url.get_secret_value().replace("%", "%%"))
+config.set_main_option("sqlalchemy.url", settings.async_database_url.replace("%", "%%"))
 target_metadata = Base.metadata
 registered_models = models.__all__
 
@@ -54,4 +54,3 @@ if context.is_offline_mode():
     run_migrations_offline()
 else:
     asyncio.run(run_async_migrations())
-

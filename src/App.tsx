@@ -20,6 +20,7 @@ import { PublicVerification } from './components/PublicVerification'
 import { RecruiterDashboard } from './components/RecruiterDashboard'
 import { RecruiterPortal } from './components/RecruiterPortal'
 import { WalletModal } from './components/WalletModal'
+import { AlbedoAssistant } from './components/AlbedoAssistant'
 import { useWallet } from './hooks/useWallet'
 import { isAdminWallet } from './lib/adminAccess'
 import { hasCompletedOnboarding, loadOnboardingDraft, type OnboardingProfile } from './lib/onboarding'
@@ -269,6 +270,7 @@ function App() {
       {profileCreated && (
         <div className="success-toast" role="status"><Check size={17} /> {profile.role === 'recruiter' ? 'Recruiter workspace created. Start reviewing talent.' : 'Profile created. Your skill passport is ready to build.'}</div>
       )}
+      <AlbedoAssistant role={onboardingComplete ? profile.role : 'visitor'} />
     </>
   )
 }
