@@ -10,9 +10,7 @@
     "backend": {
       "root": "backend",
       "framework": "fastapi",
-      "entrypoint": "main:app",
-      "maxDuration": 60,
-      "excludeFiles": "{tests/**,migrations/**,__pycache__/**}"
+      "entrypoint": "main:app"
     }
   },
   "rewrites": [

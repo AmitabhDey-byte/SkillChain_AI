@@ -11,7 +11,6 @@ test('ships Vite and FastAPI as routed services', () => {
   assert.equal(config.services.frontend.outputDirectory, 'dist')
   assert.equal(config.services.backend.framework, 'fastapi')
   assert.equal(config.services.backend.entrypoint, 'main:app')
-  assert.equal(config.services.backend.maxDuration, 60)
   assert.match(backendEntrypoint, /from backend\.app\.main import app/)
 })
 
