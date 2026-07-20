@@ -6,7 +6,8 @@ from fastapi.testclient import TestClient
 from pydantic import SecretStr
 
 from backend.app.core.config import Settings
-from backend.app.integrations.albedo import AlbedoService, get_albedo_service
+from backend.app.core.errors import AppError
+from backend.app.integrations.albedo import AlbedoService, get_albedo_service, normalize_gemini_api_key
 from backend.app.main import create_app
 from backend.app.schemas.assistant import AssistantChatRequest, AssistantChatResponse
 
@@ -17,6 +18,7 @@ class AlbedoServiceTests(unittest.IsolatedAsyncioTestCase):
             payload = json.loads(request.content)
             instruction = payload["systemInstruction"]["parts"][0]["text"]
             self.assertIn("seed phrases", instruction)
+            self.assertEqual([item["role"] for item in payload["contents"]], ["user", "model", "user"])
             self.assertIn("Current user type: freelancer", payload["contents"][-1]["parts"][0]["text"])
             return httpx.Response(
                 200,
@@ -32,10 +34,44 @@ class AlbedoServiceTests(unittest.IsolatedAsyncioTestCase):
 
         async with httpx.AsyncClient(base_url="https://generativelanguage.googleapis.com", transport=httpx.MockTransport(handler)) as client:
             result = await AlbedoService(client, "test-key", "gemini-2.5-flash").chat(
-                AssistantChatRequest(message="What is Soroban?", role="freelancer")
+                AssistantChatRequest(
+                    message="What is Soroban?",
+                    role="freelancer",
+                    history=[
+                        {"role": "assistant", "content": "Welcome to SkillChain."},
+                        {"role": "user", "content": "What is Stellar?"},
+                        {"role": "assistant", "content": "Stellar is a payments network."},
+                    ],
+                )
             )
 
         self.assertEqual(result.reply, "Soroban is Stellar's smart contract platform.")
+
+    async def test_invalid_api_key_response_is_actionable(self) -> None:
+        def handler(_: httpx.Request) -> httpx.Response:
+            return httpx.Response(
+                400,
+                json={
+                    "error": {
+                        "code": 400,
+                        "message": "API key not valid. Please pass a valid API key.",
+                        "status": "INVALID_ARGUMENT",
+                        "details": [{"reason": "API_KEY_INVALID"}],
+                    }
+                },
+            )
+
+        async with httpx.AsyncClient(base_url="https://generativelanguage.googleapis.com", transport=httpx.MockTransport(handler)) as client:
+            with self.assertRaises(AppError) as context:
+                await AlbedoService(client, "invalid-key", "gemini-2.5-flash", retry_delays=()).chat(
+                    AssistantChatRequest(message="What is Stellar?", role="talent")
+                )
+
+        self.assertEqual(context.exception.code, "albedo_unauthorized")
+        self.assertEqual(context.exception.status_code, 503)
+
+    def test_normalizes_pasted_vercel_secret(self) -> None:
+        self.assertEqual(normalize_gemini_api_key(' GEMINI_API_KEY="AIza-test" '), "AIza-test")
 
 
 class FakeAlbedoService:
