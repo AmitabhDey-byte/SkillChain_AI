@@ -34,12 +34,14 @@ class GeminiAssessmentService:
         api_key: str,
         model: str,
         attestation_secret: str,
+        api_version: str = "v1",
         retry_delays: tuple[float, ...] = (0.3, 1.0),
     ) -> None:
         self.client = client
         self.api_key = api_key
         self.model = model
         self.attestation_secret = attestation_secret
+        self.api_version = api_version
         self.retry_delays = retry_delays
 
     async def assess(
@@ -123,7 +125,7 @@ class GeminiAssessmentService:
         for attempt in range(attempts):
             try:
                 response = await self.client.post(
-                    f"/v1beta/models/{self.model}:generateContent",
+                    f"/{self.api_version}/models/{self.model}:generateContent",
                     headers={"X-Goog-Api-Key": self.api_key, "Content-Type": "application/json"},
                     json=payload,
                 )
@@ -272,4 +274,5 @@ async def get_gemini_assessment_service(settings: Settings = Depends(get_setting
             settings.gemini_api_key.get_secret_value(),
             settings.gemini_model,
             settings.credential_attestation_secret.get_secret_value(),
+            settings.gemini_api_version,
         )

@@ -88,6 +88,7 @@ Set the Framework Preset to `Services`, keep the Root Directory at the repositor
 | `ALLOWED_HOSTS` | `["skill-chain-ai-cona.vercel.app"]` |
 | `ADMIN_WALLETS` | JSON array containing the owner Stellar wallet |
 | `GEMINI_API_KEY` | Server-only Gemini key |
+| `GEMINI_API_VERSION` | `v1` |
 | `GITHUB_TOKEN` | Optional server-only GitHub token |
 | `STELLAR_CONTRACT_ID` | Deployed Soroban credential contract ID |
 | `STELLAR_ISSUER_SECRET` | Server-only Stellar testnet issuer secret |

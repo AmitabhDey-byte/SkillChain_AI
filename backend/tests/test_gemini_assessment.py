@@ -124,6 +124,7 @@ class GeminiAssessmentServiceTests(unittest.IsolatedAsyncioTestCase):
     async def test_structured_request_and_weighted_score(self) -> None:
         def handler(request: httpx.Request) -> httpx.Response:
             self.assertEqual(request.headers["X-Goog-Api-Key"], "test-key")
+            self.assertEqual(request.url.path, "/v1/models/gemini-2.5-flash:generateContent")
             payload = json.loads(request.content)
             self.assertEqual(payload["generationConfig"]["responseMimeType"], "application/json")
             self.assertIn("properties", payload["generationConfig"]["responseJsonSchema"])

@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     admin_wallets: list[str] = []
     gemini_api_key: SecretStr | None = None
     gemini_model: str = "gemini-2.5-flash"
+    gemini_api_version: Literal["v1", "v1beta"] = "v1"
     gemini_timeout_seconds: float = 45
     github_client_id: str | None = None
     github_client_secret: SecretStr | None = None

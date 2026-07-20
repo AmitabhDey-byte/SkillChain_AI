@@ -31,11 +31,13 @@ class AlbedoService:
         client: httpx.AsyncClient,
         api_key: str,
         model: str,
+        api_version: str = "v1",
         retry_delays: tuple[float, ...] = (0.3, 1.0),
     ) -> None:
         self.client = client
         self.api_key = api_key
         self.model = model
+        self.api_version = api_version
         self.retry_delays = retry_delays
 
     async def chat(self, request: AssistantChatRequest) -> AssistantChatResponse:
@@ -79,7 +81,7 @@ class AlbedoService:
         for attempt in range(len(self.retry_delays) + 1):
             try:
                 response = await self.client.post(
-                    f"/v1beta/models/{self.model}:generateContent",
+                    f"/{self.api_version}/models/{self.model}:generateContent",
                     headers={"X-Goog-Api-Key": self.api_key, "Content-Type": "application/json"},
                     json=payload,
                 )
@@ -113,7 +115,7 @@ class AlbedoService:
                         "The configured Gemini model is unavailable.",
                         "albedo_model_unavailable",
                         503,
-                        {"model": self.model},
+                        {"model": self.model, "api_version": self.api_version},
                     )
                 if response.status_code == 400:
                     raise AppError(
@@ -151,4 +153,5 @@ async def get_albedo_service(settings: Settings = Depends(get_settings)) -> Asyn
             client,
             api_key,
             settings.gemini_model,
+            settings.gemini_api_version,
         )

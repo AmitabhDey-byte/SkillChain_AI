@@ -15,6 +15,7 @@ from backend.app.schemas.assistant import AssistantChatRequest, AssistantChatRes
 class AlbedoServiceTests(unittest.IsolatedAsyncioTestCase):
     async def test_chat_uses_guardrails_and_returns_text(self) -> None:
         def handler(request: httpx.Request) -> httpx.Response:
+            self.assertEqual(request.url.path, "/v1/models/gemini-2.5-flash:generateContent")
             payload = json.loads(request.content)
             instruction = payload["systemInstruction"]["parts"][0]["text"]
             self.assertIn("seed phrases", instruction)
