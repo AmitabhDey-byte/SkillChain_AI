@@ -17,10 +17,12 @@ class AlbedoServiceTests(unittest.IsolatedAsyncioTestCase):
         def handler(request: httpx.Request) -> httpx.Response:
             self.assertEqual(request.url.path, "/v1/models/gemini-2.5-flash:generateContent")
             payload = json.loads(request.content)
-            instruction = payload["systemInstruction"]["parts"][0]["text"]
-            self.assertIn("seed phrases", instruction)
-            self.assertEqual([item["role"] for item in payload["contents"]], ["user", "model", "user"])
-            self.assertIn("Current user type: freelancer", payload["contents"][-1]["parts"][0]["text"])
+            prompt = payload["contents"][0]["parts"][0]["text"]
+            self.assertEqual(set(payload), {"contents"})
+            self.assertIn("seed phrases", prompt)
+            self.assertIn("User: What is Stellar?", prompt)
+            self.assertIn("Albedo: Stellar is a payments network.", prompt)
+            self.assertIn("Current user type: freelancer", prompt)
             return httpx.Response(
                 200,
                 json={

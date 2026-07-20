@@ -41,27 +41,20 @@ class AlbedoService:
         self.retry_delays = retry_delays
 
     async def chat(self, request: AssistantChatRequest) -> AssistantChatResponse:
-        contents: list[dict[str, Any]] = []
+        transcript: list[str] = []
         for message in request.history:
-            role = "user" if message.role == "user" else "model"
-            if not contents and role == "model":
-                continue
-            if contents and contents[-1]["role"] == role:
-                contents[-1]["parts"][0]["text"] += f"\n{message.content}"
-            else:
-                contents.append({"role": role, "parts": [{"text": message.content}]})
-        current_message = f"Current user type: {request.role}\nQuestion: {request.message}"
-        if contents and contents[-1]["role"] == "user":
-            contents[-1]["parts"][0]["text"] += f"\n{current_message}"
-        else:
-            contents.append({"role": "user", "parts": [{"text": current_message}]})
+            speaker = "User" if message.role == "user" else "Albedo"
+            transcript.append(f"{speaker}: {message.content}")
+        conversation = "\n".join(transcript[-8:]) or "No previous conversation."
+        prompt = (
+            f"{ALBEDO_INSTRUCTION}\n\n"
+            f"Conversation so far:\n{conversation}\n\n"
+            f"Current user type: {request.role}\n"
+            f"Question: {request.message}\n\n"
+            "Answer as Albedo in plain text."
+        )
         payload = {
-            "systemInstruction": {"parts": [{"text": ALBEDO_INSTRUCTION}]},
-            "contents": contents,
-            "generationConfig": {
-                "temperature": 0.35,
-                "maxOutputTokens": 900,
-            },
+            "contents": [{"parts": [{"text": prompt}]}],
         }
         response = await self._generate(payload)
         response_data: dict[str, Any] = response.json()
