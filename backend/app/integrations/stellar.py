@@ -47,6 +47,8 @@ class StellarCredentialService:
                 "model": request.model,
                 "repository_ids": sorted(request.repository_ids),
                 "rubric_version": request.rubric_version,
+                "subject_wallet": request.subject_wallet.upper(),
+                "github_username": request.github_username.lower(),
             },
             sort_keys=True,
             separators=(",", ":"),
@@ -70,6 +72,8 @@ class StellarCredentialService:
             request.repository_ids,
             request.assessment.model_dump(mode="json"),
             self.attestation_secret,
+            request.subject_wallet,
+            request.github_username,
         )
         if not hmac.compare_digest(request.attestation, expected_attestation):
             raise AppError("The AI assessment attestation is invalid.", "credential_attestation_invalid", 422)

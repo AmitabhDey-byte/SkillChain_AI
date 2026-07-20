@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { recordWalletConnection } from '../lib/api'
 import {
+  authenticateWallet,
+  clearWalletSession,
+  connectAlbedo,
   connectFreighter,
-  restoreFreighterSession,
-  WALLET_SESSION_KEY,
+  restoreWalletSession,
   type WalletConnection,
+  type WalletType,
 } from '../lib/wallet'
 
 type WalletStatus = 'checking' | 'disconnected' | 'connecting' | 'connected' | 'error'
@@ -17,7 +20,7 @@ export function useWallet() {
   useEffect(() => {
     let active = true
 
-    restoreFreighterSession()
+    restoreWalletSession()
       .then((savedConnection) => {
         if (!active) return
         setConnection(savedConnection)
@@ -25,7 +28,7 @@ export function useWallet() {
       })
       .catch(() => {
         if (!active) return
-        localStorage.removeItem(WALLET_SESSION_KEY)
+        clearWalletSession()
         setConnection(null)
         setStatus('disconnected')
       })
@@ -35,13 +38,15 @@ export function useWallet() {
     }
   }, [])
 
-  const connect = useCallback(async () => {
+  const connect = useCallback(async (walletType: WalletType = 'freighter') => {
     setStatus('connecting')
     setError(null)
 
     try {
-      const nextConnection = await connectFreighter()
-      localStorage.setItem(WALLET_SESSION_KEY, 'true')
+      const walletConnection = walletType === 'albedo'
+        ? await connectAlbedo()
+        : await connectFreighter()
+      const nextConnection = await authenticateWallet(walletConnection)
       setConnection(nextConnection)
       setStatus('connected')
       void recordWalletConnection(nextConnection.address, nextConnection.network).catch(() => undefined)
@@ -55,7 +60,7 @@ export function useWallet() {
   }, [])
 
   const disconnect = useCallback(() => {
-    localStorage.removeItem(WALLET_SESSION_KEY)
+    clearWalletSession()
     setConnection(null)
     setError(null)
     setStatus('disconnected')

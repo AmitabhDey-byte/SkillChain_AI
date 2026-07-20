@@ -10,6 +10,8 @@ def sign_assessment(
     repository_ids: list[int],
     assessment: dict[str, Any],
     secret: str,
+    subject_wallet: str,
+    github_username: str,
 ) -> str:
     payload = json.dumps(
         {
@@ -17,6 +19,8 @@ def sign_assessment(
             "model": model,
             "repository_ids": sorted(repository_ids),
             "rubric_version": rubric_version,
+            "subject_wallet": subject_wallet.upper(),
+            "github_username": github_username.lower(),
         },
         sort_keys=True,
         separators=(",", ":"),

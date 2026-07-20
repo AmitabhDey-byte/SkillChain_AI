@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
 
+from backend.app.core.auth import WalletIdentity, require_wallet_identity
 from backend.app.integrations.github import GithubService, get_github_service
 from backend.app.schemas.github import EvidenceBatchRequest, EvidenceBatchResponse, GithubProfileResponse, RepositoryEvidenceBundle, RepositoryListResponse
 
@@ -33,6 +34,7 @@ async def list_repositories(
 async def collect_repository_evidence(
     owner: GithubUsername,
     repository: RepositoryName,
+    _: WalletIdentity | None = Depends(require_wallet_identity),
     service: GithubService = Depends(get_github_service),
 ) -> RepositoryEvidenceBundle:
     return await service.collect_evidence(owner, repository)
@@ -41,6 +43,7 @@ async def collect_repository_evidence(
 @router.post("/evidence", response_model=EvidenceBatchResponse, summary="Collect evidence for selected repositories")
 async def collect_evidence_batch(
     request: EvidenceBatchRequest,
+    _: WalletIdentity | None = Depends(require_wallet_identity),
     service: GithubService = Depends(get_github_service),
 ) -> EvidenceBatchResponse:
     return await service.collect_evidence_batch(request.repositories)

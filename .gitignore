@@ -14,3 +14,4 @@ __pycache__/
 htmlcov/
 .coverage
 target/
+.superdesign/tmp/

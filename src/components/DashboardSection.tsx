@@ -10,18 +10,23 @@ import {
   FileCheck2,
   GitBranch,
   Globe2,
+  Lightbulb,
   LockKeyhole,
   LoaderCircle,
+  Network,
+  Rocket,
   ShieldCheck,
   Share2,
   Sparkles,
+  Target,
   Wallet,
 } from 'lucide-react'
-import { useState } from 'react'
+import { type CSSProperties, useState } from 'react'
 import {
   issueCredential,
   type AssessmentRunResult,
   type CredentialIssueResponse,
+  type DimensionScore,
   type GithubRepository,
 } from '../lib/api'
 import { buildVerificationUrl, createCredentialPassport, downloadJson } from '../lib/credentialSharing'
@@ -29,8 +34,9 @@ import type { OnboardingProfile } from '../lib/onboarding'
 import { shortenAddress, type WalletConnection } from '../lib/wallet'
 import { CredentialVerifier } from './CredentialVerifier'
 import { JobMarketplace } from './JobMarketplace'
+import { Avatar } from './Avatar'
 
-export type DashboardSectionName = 'Overview' | 'Opportunities' | 'Assessments' | 'Credentials' | 'Verification' | 'Public profile' | 'Settings'
+export type DashboardSectionName = 'Overview' | 'Skill graph' | 'Opportunities' | 'Assessments' | 'Credentials' | 'Career copilot' | 'Verification' | 'Public profile' | 'Settings'
 
 type DashboardSectionProps = {
   section: Exclude<DashboardSectionName, 'Overview'>
@@ -83,7 +89,8 @@ function CredentialsSection({
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [shared, setShared] = useState(false)
-  const legacyAssessment = assessmentResult && !assessmentResult.attestation
+  const legacyAssessment = assessmentResult
+    && (!assessmentResult.attestation || !assessmentResult.subject_wallet || !assessmentResult.github_username)
 
   const issue = async () => {
     if (!assessmentResult || !connection) return
@@ -182,6 +189,101 @@ function VerificationSection({
   )
 }
 
+function SkillGraphSection({
+  assessmentResult,
+  onNewAssessment,
+}: Pick<DashboardSectionProps, 'assessmentResult' | 'onNewAssessment'>) {
+  if (!assessmentResult) {
+    return (
+      <>
+        <div className="workspace-heading"><div><p className="overline">SKILL INTELLIGENCE</p><h1>Skill graph</h1><p>Map the strongest relationships across your technical evidence.</p></div></div>
+        <article className="workspace-empty-card"><span><Network size={28} /></span><h2>Your graph needs evidence</h2><p>Complete an AI portfolio assessment to generate your evidence-backed skill constellation.</p><button className="button button--primary" type="button" onClick={onNewAssessment}>Build my graph <ArrowRight size={16} /></button></article>
+      </>
+    )
+  }
+
+  const dimensions = Object.entries(assessmentResult.assessment.dimensions) as Array<[string, DimensionScore]>
+  const skills = assessmentResult.assessment.skills.slice(0, 8)
+
+  return (
+    <>
+      <div className="workspace-heading"><div><p className="overline">SKILL INTELLIGENCE</p><h1>Skill graph</h1><p>A visual map grounded in your latest Gemini evidence assessment.</p></div><span className="workspace-status workspace-status--complete"><Check size={12} /> {Math.round(assessmentResult.assessment.confidence * 100)}% confidence</span></div>
+      <div className="skill-graph-layout">
+        <article className="skill-constellation">
+          <div className="skill-constellation__core"><strong>{assessmentResult.assessment.overall_score}</strong><span>PROOF SCORE</span></div>
+          {skills.map((skill, index) => {
+            const angle = (index / Math.max(skills.length, 1)) * Math.PI * 2
+            const radius = index % 2 === 0 ? 38 : 46
+            const style = {
+              '--skill-x': `${50 + Math.cos(angle) * radius}%`,
+              '--skill-y': `${50 + Math.sin(angle) * radius}%`,
+              '--skill-delay': `${index * -0.4}s`,
+            } as CSSProperties
+            return <span className="skill-node" style={style} key={skill.name}><b>{skill.name}</b><small>{Math.round(skill.confidence * 100)}%</small></span>
+          })}
+          <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="31" /><circle cx="50" cy="50" r="43" /></svg>
+        </article>
+        <article className="dimension-ledger">
+          <div><p className="overline">CAPABILITY LEDGER</p><h2>Assessment dimensions</h2></div>
+          {dimensions.map(([name, value]) => (
+            <div className="dimension-row" key={name}>
+              <span>{name.replaceAll('_', ' ')}</span><strong>{value.score}</strong>
+              <i><b style={{ width: `${value.score}%` }} /></i>
+              <small>{value.rationale}</small>
+            </div>
+          ))}
+        </article>
+      </div>
+    </>
+  )
+}
+
+function CareerCopilotSection({
+  assessmentResult,
+  onNewAssessment,
+}: Pick<DashboardSectionProps, 'assessmentResult' | 'onNewAssessment'>) {
+  const [targetRole, setTargetRole] = useState('Senior product engineer')
+  const [generatedFor, setGeneratedFor] = useState('')
+
+  if (!assessmentResult) {
+    return (
+      <>
+        <div className="workspace-heading"><div><p className="overline">AI CAREER COPILOT</p><h1>Career copilot</h1><p>Turn verified evidence into a focused growth strategy.</p></div></div>
+        <article className="workspace-empty-card"><span><Sparkles size={28} /></span><h2>Complete an assessment first</h2><p>Your copilot grounds every recommendation in your verified strengths and evidence gaps.</p><button className="button button--primary" type="button" onClick={onNewAssessment}>Start assessment <ArrowRight size={16} /></button></article>
+      </>
+    )
+  }
+
+  const strongestSkills = assessmentResult.assessment.skills.slice(0, 3)
+  const nextSteps = assessmentResult.assessment.next_steps.slice(0, 4)
+
+  return (
+    <>
+      <div className="workspace-heading"><div><p className="overline">AI CAREER COPILOT</p><h1>Career copilot</h1><p>Build a role-specific growth plan grounded in your latest Gemini assessment.</p></div></div>
+      <section className="copilot-studio">
+        <div className="copilot-prompt">
+          <span><Sparkles /></span>
+          <div><p>CAREER TARGET</p><h2>Where do you want your proof to take you?</h2></div>
+          <label><Target size={17} /><input value={targetRole} onChange={(event) => setTargetRole(event.target.value)} maxLength={120} /><button type="button" onClick={() => setGeneratedFor(targetRole.trim())} disabled={!targetRole.trim()}>Generate path <Rocket size={15} /></button></label>
+          <small><ShieldCheck size={13} /> Uses your assessment locally. No additional AI request or cost.</small>
+        </div>
+        <div className="copilot-output">
+          {!generatedFor ? (
+            <div className="copilot-idle"><Lightbulb size={29} /><strong>Your strategy will appear here</strong><span>Set a target role to transform your evidence into a practical roadmap.</span></div>
+          ) : (
+            <>
+              <div className="copilot-output__head"><p>PATH TO</p><h2>{generatedFor}</h2><span>{assessmentResult.assessment.level} foundation · {assessmentResult.assessment.overall_score}/100 proof score</span></div>
+              <div className="copilot-strengths">{strongestSkills.map((skill) => <span key={skill.name}><Check size={12} /> Lead with {skill.name}</span>)}</div>
+              <ol>{nextSteps.map((step, index) => <li key={step}><b>0{index + 1}</b><span>{step}</span></li>)}</ol>
+              <div className="copilot-sprint"><Rocket size={17} /><div><strong>30-day proof sprint</strong><span>Ship one public artifact that combines {strongestSkills.slice(0, 2).map((skill) => skill.name).join(' + ')} and document measurable impact.</span></div></div>
+            </>
+          )}
+        </div>
+      </section>
+    </>
+  )
+}
+
 function PublicProfileSection({
   profile,
   connection,
@@ -202,7 +304,7 @@ function PublicProfileSection({
       <article className="public-profile-card">
         <div className="public-profile-cover"><span>SKILLCHAIN PASSPORT</span><BadgeCheck size={22} /></div>
         <div className="public-profile-body">
-          <span className="public-avatar">{profile.displayName.slice(0, 2).toUpperCase() || 'SC'}</span>
+          <Avatar name={profile.displayName} githubUsername={profile.githubUsername} size="large" />
           <div className="public-profile-title"><div><h2>{profile.displayName}</h2><p>{profile.headline}</p><span>{profile.location || 'Location not specified'} · @{profile.githubUsername}</span></div>{assessmentResult && <div><strong>{assessmentResult.assessment.overall_score}</strong><span>{assessmentResult.assessment.level}</span></div>}</div>
           <div className="public-profile-stats"><div><strong>{assessmentResult?.assessment.skills.length || 0}</strong><span>Verified skills</span></div><div><strong>{assessmentResult?.evidence_summary.successful || 0}</strong><span>Projects analyzed</span></div><div><strong>{assessmentResult ? `${Math.round(assessmentResult.assessment.confidence * 100)}%` : '—'}</strong><span>AI confidence</span></div></div>
           <div className="public-wallet-row"><Wallet size={16} /><span>{connection ? shortenAddress(connection.address) : 'Wallet unavailable'}</span><button type="button" onClick={() => void copyAddress()} disabled={!connection}><Clipboard size={14} /> {copied ? 'Copied' : 'Copy address'}</button></div>
@@ -237,9 +339,11 @@ function SettingsSection({
 }
 
 export function DashboardSection(props: DashboardSectionProps) {
+  if (props.section === 'Skill graph') return <SkillGraphSection {...props} />
   if (props.section === 'Opportunities') return <JobMarketplace key={props.opportunitySearchKey} profile={props.profile} connection={props.connection} assessmentResult={props.assessmentResult} initialQuery={props.opportunityQuery} />
   if (props.section === 'Assessments') return <AssessmentsSection {...props} />
   if (props.section === 'Credentials') return <CredentialsSection {...props} />
+  if (props.section === 'Career copilot') return <CareerCopilotSection {...props} />
   if (props.section === 'Verification') return <VerificationSection {...props} />
   if (props.section === 'Public profile') return <PublicProfileSection {...props} />
   return <SettingsSection {...props} />

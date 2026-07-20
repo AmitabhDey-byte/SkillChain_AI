@@ -4,6 +4,7 @@ import {
   BarChart3,
   Bell,
   Blocks,
+  BrainCircuit,
   BriefcaseBusiness,
   Check,
   ChevronRight,
@@ -15,6 +16,7 @@ import {
   Home,
   LogOut,
   Menu,
+  Network,
   PanelLeftClose,
   Plus,
   Search,
@@ -35,6 +37,7 @@ import { clearCredential, loadCredential, saveCredential } from '../lib/credenti
 import type { OnboardingProfile } from '../lib/onboarding'
 import { isTestnet, shortenAddress, type WalletConnection } from '../lib/wallet'
 import { UniversalSearch } from './UniversalSearch'
+import { Avatar } from './Avatar'
 
 type DashboardProps = {
   profile: OnboardingProfile
@@ -45,9 +48,11 @@ type DashboardProps = {
 
 const navItems = [
   { label: 'Overview', icon: Home },
+  { label: 'Skill graph', icon: Network },
   { label: 'Opportunities', icon: BriefcaseBusiness, badge: '50' },
   { label: 'Assessments', icon: Sparkles, badge: '1' },
   { label: 'Credentials', icon: BadgeCheck },
+  { label: 'Career copilot', icon: BrainCircuit },
   { label: 'Verification', icon: Search },
 ] satisfies Array<{ label: DashboardSectionName; icon: typeof Home; badge?: string }>
 
@@ -144,7 +149,7 @@ export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: D
           <UniversalSearch audience="talent" onOpenJobs={openOpportunitySearch} />
           <div className="topbar-actions">
             <button type="button" aria-label="Open assessment notifications" onClick={() => selectSection('Assessments')}><Bell size={18} /><span /></button>
-            <button className="profile-chip" type="button" onClick={() => selectSection('Public profile')}><span>{profile.displayName.slice(0, 2).toUpperCase() || 'SC'}</span><div><strong>{profile.displayName || 'SkillChain user'}</strong><small>{profile.role || 'Member'}</small></div></button>
+            <button className="profile-chip" type="button" onClick={() => selectSection('Public profile')}><Avatar name={profile.displayName} githubUsername={profile.githubUsername} size="small" /><div><strong>{profile.displayName || 'SkillChain user'}</strong><small>{profile.role || 'Member'}</small></div></button>
           </div>
         </header>
 

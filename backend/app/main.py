@@ -5,12 +5,13 @@ import logging
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from backend.app.api.router import api_router
 from backend.app.core.config import Settings, get_settings
 from backend.app.core.errors import AppError, app_error_handler, unexpected_error_handler, validation_error_handler
 from backend.app.core.logging import configure_logging
-from backend.app.core.middleware import RequestContextMiddleware
+from backend.app.core.middleware import RateLimitMiddleware, RequestBodyLimitMiddleware, RequestContextMiddleware, SecurityHeadersMiddleware
 from backend.app.db.session import dispose_engine
 
 
@@ -39,11 +40,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     application.state.settings = active_settings
     application.dependency_overrides[get_settings] = lambda: active_settings
+    application.add_middleware(TrustedHostMiddleware, allowed_hosts=active_settings.allowed_hosts)
+    application.add_middleware(SecurityHeadersMiddleware)
+    application.add_middleware(RequestBodyLimitMiddleware, max_bytes=active_settings.max_request_body_bytes)
+    application.add_middleware(RateLimitMiddleware)
     application.add_middleware(RequestContextMiddleware)
     application.add_middleware(
         CORSMiddleware,
         allow_origins=active_settings.cors_origins,
-        allow_credentials=True,
+        allow_credentials=False,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["Authorization", "Content-Type", "X-Admin-Key", "X-Request-ID"],
         expose_headers=["X-Request-ID", "X-Process-Time"],

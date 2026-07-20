@@ -1,7 +1,9 @@
 import {
   BadgeCheck,
   Blocks,
+  BrainCircuit,
   BriefcaseBusiness,
+  ChartNoAxesCombined,
   Check,
   ChevronRight,
   Clock3,
@@ -26,6 +28,9 @@ import { CredentialVerifier } from './CredentialVerifier'
 import { RecruiterApplications } from './RecruiterApplications'
 import { TalentMarketplace } from './TalentMarketplace'
 import { UniversalSearch } from './UniversalSearch'
+import { Avatar } from './Avatar'
+import { InterviewStudio } from './InterviewStudio'
+import { RecruiterAnalytics } from './RecruiterAnalytics'
 
 type RecruiterDashboardProps = {
   profile: OnboardingProfile
@@ -34,12 +39,14 @@ type RecruiterDashboardProps = {
   onDisconnect: () => void
 }
 
-type RecruiterSection = 'Overview' | 'Talent marketplace' | 'Applications' | 'Verify candidates' | 'Review history'
+type RecruiterSection = 'Overview' | 'Talent marketplace' | 'Applications' | 'Interview studio' | 'Talent analytics' | 'Verify candidates' | 'Review history'
 
 const recruiterNav = [
   { label: 'Overview', icon: Home },
   { label: 'Talent marketplace', icon: UserRoundSearch },
   { label: 'Applications', icon: BriefcaseBusiness },
+  { label: 'Interview studio', icon: BrainCircuit },
+  { label: 'Talent analytics', icon: ChartNoAxesCombined },
   { label: 'Verify candidates', icon: Search },
   { label: 'Review history', icon: UsersRound },
 ] satisfies Array<{ label: RecruiterSection; icon: typeof Home }>
@@ -108,7 +115,7 @@ export function RecruiterDashboard({ profile, connection, onOpenWallet, onDiscon
         <header className="dashboard-topbar">
           <div><button className="dashboard-menu" type="button" aria-label="Open navigation" onClick={() => setSidebarOpen(true)}><Menu size={20} /></button><span className="dashboard-breadcrumb">Hiring desk <ChevronRight size={13} /> {activeSection}</span></div>
           <UniversalSearch audience="recruiter" onOpenJobs={() => selectSection('Applications')} onOpenTalent={openTalentSearch} />
-          <div className="topbar-actions"><button className="profile-chip" type="button" onClick={() => selectSection('Overview')}><span>{profile.displayName.slice(0, 2).toUpperCase() || 'HR'}</span><div><strong>{profile.displayName || 'Recruiter'}</strong><small>{profile.organization || profile.headline}</small></div></button></div>
+          <div className="topbar-actions"><button className="profile-chip" type="button" onClick={() => selectSection('Overview')}><Avatar name={profile.displayName} size="small" /><div><strong>{profile.displayName || 'Recruiter'}</strong><small>{profile.organization || profile.headline}</small></div></button></div>
         </header>
 
         <div className="dashboard-content">
@@ -131,6 +138,10 @@ export function RecruiterDashboard({ profile, connection, onOpenWallet, onDiscon
           {activeSection === 'Talent marketplace' && <TalentMarketplace key={talentSearch.key} initialQuery={talentSearch.query} />}
 
           {activeSection === 'Applications' && <RecruiterApplications />}
+
+          {activeSection === 'Interview studio' && <InterviewStudio />}
+
+          {activeSection === 'Talent analytics' && <RecruiterAnalytics />}
 
           {activeSection === 'Verify candidates' && (
             <><div className="workspace-heading"><div><p className="overline">LIVE STELLAR CHECK</p><h1>Verify candidates</h1><p>Validate credential ownership and status without accessing a candidate’s private accounts.</p></div></div><CredentialVerifier onVerified={recordVerification} /><div className="verification-guide"><ShieldCheck size={24} /><div><strong>Evidence-backed hiring</strong><p>Every successful check is saved to your recruiter review history in this browser.</p></div></div></>

@@ -10,6 +10,6 @@ test('uses the configured API URL in development', () => {
   assert.equal(resolveApiBaseUrl(false, 'https://api.example.com/api/v1/'), 'https://api.example.com/api/v1')
 })
 
-test('uses the local backend by default in development', () => {
-  assert.equal(resolveApiBaseUrl(false), 'http://localhost:8000/api/v1')
+test('uses the Vite API proxy by default in development', () => {
+  assert.equal(resolveApiBaseUrl(false), '/api/v1')
 })

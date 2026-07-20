@@ -1,6 +1,7 @@
 import { resolveApiBaseUrl } from './apiConfig'
 
 const apiBaseUrl = resolveApiBaseUrl(import.meta.env.PROD, import.meta.env.VITE_API_BASE_URL)
+const AUTH_SESSION_KEY = 'skillchain.auth.session'
 
 type ApiErrorPayload = {
   error?: {
@@ -28,19 +29,62 @@ export class ApiError extends Error {
 }
 
 type ApiRequestOptions = {
-  method?: 'GET' | 'POST' | 'PATCH'
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH'
   body?: unknown
   signal?: AbortSignal
   headers?: Record<string, string>
 }
 
+export type AuthSession = {
+  access_token: string
+  token_type: 'bearer'
+  expires_at: string
+  wallet_address: string
+  network: string
+  wallet_type: 'freighter' | 'albedo'
+}
+
+export type AuthIdentity = Omit<AuthSession, 'access_token' | 'token_type'>
+
+export function saveAuthSession(session: AuthSession) {
+  sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session))
+}
+
+export function loadAuthSession(): AuthSession | null {
+  const value = sessionStorage.getItem(AUTH_SESSION_KEY)
+  if (!value) return null
+
+  try {
+    const session = JSON.parse(value) as AuthSession
+    if (!session.access_token || Date.parse(session.expires_at) <= Date.now()) {
+      sessionStorage.removeItem(AUTH_SESSION_KEY)
+      return null
+    }
+    return session
+  } catch {
+    sessionStorage.removeItem(AUTH_SESSION_KEY)
+    return null
+  }
+}
+
+export function clearAuthSession() {
+  sessionStorage.removeItem(AUTH_SESSION_KEY)
+}
+
 async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
   let response: Response
+  const authSession = loadAuthSession()
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+    ...options.headers,
+  }
+  if (authSession) headers.Authorization = `Bearer ${authSession.access_token}`
 
   try {
     response = await fetch(`${apiBaseUrl}${path}`, {
       method: options.method || 'GET',
-      headers: { Accept: 'application/json', 'Content-Type': 'application/json', ...options.headers },
+      headers,
       body: options.body === undefined ? undefined : JSON.stringify(options.body),
       signal: options.signal,
     })
@@ -52,6 +96,85 @@ async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Pro
   const payload = await response.json().catch(() => ({}))
   if (!response.ok) throw new ApiError(response.status, payload as ApiErrorPayload)
   return payload as T
+}
+
+export function createAuthChallenge(
+  walletAddress: string,
+  network: string,
+  walletType: AuthSession['wallet_type'],
+  signal?: AbortSignal,
+) {
+  return apiRequest<{ challenge_id: string; message: string; expires_at: string }>('/auth/challenge', {
+    method: 'POST',
+    body: {
+      wallet_address: walletAddress,
+      network: network.toLowerCase(),
+      wallet_type: walletType,
+    },
+    signal,
+  })
+}
+
+export function verifyAuthChallenge(
+  challengeId: string,
+  walletAddress: string,
+  signature: string,
+  signal?: AbortSignal,
+) {
+  return apiRequest<AuthSession>('/auth/verify', {
+    method: 'POST',
+    body: {
+      challenge_id: challengeId,
+      wallet_address: walletAddress,
+      signature,
+    },
+    signal,
+  })
+}
+
+export function getAuthIdentity(signal?: AbortSignal) {
+  return apiRequest<AuthIdentity>('/auth/me', { signal })
+}
+
+export type UserProfile = {
+  id: string
+  wallet_address: string
+  role: 'talent' | 'freelancer' | 'recruiter'
+  display_name: string
+  headline: string
+  location: string | null
+  organization: string | null
+  bio: string | null
+  avatar_url: string | null
+  github_username: string | null
+  skills: string[]
+  onboarding_complete: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type UserProfileUpsert = {
+  role: UserProfile['role']
+  display_name: string
+  headline: string
+  location?: string
+  organization?: string
+  bio?: string
+  avatar_url?: string
+  github_username?: string
+  skills?: string[]
+}
+
+export function getUserProfile(signal?: AbortSignal) {
+  return apiRequest<UserProfile>('/users/me', { signal })
+}
+
+export function upsertUserProfile(profile: UserProfileUpsert, signal?: AbortSignal) {
+  return apiRequest<UserProfile>('/users/me', {
+    method: 'PUT',
+    body: profile,
+    signal,
+  })
 }
 
 export type GithubProfile = {
@@ -212,6 +335,8 @@ export type SkillAssessment = {
 export type AssessmentPreviewResponse = {
   model: string
   rubric_version: string
+  subject_wallet: string
+  github_username: string
   assessment: SkillAssessment
   attestation: string
   usage: {
@@ -277,6 +402,8 @@ export function issueCredential(walletAddress: string, result: AssessmentRunResu
     method: 'POST',
     body: {
       wallet_address: walletAddress,
+      subject_wallet: result.subject_wallet,
+      github_username: result.github_username,
       model: result.model,
       rubric_version: result.rubric_version,
       repository_ids: result.repository_ids,
@@ -348,10 +475,9 @@ export type AdminOverviewResponse = {
   recent_transactions: AdminActivityItem[]
 }
 
-export function getAdminOverview(adminKey: string, signal?: AbortSignal) {
+export function getAdminOverview(signal?: AbortSignal) {
   return apiRequest<AdminOverviewResponse>('/admin/overview', {
     signal,
-    headers: { 'X-Admin-Key': adminKey },
   })
 }
 

@@ -43,10 +43,28 @@ class HealthEndpointTests(unittest.TestCase):
         response = self.client.get("/api/v1/health/live")
         UUID(response.headers["X-Request-ID"])
         self.assertGreaterEqual(float(response.headers["X-Process-Time"]), 0)
+        self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
+        self.assertEqual(response.headers["X-Frame-Options"], "DENY")
+        self.assertEqual(response.headers["Cache-Control"], "no-store")
 
     def test_supplied_request_id_is_preserved(self) -> None:
         response = self.client.get("/api/v1/health/live", headers={"X-Request-ID": "test-request-123"})
         self.assertEqual(response.headers["X-Request-ID"], "test-request-123")
+
+    def test_oversized_request_is_rejected(self) -> None:
+        settings = Settings(
+            environment="test",
+            max_request_body_bytes=32,
+            database_url=SecretStr("postgresql+asyncpg://test:test@localhost/skillchain_test"),
+        )
+        response = TestClient(create_app(settings)).post(
+            "/api/v1/assistant/chat",
+            content=b"x" * 64,
+            headers={"Content-Type": "application/octet-stream"},
+        )
+
+        self.assertEqual(response.status_code, 413)
+        self.assertEqual(response.json()["error"]["code"], "request_too_large")
 
 
 if __name__ == "__main__":

@@ -21,9 +21,19 @@ OWNER = "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF"
 def credential_request() -> dict:
     assessment = assessment_payload()
     assessment["overall_score"] = 73
-    attestation = sign_assessment("gemini-2.5-flash", "skillchain-v1", [501], assessment, "attestation-key")
+    attestation = sign_assessment(
+        "gemini-2.5-flash",
+        "skillchain-v1",
+        [501],
+        assessment,
+        "attestation-key",
+        OWNER,
+        "aisha-builds",
+    )
     return {
         "wallet_address": OWNER,
+        "subject_wallet": OWNER,
+        "github_username": "aisha-builds",
         "model": "gemini-2.5-flash",
         "rubric_version": "skillchain-v1",
         "repository_ids": [501],

@@ -15,7 +15,6 @@ import {
 } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
 import {
-  completeOnboarding,
   loadOnboardingDraft,
   saveOnboardingDraft,
   type OnboardingProfile,
@@ -25,7 +24,7 @@ import {
 type OnboardingFlowProps = {
   open: boolean
   onClose: () => void
-  onComplete: (profile: OnboardingProfile) => void
+  onComplete: (profile: OnboardingProfile) => Promise<void>
 }
 
 const roleOptions: Array<{
@@ -104,10 +103,13 @@ export function OnboardingFlow({ open, onClose, onComplete }: OnboardingFlowProp
 
       setSubmitting(true)
       setError(null)
-      await new Promise((resolve) => window.setTimeout(resolve, 450))
-      completeOnboarding(profile)
-      setSubmitting(false)
-      onComplete(profile)
+      try {
+        await onComplete(profile)
+      } catch (caughtError) {
+        setError(caughtError instanceof Error ? caughtError.message : 'Your workspace could not be created.')
+      } finally {
+        setSubmitting(false)
+      }
       return
     }
 
@@ -131,11 +133,14 @@ export function OnboardingFlow({ open, onClose, onComplete }: OnboardingFlowProp
     setSubmitting(true)
     setError(null)
     const completedProfile = { ...profile, githubUsername }
-    await new Promise((resolve) => window.setTimeout(resolve, 650))
-    completeOnboarding(completedProfile)
-    setProfile(completedProfile)
-    setSubmitting(false)
-    onComplete(completedProfile)
+    try {
+      await onComplete(completedProfile)
+      setProfile(completedProfile)
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : 'Your profile could not be created.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (

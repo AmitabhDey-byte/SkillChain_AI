@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 from pydantic import SecretStr
 
 from backend.app.core.config import Settings
+from backend.app.core.auth import create_session_token
 from backend.app.db.models import InteractionType
 from backend.app.db.session import get_database_session
 from backend.app.main import create_app
@@ -88,6 +89,25 @@ class AdminConfigurationTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 503)
         self.assertEqual(response.json()["error"]["code"], "admin_not_configured")
+
+    def test_production_admin_uses_allowlisted_wallet_session(self) -> None:
+        settings = Settings(
+            environment="production",
+            allowed_hosts=["testserver"],
+            auth_session_secret=SecretStr("a-production-length-auth-secret-value"),
+            admin_wallets=[OWNER],
+        )
+        application = create_app(settings)
+        application.dependency_overrides[get_database_session] = fake_admin_session
+        token, _ = create_session_token(OWNER, "testnet", "freighter", settings, "admin-test")
+
+        response = TestClient(application).get(
+            "/api/v1/admin/overview",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["unique_wallets"], 2)
 
 
 if __name__ == "__main__":

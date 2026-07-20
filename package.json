@@ -10,7 +10,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "backend:dev": "python -m uvicorn backend.app.main:app --reload --reload-dir backend --host 0.0.0.0 --port 8000",
+    "backend:dev": "python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000",
     "backend:test": "python -m unittest discover -s backend/tests -v",
     "backend:migrate": "python -m alembic -c backend/alembic.ini upgrade head",
     "contracts:test": "cargo test --manifest-path contracts/Cargo.toml",
@@ -18,6 +18,7 @@
     "contracts:deploy:testnet": "powershell -ExecutionPolicy Bypass -File contracts/scripts/deploy-testnet.ps1"
   },
   "dependencies": {
+    "@albedo-link/intent": "^0.13.0",
     "@stellar/freighter-api": "^6.0.1",
     "@vitejs/plugin-react": "latest",
     "lucide-react": "latest",

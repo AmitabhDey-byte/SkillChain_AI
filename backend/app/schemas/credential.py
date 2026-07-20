@@ -12,6 +12,8 @@ RepositoryId = Annotated[int, Field(gt=0)]
 
 class CredentialIssueRequest(BaseModel):
     wallet_address: str = Field(pattern=WALLET_PATTERN)
+    subject_wallet: str = Field(pattern=WALLET_PATTERN)
+    github_username: str = Field(min_length=1, max_length=39)
     model: str = Field(min_length=1, max_length=100)
     rubric_version: str = Field(min_length=1, max_length=100)
     repository_ids: list[RepositoryId] = Field(min_length=1, max_length=5)
@@ -22,6 +24,8 @@ class CredentialIssueRequest(BaseModel):
     def validate_unique_repositories(self) -> "CredentialIssueRequest":
         if len(self.repository_ids) != len(set(self.repository_ids)):
             raise ValueError("Repository IDs must be unique.")
+        if self.wallet_address.upper() != self.subject_wallet.upper():
+            raise ValueError("Wallet address must match the attested subject wallet.")
         return self
 
 

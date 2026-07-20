@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Header
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.app.core.auth import WalletIdentity, get_optional_identity
 from backend.app.core.config import Settings, get_settings
 from backend.app.core.errors import AppError
 from backend.app.db.models import InteractionType, WalletInteraction
@@ -17,8 +18,13 @@ router = APIRouter()
 
 def require_admin_key(
     x_admin_key: Annotated[str | None, Header(alias="X-Admin-Key")] = None,
+    identity: WalletIdentity | None = Depends(get_optional_identity),
     settings: Settings = Depends(get_settings),
 ) -> None:
+    if identity and identity.wallet_address.upper() in settings.admin_wallets:
+        return
+    if settings.security_enforced:
+        raise AppError("Administrative wallet authorization is required.", "admin_unauthorized", 401)
     if not settings.admin_api_key or not settings.admin_api_key.get_secret_value():
         raise AppError("Administrative access is not configured.", "admin_not_configured", 503)
     if not x_admin_key or not hmac.compare_digest(x_admin_key, settings.admin_api_key.get_secret_value()):

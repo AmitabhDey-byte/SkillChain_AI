@@ -218,6 +218,8 @@ class FakeAssessmentService:
         return AssessmentPreviewResponse(
             model="gemini-2.5-flash",
             rubric_version="skillchain-v1",
+            subject_wallet="GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
+            github_username=request.github_username,
             assessment=assessment_payload(),
             usage={"prompt_tokens": 100, "output_tokens": 100, "total_tokens": 200},
             attestation="a" * 64,

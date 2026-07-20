@@ -4,7 +4,7 @@ AI-powered technical skill verification and portable on-chain credentials on Ste
 
 ## Current milestone
 
-The application includes role-specific React dashboards, Freighter wallet authentication, GitHub evidence analysis, Gemini skill assessment, Stellar credentials, a searchable jobs and talent marketplace, PostgreSQL-backed applications, and the Gemini-powered Albedo blockchain assistant.
+The application includes role-specific React workspaces, signed Freighter and Albedo wallet sessions, GitHub evidence analysis, Gemini skill assessment, Stellar credentials, a searchable opportunity graph, PostgreSQL-backed profiles and applications, hiring intelligence, and the Albedo blockchain assistant.
 
 ## Local development
 
@@ -26,14 +26,21 @@ npm run frontend:dev
 npm run backend:dev
 ```
 
+Local development uses `/api/v1` through the Vite proxy when `VITE_API_BASE_URL` is empty. A configured local API URL such as `http://localhost:8000/api/v1` also remains supported. The Windows development command runs Uvicorn without multiprocessing reload mode for compatibility with Python 3.14.
+
 ## Environment variables
 
 | Variable | Purpose |
 | --- | --- |
-| `VITE_API_BASE_URL` | Optional local API URL; production always uses same-origin `/api/v1` |
+| `VITE_API_BASE_URL` | Optional local API URL; Vercel production uses same-origin `/api/v1` |
 | `VITE_STELLAR_NETWORK` | Stellar network name |
 | `VITE_STELLAR_NETWORK_PASSPHRASE` | Stellar network passphrase |
+| `VITE_ADMIN_WALLETS` | Comma-separated admin wallets used for frontend route visibility |
 | `DATABASE_URL` | PostgreSQL connection string |
+| `AUTH_SESSION_SECRET` | At least 32 random characters used to sign wallet sessions |
+| `AUTH_TOKEN_MINUTES` | Signed wallet session lifetime |
+| `AUTH_CHALLENGE_MINUTES` | One-time wallet challenge lifetime |
+| `ADMIN_WALLETS` | JSON array of production administrator wallet addresses |
 | `GEMINI_API_KEY` | Server-only Gemini credential |
 | `GEMINI_MODEL` | Gemini model used for assessments |
 | `CORS_ORIGINS` | JSON array of permitted frontend origins |
@@ -45,6 +52,8 @@ npm run backend:dev
 | `STELLAR_CONTRACT_ID` | Deployed credential contract address |
 | `STELLAR_ISSUER_SECRET` | Server-only issuer signing key |
 | `CREDENTIAL_ATTESTATION_SECRET` | Server-only HMAC key protecting AI reports |
+| `ALLOWED_HOSTS` | JSON array of exact production hosts accepted by FastAPI |
+| `MAX_REQUEST_BODY_BYTES` | Maximum request body size |
 
 ## Backend foundation
 
@@ -62,7 +71,38 @@ PostgreSQL persistence uses SQLAlchemy 2 with async sessions and Alembic migrati
 npm run backend:migrate
 ```
 
-Run the migration command against the production `DATABASE_URL` after every deployment containing a new migration. The `20260719_0002` migration creates the recruiter application inbox.
+Run the migration command against the production `DATABASE_URL` after every deployment containing a new migration. Migration `20260720_0003` adds one-time auth challenges and persistent professional profiles.
+
+## Vercel deployment
+
+The repository deploys as one Vite project with a FastAPI function at `api/index.py`. Keep the Vercel Framework Preset set to `Vite`; the project does not require the beta Services preset.
+
+Add these required Production and Preview environment variables before redeploying:
+
+| Variable | Value |
+| --- | --- |
+| `ENVIRONMENT` | `production` |
+| `DATABASE_URL` | Neon pooled PostgreSQL URL |
+| `AUTH_SESSION_SECRET` | A unique random value containing at least 32 characters |
+| `ALLOWED_HOSTS` | JSON array containing the production custom domain, or `[]` when Vercel system environment variables are exposed |
+| `CORS_ORIGINS` | JSON array containing the production frontend origin |
+
+Vercel automatically supplies `VERCEL_URL` and `VERCEL_PROJECT_PRODUCTION_URL`. The API adds both values to its trusted-host policy. Environment changes only affect new deployments, so redeploy after saving them.
+
+After deployment, confirm the API responds:
+
+```text
+https://YOUR_DOMAIN/api/v1/health/live
+```
+
+## Product surfaces
+
+- `/` presents the three-dimensional SkillChain Proof OS experience.
+- `/explore` searches 50 clearly marked demo roles, companies, and talent profiles.
+- `/trust` exposes live service readiness and the platform security model.
+- `/dashboard` provides skill graphs, opportunities, assessments, credentials, career copilot, verification, public profile, and settings for developers and freelancers.
+- `/recruiter-dashboard` provides talent discovery, applications, interview studio, analytics, credential verification, and review history.
+- `/admin` is available only to signed wallets present in both `VITE_ADMIN_WALLETS` and the server-side `ADMIN_WALLETS` allowlist.
 
 ## Marketplace
 
@@ -78,7 +118,7 @@ Recruiters can also search 50 developer and freelancer profiles by skill, role, 
 
 ## Albedo assistant
 
-Albedo is a floating Gemini-powered assistant available throughout the product. It answers practical questions about Stellar, Soroban, wallets, credentials, blockchain careers, and SkillChain workflows. Server-side guardrails prevent requests for secrets and clearly separate testnet assets from real funds.
+Albedo is available throughout the product. Anonymous visitors receive a curated local blockchain guide that makes no model request. Authenticated users can use the Gemini-powered assistant for role-aware guidance. Server-side guardrails reject secret-recovery requests and the API applies authenticated access and route-specific throttling.
 
 | Endpoint | Purpose |
 | --- | --- |
@@ -116,7 +156,9 @@ The frontend now runs the complete assessment pipeline from the dashboard. It co
 
 ## Wallet authentication
 
-Wallet sign-in uses the official `@stellar/freighter-api` package. The application requests only the user's public address and transaction signatures, validates the active network, warns when the wallet is not on testnet, and stores only a local session preference. Private keys never leave Freighter.
+Freighter sign-in uses the official `@stellar/freighter-api` package and Albedo uses `@albedo-link/intent`. The API creates a short-lived, one-time challenge containing the wallet, network, nonce, issue time, and expiry. The wallet signs that exact message and the server verifies its Ed25519 signature before issuing a bounded bearer session. Sessions are stored in browser session storage and disappear when the tab session ends. Private keys never reach SkillChain.
+
+Protected production routes bind credential issuance, AI assessment, GitHub evidence collection, marketplace applications, user profiles, and admin operations to the signed wallet identity.
 
 ## Stellar credential contract
 
@@ -142,28 +184,29 @@ Completed reports now continue into a responsive issuance experience with transa
 
 ## User onboarding
 
-After wallet authentication, users choose their platform role, create a public professional profile, and link their GitHub identity. The onboarding flow validates each step, saves unfinished drafts locally, clearly explains GitHub analysis consent, and adapts to mobile screens.
+After wallet authentication, users choose their platform role, create a public professional profile, and link their GitHub identity. Completed profiles are persisted to PostgreSQL and restored by wallet address across devices. Unfinished drafts remain local, GitHub analysis requires explicit consent, and GitHub avatars appear automatically when available.
 
 ## User dashboard
 
-Completed onboarding routes users into a responsive workspace that shows trust readiness, evidence sources, assessment status, credential progress, connected wallet details, public profile data, and recent account activity. Returning users can resume directly from the landing page.
+Completed onboarding routes users into a responsive workspace with trust readiness, evidence sources, assessment status, a visual skill graph, career copilot, opportunity search, credential progress, connected wallet details, public profile data, and recent activity. Recruiters receive a separate hiring command center rather than the talent dashboard.
 
 Secrets such as the Gemini API key will live only in the backend environment and must never use the `VITE_` prefix or be committed to source control.
 
-## Planned architecture
+## Security controls
 
-- **Frontend:** React, TypeScript, Vite
-- **Backend:** FastAPI, PostgreSQL, Gemini API
-- **Blockchain:** Stellar testnet, Soroban contracts
-- **Integrations:** GitHub OAuth, Stellar wallet providers
+- Signed one-time Freighter and Albedo authentication challenges
+- Wallet-bound resource authorization and recruiter role checks
+- Wallet allowlisted production administration without browser-stored admin keys
+- Explicit CORS and trusted host allowlists
+- Route-sensitive rate limits with bounded in-memory buckets
+- Request body limits for declared and streamed payloads
+- CSP, clickjacking, MIME-sniffing, referrer, permissions, and no-store headers
+- Strict Gemini schemas, prompt-injection boundaries, timeouts, and bounded retries
+- Signed assessment attestations before credential issuance
+- Server-only Gemini, GitHub, Stellar issuer, and attestation secrets
 
-## Roadmap
+See `SECURITY.md` for reporting guidance and `docs/PRODUCTION_CHECKLIST.md` for deployment verification.
 
-1. Product shell and responsive visual system
-2. Wallet authentication and onboarding
-3. GitHub connection and repository selection
-4. AI assessment workflow and reports
-5. Connect credential issuance to the deployed Soroban contract
-6. Public credential verification portal
-7. Recruiter dashboard and milestone payments
-8. Analytics, monitoring, testing, and deployment
+## Cost controls
+
+The redesign uses local CSS, an included generated image asset, Lucide icons, and open-source wallet SDKs. It does not require a paid design plugin or third-party analytics subscription. Anonymous Albedo answers are local. Gemini usage occurs only for authenticated assistant requests and explicit portfolio assessments, so configure a Google AI usage limit and alert before production.

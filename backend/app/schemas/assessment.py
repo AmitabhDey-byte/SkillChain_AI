@@ -112,6 +112,8 @@ class GeminiUsage(BaseModel):
 class AssessmentPreviewResponse(BaseModel):
     model: str
     rubric_version: str
+    subject_wallet: str = Field(pattern=r"^G[A-Z2-7]{55}$")
+    github_username: str = Field(min_length=1, max_length=39)
     assessment: SkillAssessment
     usage: GeminiUsage
     attestation: str = Field(pattern=r"^[a-f0-9]{64}$")

@@ -2,7 +2,7 @@ from functools import lru_cache
 from typing import Literal
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
-from pydantic import SecretStr
+from pydantic import SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -31,7 +31,13 @@ class Settings(BaseSettings):
     port: int = 8000
     api_v1_prefix: str = "/api/v1"
     cors_origins: list[str] = ["http://localhost:5173"]
+    allowed_hosts: list[str] = ["localhost", "127.0.0.1", "testserver"]
+    max_request_body_bytes: int = 1_048_576
     database_url: SecretStr = SecretStr("postgresql+asyncpg://postgres:postgres@localhost:5432/skillchain")
+    auth_session_secret: SecretStr = SecretStr("development-only-change-this-session-secret")
+    auth_token_minutes: int = 720
+    auth_challenge_minutes: int = 5
+    admin_wallets: list[str] = []
     gemini_api_key: SecretStr | None = None
     gemini_model: str = "gemini-2.5-flash"
     gemini_timeout_seconds: float = 45
@@ -46,6 +52,8 @@ class Settings(BaseSettings):
     stellar_transaction_timeout_seconds: int = 45
     credential_attestation_secret: SecretStr | None = None
     admin_api_key: SecretStr | None = None
+    vercel_url: str | None = None
+    vercel_project_production_url: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=(".env", ".env.local"),
@@ -61,6 +69,27 @@ class Settings(BaseSettings):
     @property
     def async_database_url(self) -> str:
         return normalize_async_database_url(self.database_url.get_secret_value())
+
+    @property
+    def security_enforced(self) -> bool:
+        return self.environment in {"staging", "production"}
+
+    @model_validator(mode="after")
+    def validate_production_security(self) -> "Settings":
+        generated_hosts = [
+            host.strip().lower()
+            for host in (self.vercel_url, self.vercel_project_production_url)
+            if host and host.strip()
+        ]
+        self.allowed_hosts = list(dict.fromkeys([*self.allowed_hosts, *generated_hosts]))
+        if self.security_enforced:
+            secret = self.auth_session_secret.get_secret_value()
+            if len(secret) < 32 or secret == "development-only-change-this-session-secret":
+                raise ValueError("AUTH_SESSION_SECRET must contain at least 32 unique production characters.")
+            if not self.allowed_hosts or "*" in self.allowed_hosts:
+                raise ValueError("ALLOWED_HOSTS must explicitly list production hosts.")
+        self.admin_wallets = [wallet.strip().upper() for wallet in self.admin_wallets if wallet.strip()]
+        return self
 
 
 @lru_cache

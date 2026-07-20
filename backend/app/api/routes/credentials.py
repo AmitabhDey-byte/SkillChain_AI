@@ -3,6 +3,7 @@ import asyncio
 from fastapi import APIRouter, Depends, Path, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.app.core.auth import WalletIdentity, require_matching_wallet, require_wallet_identity
 from backend.app.db.models import InteractionType
 from backend.app.db.session import get_database_session
 from backend.app.integrations.stellar import StellarCredentialService, get_stellar_credential_service
@@ -22,9 +23,11 @@ router = APIRouter()
 @router.post("", response_model=CredentialIssueResponse, summary="Issue a verified skill credential on Stellar")
 async def issue_credential(
     request: CredentialIssueRequest,
+    identity: WalletIdentity | None = Depends(require_wallet_identity),
     service: StellarCredentialService = Depends(get_stellar_credential_service),
     session: AsyncSession = Depends(get_database_session),
 ) -> CredentialIssueResponse:
+    require_matching_wallet(identity, request.wallet_address)
     credential = await asyncio.to_thread(service.issue, request)
     await record_wallet_interaction(
         session,
