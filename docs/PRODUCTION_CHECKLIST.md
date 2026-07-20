@@ -5,6 +5,7 @@
 - [ ] Run `npm ci`
 - [ ] Set the Vercel Framework Preset to `Services`
 - [ ] Keep the Vercel Root Directory set to the repository root
+- [ ] Clear Vercel Build Command, Output Directory, and Install Command overrides
 - [ ] Enable Vercel system environment variables
 - [ ] Remove `VITE_API_BASE_URL` from Vercel
 - [ ] Run `npm run frontend:test`

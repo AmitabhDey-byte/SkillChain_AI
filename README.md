@@ -77,7 +77,7 @@ Run the migration command against the production `DATABASE_URL` after every depl
 
 The repository deploys the Vite frontend and complete FastAPI backend as two Vercel Services in one project. `vercel.json` routes `/api/*` to `backend/main.py` and all product routes to the Vite frontend.
 
-Set the Framework Preset to `Services`, keep the Root Directory at the repository root, and keep Vercel system environment variables enabled. Add these Production and Preview variables:
+Set the Framework Preset to `Services`, keep the Root Directory at the repository root, leave the Build Command, Output Directory, and Install Command overrides empty, and keep Vercel system environment variables enabled. Each service is detected and built from `vercel.json`. Add these Production and Preview variables:
 
 | Variable | Value |
 | --- | --- |

@@ -7,15 +7,15 @@ const backendEntrypoint = readFileSync(new URL('../backend/main.py', import.meta
 
 test('ships Vite and FastAPI as routed services', () => {
   assert.equal(config.services.frontend.framework, 'vite')
-  assert.equal(config.services.frontend.buildCommand, 'npm run build')
-  assert.equal(config.services.frontend.outputDirectory, 'dist')
-  assert.equal(config.services.backend.framework, 'fastapi')
+  assert.equal(config.services.frontend.buildCommand, undefined)
+  assert.equal(config.services.frontend.outputDirectory, undefined)
+  assert.equal(config.services.backend.framework, undefined)
   assert.equal(config.services.backend.entrypoint, 'main:app')
   assert.match(backendEntrypoint, /from backend\.app\.main import app/)
 })
 
 test('routes API traffic to the backend before the frontend catch-all', () => {
-  assert.equal(config.rewrites[0].source, '/api/(.*)')
+  assert.equal(config.rewrites[0].source, '/api/:path*')
   assert.equal(config.rewrites[0].destination.service, 'backend')
   assert.equal(config.rewrites.at(-1).destination.service, 'frontend')
 })
