@@ -75,7 +75,7 @@ Run the migration command against the production `DATABASE_URL` after every depl
 
 ## Vercel deployment
 
-The repository deploys the Vite frontend and complete FastAPI backend in one Vercel project. `api/index.py` is the recognized Python catch-all for `/api/*`, and `vercel.json` configures its duration and bundle exclusions.
+The repository deploys the Vite frontend and complete FastAPI backend in one Vercel project. `api/index.py` is the recognized Python catch-all for `/api/*`, `pyproject.toml` and `.python-version` declare the serverless Python runtime, and `vercel.json` configures the frontend build plus Python function limits.
 
 Keep the Framework Preset set to `Vite`, the Root Directory set to the repository root, and Vercel system environment variables enabled. Add these Production and Preview variables:
 
