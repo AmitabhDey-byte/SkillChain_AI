@@ -9,13 +9,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.core.auth import WalletIdentity, require_matching_wallet, require_wallet_identity
 from backend.app.core.config import Settings, get_settings
 from backend.app.core.errors import AppError
-from backend.app.db.models import ApplicationStatus, JobApplication, User, UserRole
+from backend.app.db.models import ApplicationStatus, JobApplication, User, UserRole, UserStatus
 from backend.app.db.session import get_database_session
 from backend.app.schemas.marketplace import (
     JobApplicationCreate,
     JobApplicationListResponse,
     JobApplicationResponse,
     JobApplicationStatusUpdate,
+    TalentDirectoryResponse,
 )
 
 
@@ -33,6 +34,27 @@ async def require_recruiter(
     if settings.security_enforced and (user is None or user.role != UserRole.RECRUITER):
         raise AppError("Recruiter access is required.", "recruiter_required", 403)
     return user
+
+
+@router.get("/talent", response_model=TalentDirectoryResponse, summary="List registered developer and freelancer profiles")
+async def list_talent(
+    limit: Annotated[int, Query(ge=1, le=200)] = 200,
+    _: User | None = Depends(require_recruiter),
+    session: AsyncSession = Depends(get_database_session),
+) -> TalentDirectoryResponse:
+    statement = (
+        select(User)
+        .where(
+            User.role.in_((UserRole.TALENT, UserRole.FREELANCER)),
+            User.status == UserStatus.ACTIVE,
+            User.onboarding_complete.is_(True),
+        )
+        .order_by(User.updated_at.desc())
+        .limit(limit)
+    )
+    result = await session.scalars(statement)
+    profiles = list(result.all())
+    return TalentDirectoryResponse(profiles=profiles, total=len(profiles))
 
 
 @router.post("/applications", response_model=JobApplicationResponse, status_code=201, summary="Apply to a marketplace opportunity")

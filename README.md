@@ -26,13 +26,13 @@ npm run frontend:dev
 npm run backend:dev
 ```
 
-Local development uses `/api/v1` through the Vite proxy when `VITE_API_BASE_URL` is empty. A configured local API URL such as `http://localhost:8000/api/v1` also remains supported. The Windows development command runs Uvicorn without multiprocessing reload mode for compatibility with Python 3.14.
+Local development uses `/api/v1` through the Vite proxy when `VITE_API_BASE_URL` is empty. A configured local API URL such as `http://localhost:8000/api/v1` is also supported. Production always uses same-origin `/api/v1`. The Windows development command runs Uvicorn without multiprocessing reload mode for compatibility with Python 3.14.
 
 ## Environment variables
 
 | Variable | Purpose |
 | --- | --- |
-| `VITE_API_BASE_URL` | Optional local API URL; Vercel production uses same-origin `/api/v1` |
+| `VITE_API_BASE_URL` | Optional local API URL; production uses same-origin `/api/v1` |
 | `VITE_STELLAR_NETWORK` | Stellar network name |
 | `VITE_STELLAR_NETWORK_PASSPHRASE` | Stellar network passphrase |
 | `VITE_ADMIN_WALLETS` | Comma-separated admin wallets used for frontend route visibility |
@@ -75,24 +75,32 @@ Run the migration command against the production `DATABASE_URL` after every depl
 
 ## Vercel deployment
 
-The repository deploys as one Vite project with a FastAPI function at `api/index.py`. Keep the Vercel Framework Preset set to `Vite`; the project does not require the beta Services preset.
+The repository deploys the Vite frontend and complete FastAPI backend in one Vercel project. `api/index.py` is the recognized Python catch-all for `/api/*`, and `vercel.json` configures its duration and bundle exclusions.
 
-Add these required Production and Preview environment variables before redeploying:
+Keep the Framework Preset set to `Vite`, the Root Directory set to the repository root, and Vercel system environment variables enabled. Add these Production and Preview variables:
 
 | Variable | Value |
 | --- | --- |
 | `ENVIRONMENT` | `production` |
 | `DATABASE_URL` | Neon pooled PostgreSQL URL |
-| `AUTH_SESSION_SECRET` | A unique random value containing at least 32 characters |
-| `ALLOWED_HOSTS` | JSON array containing the production custom domain, or `[]` when Vercel system environment variables are exposed |
-| `CORS_ORIGINS` | JSON array containing the production frontend origin |
+| `AUTH_SESSION_SECRET` | Unique random value with at least 32 characters |
+| `CORS_ORIGINS` | `["https://skill-chain-ai-cona.vercel.app"]` |
+| `ALLOWED_HOSTS` | `["skill-chain-ai-cona.vercel.app"]` |
+| `ADMIN_WALLETS` | JSON array containing the owner Stellar wallet |
+| `GEMINI_API_KEY` | Server-only Gemini key |
+| `GITHUB_TOKEN` | Optional server-only GitHub token |
+| `STELLAR_CONTRACT_ID` | Deployed Soroban credential contract ID |
+| `STELLAR_ISSUER_SECRET` | Server-only Stellar testnet issuer secret |
+| `CREDENTIAL_ATTESTATION_SECRET` | Unique random value with at least 32 characters |
+| `VITE_STELLAR_NETWORK` | `testnet` |
+| `VITE_STELLAR_NETWORK_PASSPHRASE` | `Test SDF Network ; September 2015` |
+| `VITE_ADMIN_WALLETS` | Comma-separated owner wallet addresses |
 
-Vercel automatically supplies `VERCEL_URL` and `VERCEL_PROJECT_PRODUCTION_URL`. The API adds both values to its trusted-host policy. Environment changes only affect new deployments, so redeploy after saving them.
-
-After deployment, confirm the API responds:
+Delete `VITE_API_BASE_URL` from Vercel because production uses the same deployment origin. After redeploying, verify:
 
 ```text
-https://YOUR_DOMAIN/api/v1/health/live
+https://skill-chain-ai-cona.vercel.app/api/v1/health/live
+https://skill-chain-ai-cona.vercel.app/api/v1/health/ready
 ```
 
 ## Product surfaces
@@ -108,10 +116,11 @@ https://YOUR_DOMAIN/api/v1/health/live
 
 Talent accounts can search 50 distinct demonstration companies and vacancies, filter by work mode or engagement, save opportunities, and submit wallet-linked application requests. Recruiters receive those requests in a persistent inbox and can move them through pending, reviewing, shortlisted, and declined states.
 
-Recruiters can also search 50 developer and freelancer profiles by skill, role, location, availability, and AI skill score. The universal dashboard search adapts its result priority to the current account role.
+Recruiters can search registered developer and freelancer accounts together with 50 clearly marked demonstration profiles. Live database members appear first and are searchable by name, GitHub username, headline, role, location, and saved skills. The universal dashboard search consumes the same live directory.
 
 | Endpoint | Purpose |
 | --- | --- |
+| `GET /api/v1/marketplace/talent` | List registered developer and freelancer profiles |
 | `POST /api/v1/marketplace/applications` | Submit a job application |
 | `GET /api/v1/marketplace/applications` | Read recruiter application requests |
 | `PATCH /api/v1/marketplace/applications/{id}` | Update recruiter review status |

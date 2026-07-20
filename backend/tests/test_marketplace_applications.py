@@ -5,6 +5,7 @@ from uuid import uuid4
 from fastapi.testclient import TestClient
 
 from backend.app.core.config import Settings
+from backend.app.db.models import User, UserRole
 from backend.app.db.session import get_database_session
 from backend.app.main import create_app
 
@@ -92,6 +93,29 @@ class MarketplaceApplicationRouteTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "shortlisted")
+
+    def test_registered_developer_appears_in_talent_directory(self) -> None:
+        now = datetime.now(UTC)
+        self.session.items.append(
+            User(
+                id=uuid4(),
+                wallet_address=OWNER,
+                role=UserRole.TALENT,
+                display_name="Live Builder",
+                headline="Stellar protocol developer",
+                location="Remote",
+                skills=["Soroban", "Rust"],
+                onboarding_complete=True,
+                created_at=now,
+                updated_at=now,
+            )
+        )
+
+        response = self.client.get("/api/v1/marketplace/talent")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["total"], 1)
+        self.assertEqual(response.json()["profiles"][0]["display_name"], "Live Builder")
 
 
 if __name__ == "__main__":

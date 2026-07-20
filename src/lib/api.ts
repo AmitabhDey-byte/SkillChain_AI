@@ -93,7 +93,18 @@ async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Pro
     throw new ApiError(0, { error: { code: 'network_error', message: 'Cannot reach the SkillChain API. Make sure the backend is running.' } })
   }
 
-  const payload = await response.json().catch(() => ({}))
+  const contentType = response.headers.get('content-type') || ''
+  const payload = contentType.includes('application/json')
+    ? await response.json().catch(() => ({}))
+    : {}
+  if (!response.ok && response.status === 404 && !contentType.includes('application/json')) {
+    throw new ApiError(404, {
+      error: {
+        code: 'api_route_not_found',
+        message: 'The SkillChain API route was not deployed. Redeploy and verify /api/v1/health/live.',
+      },
+    })
+  }
   if (!response.ok) throw new ApiError(response.status, payload as ApiErrorPayload)
   return payload as T
 }
@@ -175,6 +186,10 @@ export function upsertUserProfile(profile: UserProfileUpsert, signal?: AbortSign
     body: profile,
     signal,
   })
+}
+
+export function getTalentDirectory(signal?: AbortSignal) {
+  return apiRequest<{ profiles: UserProfile[]; total: number }>('/marketplace/talent?limit=200', { signal })
 }
 
 export type GithubProfile = {

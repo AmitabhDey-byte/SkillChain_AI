@@ -4,7 +4,9 @@
 
 - [ ] Run `npm ci`
 - [ ] Keep the Vercel Framework Preset set to `Vite`
+- [ ] Keep the Vercel Root Directory set to the repository root
 - [ ] Enable Vercel system environment variables
+- [ ] Remove `VITE_API_BASE_URL` from Vercel
 - [ ] Run `npm run frontend:test`
 - [ ] Run `npm run backend:test`
 - [ ] Run `npm run contracts:test`
@@ -21,21 +23,24 @@
 ## Database
 
 - [ ] Point `DATABASE_URL` to the production Neon PostgreSQL database
-- [ ] Run `npm run backend:migrate`
+- [ ] Run `npm run backend:migrate` against the production database
 - [ ] Confirm Alembic head is `20260720_0003`
 - [ ] Confirm `auth_challenges`, `users`, `wallet_interactions`, and `job_applications` exist
 - [ ] Enable provider backups and retention
 
 ## Smoke tests
 
-- [ ] Confirm `/api/v1/health/live` returns HTTP 200 JSON
+- [ ] Confirm the Vercel `/api/v1/health/live` URL returns HTTP 200 JSON
+- [ ] Confirm the Vercel `/api/v1/health/ready` URL reports configured dependencies
 - [ ] Open the landing page on desktop and mobile
 - [ ] Search jobs, companies, and talent on `/explore`
 - [ ] Connect Freighter and sign the authentication message
 - [ ] Connect Albedo on a mobile browser and sign the authentication message
 - [ ] Complete each onboarding role and confirm separate dashboards
+- [ ] Search a newly registered developer from a recruiter account
 - [ ] Sync a public GitHub profile and repository list
 - [ ] Run an AI assessment and reopen the saved report
+- [ ] Send an authenticated Albedo message and receive a Gemini response
 - [ ] Issue a testnet credential and open its Stellar Expert transaction
 - [ ] Verify the credential from `/verify`
 - [ ] Submit an application and confirm it reaches the recruiter inbox

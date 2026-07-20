@@ -5,6 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from backend.app.schemas.credential import WALLET_PATTERN
+from backend.app.schemas.user import UserProfileResponse
 
 
 class ApplicationStatusValue(str, Enum):
@@ -52,4 +53,9 @@ class JobApplicationResponse(BaseModel):
 
 class JobApplicationListResponse(BaseModel):
     applications: list[JobApplicationResponse]
+    total: int
+
+
+class TalentDirectoryResponse(BaseModel):
+    profiles: list[UserProfileResponse]
     total: int

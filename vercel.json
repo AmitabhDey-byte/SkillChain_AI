@@ -4,7 +4,7 @@
   "functions": {
     "api/index.py": {
       "maxDuration": 60,
-      "excludeFiles": "{backend/tests/**,backend/migrations/**,contracts/**,.superdesign/**,docs/**}"
+      "excludeFiles": "{backend/tests/**,backend/migrations/**,contracts/**,.superdesign/**,docs/**,dist/**,public/**,src/**,tests/**}"
     }
   },
   "rewrites": [
