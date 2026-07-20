@@ -3,7 +3,7 @@
 ## Before deployment
 
 - [ ] Run `npm ci`
-- [ ] Keep the Vercel Framework Preset set to `Vite`
+- [ ] Set the Vercel Framework Preset to `Services`
 - [ ] Keep the Vercel Root Directory set to the repository root
 - [ ] Enable Vercel system environment variables
 - [ ] Remove `VITE_API_BASE_URL` from Vercel

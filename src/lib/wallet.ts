@@ -1,5 +1,5 @@
 import albedo from '@albedo-link/intent'
-import { getNetwork, isConnected, requestAccess, signMessage } from '@stellar/freighter-api'
+import { getNetwork, requestAccess, signMessage } from '@stellar/freighter-api'
 import {
   clearAuthSession,
   createAuthChallenge,
@@ -44,14 +44,6 @@ function saveWalletConnection(connection: WalletConnection) {
   sessionStorage.setItem(WALLET_SESSION_KEY, JSON.stringify(connection))
 }
 
-async function requireFreighter() {
-  const connection = await isConnected()
-
-  if (connection.error || !connection.isConnected) {
-    throw new Error('Freighter is not available. Install or unlock the Freighter browser extension to continue.')
-  }
-}
-
 async function readFreighterConnection(address: string): Promise<WalletConnection> {
   const networkResult = await getNetwork()
 
@@ -68,11 +60,10 @@ async function readFreighterConnection(address: string): Promise<WalletConnectio
 }
 
 export async function connectFreighter(): Promise<WalletConnection> {
-  await requireFreighter()
   const accessResult = await requestAccess()
 
   if (accessResult.error || !accessResult.address) {
-    throw new Error(getErrorMessage(accessResult.error, 'Wallet access was declined. Please approve the request in Freighter.'))
+    throw new Error(getErrorMessage(accessResult.error, 'Freighter did not respond. Install or unlock the extension, then approve wallet access.'))
   }
 
   return readFreighterConnection(accessResult.address)

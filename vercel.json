@@ -1,42 +1,81 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "vite",
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "functions": {
-    "api/**/*.py": {
+  "services": {
+    "frontend": {
+      "root": ".",
+      "framework": "vite",
+      "buildCommand": "npm run build",
+      "outputDirectory": "dist"
+    },
+    "backend": {
+      "root": "backend",
+      "framework": "fastapi",
+      "entrypoint": "main:app",
       "maxDuration": 60,
-      "excludeFiles": "{backend/tests/**,backend/migrations/**,contracts/**,.superdesign/**,docs/**,dist/**,public/**,src/**,tests/**}"
+      "excludeFiles": "{tests/**,migrations/**,__pycache__/**}"
     }
   },
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "backend"
+      }
+    },
+    {
       "source": "/explore",
-      "destination": "/index.html"
+      "destination": {
+        "service": "frontend",
+        "path": "/index.html"
+      }
     },
     {
       "source": "/trust",
-      "destination": "/index.html"
+      "destination": {
+        "service": "frontend",
+        "path": "/index.html"
+      }
     },
     {
       "source": "/verify",
-      "destination": "/index.html"
+      "destination": {
+        "service": "frontend",
+        "path": "/index.html"
+      }
     },
     {
       "source": "/recruiters",
-      "destination": "/index.html"
+      "destination": {
+        "service": "frontend",
+        "path": "/index.html"
+      }
     },
     {
       "source": "/dashboard",
-      "destination": "/index.html"
+      "destination": {
+        "service": "frontend",
+        "path": "/index.html"
+      }
     },
     {
       "source": "/recruiter-dashboard",
-      "destination": "/index.html"
+      "destination": {
+        "service": "frontend",
+        "path": "/index.html"
+      }
     },
     {
       "source": "/admin",
-      "destination": "/index.html"
+      "destination": {
+        "service": "frontend",
+        "path": "/index.html"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "frontend"
+      }
     }
   ],
   "headers": [
@@ -45,7 +84,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://avatars.githubusercontent.com; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://avatars.githubusercontent.com; connect-src 'self' https://horizon-testnet.stellar.org https://soroban-testnet.stellar.org; frame-src https://albedo.link; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self' https://albedo.link; upgrade-insecure-requests"
         },
         {
           "key": "Referrer-Policy",
