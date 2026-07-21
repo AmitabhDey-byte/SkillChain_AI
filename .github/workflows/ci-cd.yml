@@ -1,0 +1,167 @@
+name: SkillChain CI/CD
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: skillchain-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  frontend:
+    name: Frontend quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run frontend tests
+        run: npm run frontend:test
+      - name: Run lint checks
+        run: npm run lint
+      - name: Build production frontend
+        run: npm run build
+
+  backend:
+    name: Backend quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Configure Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      - name: Run backend tests
+        run: python -m unittest discover -s backend/tests -v
+      - name: Validate migration graph
+        run: python -m alembic -c backend/alembic.ini heads
+
+  contracts:
+    name: Soroban contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Configure Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            contracts/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('contracts/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+      - name: Test credential contract
+        run: cargo test --manifest-path contracts/Cargo.toml --locked
+
+  deploy-production:
+    name: Deploy production
+    if: github.event_name == 'push'
+    needs:
+      - frontend
+      - backend
+      - contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: https://skill-chain-ai-cona.vercel.app
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      PRODUCTION_URL: https://skill-chain-ai-cona.vercel.app
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Check deployment configuration
+        id: deployment
+        shell: bash
+        run: |
+          missing=()
+          [[ -z "$VERCEL_TOKEN" ]] && missing+=("VERCEL_TOKEN")
+          [[ -z "$VERCEL_ORG_ID" ]] && missing+=("VERCEL_ORG_ID")
+          [[ -z "$VERCEL_PROJECT_ID" ]] && missing+=("VERCEL_PROJECT_ID")
+          [[ -z "$DATABASE_URL" ]] && missing+=("DATABASE_URL")
+          if (( ${#missing[@]} > 0 )); then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Production deployment skipped. Add repository secrets: ${missing[*]}"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Configure Node.js
+        if: steps.deployment.outputs.configured == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Configure Python
+        if: steps.deployment.outputs.configured == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - name: Install deployment tools
+        if: steps.deployment.outputs.configured == 'true'
+        run: |
+          npm install --global vercel@latest
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      - name: Pull Vercel production configuration
+        if: steps.deployment.outputs.configured == 'true'
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+      - name: Build Vercel services
+        if: steps.deployment.outputs.configured == 'true'
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+      - name: Apply database migrations
+        if: steps.deployment.outputs.configured == 'true'
+        run: python -m alembic -c backend/alembic.ini upgrade head
+      - name: Deploy prebuilt services
+        if: steps.deployment.outputs.configured == 'true'
+        run: vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+      - name: Verify production health
+        if: steps.deployment.outputs.configured == 'true'
+        shell: bash
+        run: |
+          for attempt in {1..18}; do
+            if curl --fail --silent --show-error "$PRODUCTION_URL/api/v1/health/live" > /dev/null; then
+              echo "Production health check passed."
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Production health check failed."
+          exit 1
