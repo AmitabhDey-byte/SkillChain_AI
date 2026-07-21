@@ -5,6 +5,22 @@ AI-powered technical skill verification and portable on-chain credentials on Ste
 ## Current milestone
 
 The application includes role-specific React workspaces, signed Freighter and Albedo wallet sessions, GitHub evidence analysis, Gemini skill assessment, Stellar credentials, a searchable opportunity graph, PostgreSQL-backed profiles and applications, hiring intelligence, and the Albedo blockchain assistant.
+## Screenshots:
+
+<img width="1917" height="862" alt="Screenshot 2026-07-21 103917" src="https://github.com/user-attachments/assets/6b0cd245-0aa6-41c4-b045-4897dab69148" />
+<img width="1915" height="967" alt="Screenshot 2026-07-21 103850" src="https://github.com/user-attachments/assets/2f567b4a-57eb-4663-b6e7-4ebdbbab704c" />
+<img width="1917" height="867" alt="Screenshot 2026-07-21 103830" src="https://github.com/user-attachments/assets/7d0b74e7-436d-45e4-a668-691361badd00" />
+<img width="1917" height="867" alt="Screenshot 2026-07-21 103807" src="https://github.com/user-attachments/assets/d6084bb0-15d1-49a6-81b8-87790f9c98f1" />
+<img width="720" height="1600" alt="WhatsApp Image 2026-07-21 at 3 18 34 PM (1)" src="https://github.com/user-attachments/assets/84d8ce5c-66f8-428a-8950-000b4c5e3520" />
+<img width="720" height="1600" alt="WhatsApp Image 2026-07-21 at 3 18 34 PM" src="https://github.com/user-attachments/assets/50af13d3-80a2-4f25-bab1-5a5f7dcee884" />
+<img width="720" height="1600" alt="WhatsApp Image 2026-07-21 at 3 18 33 PM" src="https://github.com/user-attachments/assets/7cdeb23f-50d8-45a0-ae10-4dce0c16d58c" />
+
+## Demo Video Link:
+
+
+## The Users Logged in and used
+
+https://docs.google.com/spreadsheets/d/1oUoptldG3q2xLOB6MRCxIvKnnaoslLS-xJvDXYy84ZE/edit?usp=sharing
 
 ## Local development
 
