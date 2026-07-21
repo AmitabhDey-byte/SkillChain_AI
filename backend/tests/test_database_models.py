@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from backend.app.db.base import Base
-from backend.app.db.models import AuthChallenge, Feedback, GithubProfile, InteractionType, User, UserRole, WalletInteraction
+from backend.app.db.models import AuthChallenge, Feedback, GithubProfile, InteractionType, Notification, User, UserRole, WalletInteraction
 
 
 class DatabaseModelTests(unittest.TestCase):
@@ -18,7 +18,11 @@ class DatabaseModelTests(unittest.TestCase):
 
     def test_expected_tables_are_registered(self) -> None:
         table_names = set(inspect(self.engine).get_table_names())
-        self.assertEqual(table_names, {"auth_challenges", "feedback", "github_profiles", "job_applications", "users", "wallet_interactions"})
+        self.assertEqual(table_names, {"auth_challenges", "feedback", "github_profiles", "job_applications", "notifications", "users", "wallet_interactions"})
+
+    def test_notification_wallet_index_is_registered(self) -> None:
+        indexes = {item["name"] for item in inspect(self.engine).get_indexes(Notification.__tablename__)}
+        self.assertIn("ix_notifications_recipient_read", indexes)
 
     def test_user_github_and_wallet_relationships(self) -> None:
         user = User(

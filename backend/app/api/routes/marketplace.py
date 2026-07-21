@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.core.auth import WalletIdentity, require_matching_wallet, require_wallet_identity
 from backend.app.core.config import Settings, get_settings
 from backend.app.core.errors import AppError
-from backend.app.db.models import ApplicationStatus, JobApplication, User, UserRole, UserStatus
+from backend.app.db.models import ApplicationStatus, JobApplication, Notification, NotificationType, User, UserRole, UserStatus
 from backend.app.db.session import get_database_session
 from backend.app.schemas.marketplace import (
     JobApplicationCreate,
@@ -21,6 +21,25 @@ from backend.app.schemas.marketplace import (
 
 
 router = APIRouter()
+
+
+notification_content = {
+    ApplicationStatus.REVIEWING: (
+        NotificationType.APPLICATION_REVIEWING,
+        "Your application is under review",
+        "{company} is now reviewing your application for {job}.",
+    ),
+    ApplicationStatus.SHORTLISTED: (
+        NotificationType.APPLICATION_SHORTLISTED,
+        "You made the shortlist",
+        "{company} shortlisted you for {job}. Your verified proof stood out.",
+    ),
+    ApplicationStatus.DECLINED: (
+        NotificationType.APPLICATION_DECLINED,
+        "Application update",
+        "{company} closed your application for {job}. Keep building your proof profile for the next match.",
+    ),
+}
 
 
 async def require_recruiter(
@@ -119,7 +138,19 @@ async def update_application(
         raise AppError("Application request was not found.", "application_not_found", 404)
     if settings.security_enforced and recruiter and application.company_name != recruiter.organization:
         raise AppError("This application belongs to another organization.", "application_forbidden", 403)
+    previous_status = application.status
     application.status = ApplicationStatus(request.status.value)
+    if previous_status != application.status and application.status in notification_content:
+        notification_type, title, message = notification_content[application.status]
+        session.add(
+            Notification(
+                recipient_wallet=application.applicant_wallet.upper(),
+                notification_type=notification_type,
+                title=title,
+                message=message.format(company=application.company_name, job=application.job_title),
+                application_id=application.id,
+            )
+        )
     await session.commit()
     await session.refresh(application)
     return application

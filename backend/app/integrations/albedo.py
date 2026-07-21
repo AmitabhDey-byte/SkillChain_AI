@@ -6,13 +6,21 @@ from typing import Any
 
 import httpx
 from fastapi import Depends
+from pydantic import ValidationError
 
 from backend.app.core.config import Settings, get_settings
 from backend.app.core.errors import AppError
-from backend.app.schemas.assistant import AssistantChatRequest, AssistantChatResponse
+from backend.app.schemas.assistant import (
+    AssistantChatRequest,
+    AssistantChatResponse,
+    InterviewKitContent,
+    InterviewKitRequest,
+    InterviewKitResponse,
+)
 
 
 ALBEDO_INSTRUCTION = """You are Albedo, SkillChain AI's friendly blockchain career assistant. Help students, developers, freelancers, and recruiters understand Stellar, Soroban, wallets, on-chain credentials, blockchain careers, secure payments, and SkillChain workflows. Keep answers practical, concise, and easy to scan. Never request wallet secret keys, seed phrases, private keys, API keys, or passwords. Explain that testnet assets have no real monetary value. Do not provide investment, legal, or tax advice. If a question is unrelated to blockchain, technical careers, hiring, credentials, or SkillChain, politely guide the user back to those areas."""
+INTERVIEW_INSTRUCTION = """You are SkillChain AI's evidence-based technical interview architect. Build fair, role-specific questions that ask candidates to explain real artifacts, technical decisions, trade-offs, ownership, collaboration, and measurable outcomes. Never infer protected personal characteristics. Avoid trivia, brainteasers, credential prestige, or questions unrelated to demonstrated work. Return only valid JSON with no markdown."""
 logger = logging.getLogger("skillchain.integrations.albedo")
 
 
@@ -57,18 +65,66 @@ class AlbedoService:
             "contents": [{"parts": [{"text": prompt}]}],
         }
         response = await self._generate(payload)
+        reply = self._response_text(response, "Albedo")
+        return AssistantChatResponse(reply=reply, model=self.model)
+
+    async def generate_interview_kit(self, request: InterviewKitRequest) -> InterviewKitResponse:
+        role_context = {
+            "target_role": request.role.strip(),
+            "seniority": request.seniority,
+            "job_description": request.job_description.strip() or "Not provided",
+            "evidence_domains": list(dict.fromkeys(skill.strip() for skill in request.skills if skill.strip())),
+        }
+        prompt = (
+            f"{INTERVIEW_INSTRUCTION}\n\n"
+            f"Role context:\n{json.dumps(role_context, ensure_ascii=True)}\n\n"
+            "Create a 45 to 60 minute structured interview kit. Return exactly this JSON shape:\n"
+            '{"title":"string","overview":"string","questions":[{"question":"string","look_for":"string","skill":"string"}],'
+            '"scorecard":[{"criterion":"string","guidance":"string"}],"duration_minutes":45}\n'
+            "Include 5 to 7 questions and 4 to 5 scorecard criteria. Every question must reference evidence or a realistic scenario."
+        )
+        response = await self._generate({"contents": [{"parts": [{"text": prompt}]}]})
+        raw_content = self._response_text(response, "Interview Studio")
+        try:
+            content = InterviewKitContent.model_validate(self._parse_json_object(raw_content))
+        except (json.JSONDecodeError, ValidationError, ValueError) as error:
+            raise AppError(
+                "Gemini returned an interview kit in an unexpected format. Try generating it again.",
+                "interview_kit_invalid",
+                502,
+            ) from error
+        return InterviewKitResponse(**content.model_dump(), model=self.model)
+
+    @staticmethod
+    def _response_text(response: httpx.Response, feature_name: str) -> str:
         response_data: dict[str, Any] = response.json()
         candidates = response_data.get("candidates") or []
         if not candidates:
-            raise AppError("Albedo could not answer that request.", "albedo_empty_response", 502)
+            raise AppError(f"{feature_name} could not complete that request.", "albedo_empty_response", 502)
         candidate = candidates[0]
         if candidate.get("finishReason") in {"SAFETY", "RECITATION", "BLOCKLIST", "PROHIBITED_CONTENT"}:
-            raise AppError("Albedo could not answer that request safely.", "albedo_blocked", 422)
+            raise AppError(f"{feature_name} could not complete that request safely.", "albedo_blocked", 422)
         parts = ((candidate.get("content") or {}).get("parts") or [])
-        reply = "".join(part.get("text", "") for part in parts).strip()
-        if not reply:
-            raise AppError("Albedo returned an empty response.", "albedo_empty_response", 502)
-        return AssistantChatResponse(reply=reply, model=self.model)
+        text = "".join(part.get("text", "") for part in parts).strip()
+        if not text:
+            raise AppError(f"{feature_name} returned an empty response.", "albedo_empty_response", 502)
+        return text
+
+    @staticmethod
+    def _parse_json_object(value: str) -> dict[str, Any]:
+        normalized = value.strip()
+        if normalized.startswith("```"):
+            normalized = normalized.split("\n", 1)[1] if "\n" in normalized else normalized[3:]
+            if normalized.rstrip().endswith("```"):
+                normalized = normalized.rstrip()[:-3]
+        start = normalized.find("{")
+        end = normalized.rfind("}")
+        if start < 0 or end < start:
+            raise ValueError("Missing JSON object")
+        parsed = json.loads(normalized[start : end + 1])
+        if not isinstance(parsed, dict):
+            raise ValueError("Expected a JSON object")
+        return parsed
 
     async def _generate(self, payload: dict[str, Any]) -> httpx.Response:
         for attempt in range(len(self.retry_delays) + 1):

@@ -5,7 +5,7 @@ from uuid import uuid4
 from fastapi.testclient import TestClient
 
 from backend.app.core.config import Settings
-from backend.app.db.models import User, UserRole
+from backend.app.db.models import JobApplication, Notification, NotificationType, User, UserRole
 from backend.app.db.session import get_database_session
 from backend.app.main import create_app
 
@@ -44,7 +44,13 @@ class FakeMarketplaceSession:
         self.items.append(item)
 
     async def commit(self) -> None:
-        return None
+        now = datetime.now(UTC)
+        for item in self.items:
+            if item.id is None:
+                item.id = uuid4()
+            if item.created_at is None:
+                item.created_at = now
+            item.updated_at = now
 
     async def rollback(self) -> None:
         return None
@@ -58,10 +64,11 @@ class FakeMarketplaceSession:
         item.updated_at = now
 
     async def scalars(self, statement) -> FakeScalarCollection:
-        return FakeScalarCollection(self.items)
+        entity = statement.column_descriptions[0].get("entity")
+        return FakeScalarCollection([item for item in self.items if entity is None or isinstance(item, entity)])
 
     async def get(self, model, item_id):
-        return next((item for item in self.items if item.id == item_id), None)
+        return next((item for item in self.items if isinstance(item, model) and item.id == item_id), None)
 
 
 class MarketplaceApplicationRouteTests(unittest.TestCase):
@@ -93,6 +100,38 @@ class MarketplaceApplicationRouteTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "shortlisted")
+        notifications = [item for item in self.session.items if isinstance(item, Notification)]
+        self.assertEqual(len(notifications), 1)
+        self.assertEqual(notifications[0].notification_type, NotificationType.APPLICATION_SHORTLISTED)
+        self.assertEqual(notifications[0].recipient_wallet, OWNER)
+
+    def test_candidate_can_read_recruiter_decision_notification(self) -> None:
+        created = self.client.post("/api/v1/marketplace/applications", json=application_payload()).json()
+        self.client.patch(
+            f"/api/v1/marketplace/applications/{created['id']}",
+            json={"status": "reviewing"},
+        )
+
+        inbox = self.client.get(f"/api/v1/notifications?wallet={OWNER}")
+        notification = inbox.json()["notifications"][0]
+        marked = self.client.patch(f"/api/v1/notifications/{notification['id']}/read?wallet={OWNER}")
+
+        self.assertEqual(inbox.status_code, 200)
+        self.assertEqual(inbox.json()["unread_count"], 1)
+        self.assertEqual(notification["notification_type"], "application_reviewing")
+        self.assertEqual(marked.status_code, 200)
+        self.assertIsNotNone(marked.json()["read_at"])
+
+    def test_repeating_same_status_does_not_duplicate_notification(self) -> None:
+        created = self.client.post("/api/v1/marketplace/applications", json=application_payload()).json()
+        endpoint = f"/api/v1/marketplace/applications/{created['id']}"
+        self.client.patch(endpoint, json={"status": "shortlisted"})
+        self.client.patch(endpoint, json={"status": "shortlisted"})
+
+        notifications = [item for item in self.session.items if isinstance(item, Notification)]
+        applications = [item for item in self.session.items if isinstance(item, JobApplication)]
+        self.assertEqual(len(notifications), 1)
+        self.assertEqual(len(applications), 1)
 
     def test_registered_developer_appears_in_talent_directory(self) -> None:
         now = datetime.now(UTC)

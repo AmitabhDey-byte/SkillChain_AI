@@ -6,13 +6,19 @@ SkillChain AI is a proof-of-skill network combining explainable AI, public devel
 
 ## Current Palette
 
-- Obsidian forest: `#07140f`
-- Deep surface: `#0c1c15`
-- Raised surface: `#12261c`
-- Acid mint: `#7cf39d`
-- Electric lime: `#b7ff7a`
-- Editorial cream: `#f4f2e9`
-- Muted text: `#9bb0a2`
+- Cosmic ink: `#070812`
+- Deep indigo surface: `#0d1124`
+- Raised violet surface: `#151a35`
+- Electric violet: `#8a63ff`
+- Signal cyan: `#53ddff`
+- Aurora rose: `#ff7b9d`
+- Warm signal: `#ffc66d`
+- Success only: `#57e3a1`
+- Primary text: `#f5f7ff`
+- Secondary text: `#b8c0dc`
+- Structural line: `rgba(195, 205, 255, 0.16)`
+
+Green is reserved for positive status feedback. Panels, cards, navigation, filters, and primary buttons must use indigo, violet, cyan, or rose instead of forest green or acid lime.
 
 ## Typography
 
@@ -20,17 +26,20 @@ SkillChain AI is a proof-of-skill network combining explainable AI, public devel
 - Display: Space Grotesk
 - Editorial accent: Instrument Serif
 - Data and labels: DM Mono
+- Body text: 15-16px with at least 1.55 line height
+- Navigation and controls: 14px minimum
+- Supporting text: 13px minimum
+- Data labels and overlines: 11px minimum
 
 ## Geometry
 
-- Current controls and cards are mostly square
-- Borders are one pixel and low contrast
-- Primary actions use electric lime
+- Controls and cards use 14-20px radii with precise one-pixel borders
+- Primary actions use violet-to-cyan gradients
 - Dashboard uses a fixed sidebar and fluid content canvas
 
 ## Motion
 
-- Short 160–250ms transitions
+- Short 160-250ms transitions
 - Floating credential chips
 - Soft glow blooms
 - Spinner and modal entrance animations

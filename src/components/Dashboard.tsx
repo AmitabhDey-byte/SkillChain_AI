@@ -2,7 +2,6 @@ import {
   ArrowRight,
   BadgeCheck,
   BarChart3,
-  Bell,
   Blocks,
   BrainCircuit,
   BriefcaseBusiness,
@@ -38,6 +37,7 @@ import type { OnboardingProfile } from '../lib/onboarding'
 import { isTestnet, shortenAddress, type WalletConnection } from '../lib/wallet'
 import { UniversalSearch } from './UniversalSearch'
 import { Avatar } from './Avatar'
+import { NotificationCenter } from './NotificationCenter'
 
 type DashboardProps = {
   profile: OnboardingProfile
@@ -148,7 +148,7 @@ export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: D
           </div>
           <UniversalSearch audience="talent" onOpenJobs={openOpportunitySearch} />
           <div className="topbar-actions">
-            <button type="button" aria-label="Open assessment notifications" onClick={() => selectSection('Assessments')}><Bell size={18} /><span /></button>
+            <NotificationCenter walletAddress={connection?.address} />
             <button className="profile-chip" type="button" onClick={() => selectSection('Public profile')}><Avatar name={profile.displayName} githubUsername={profile.githubUsername} size="small" /><div><strong>{profile.displayName || 'SkillChain user'}</strong><small>{profile.role || 'Member'}</small></div></button>
           </div>
         </header>

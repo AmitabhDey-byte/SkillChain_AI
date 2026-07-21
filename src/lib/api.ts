@@ -509,6 +509,42 @@ export function chatWithAlbedo(message: string, role: string, history: Assistant
   })
 }
 
+export type InterviewSeniority = 'junior' | 'mid' | 'senior' | 'staff'
+
+export type InterviewQuestion = {
+  question: string
+  look_for: string
+  skill: string
+}
+
+export type InterviewScorecardCriterion = {
+  criterion: string
+  guidance: string
+}
+
+export type InterviewKit = {
+  title: string
+  overview: string
+  questions: InterviewQuestion[]
+  scorecard: InterviewScorecardCriterion[]
+  duration_minutes: number
+  model: string
+}
+
+export function generateInterviewKit(
+  role: string,
+  seniority: InterviewSeniority,
+  jobDescription: string,
+  skills: string[],
+  signal?: AbortSignal,
+) {
+  return apiRequest<InterviewKit>('/assistant/interview-kit', {
+    method: 'POST',
+    body: { role, seniority, job_description: jobDescription, skills },
+    signal,
+  })
+}
+
 export type JobApplicationStatus = 'pending' | 'reviewing' | 'shortlisted' | 'declined'
 
 export type JobApplication = {
@@ -547,6 +583,40 @@ export function updateJobApplication(applicationId: string, status: JobApplicati
   return apiRequest<JobApplication>(`/marketplace/applications/${encodeURIComponent(applicationId)}`, {
     method: 'PATCH',
     body: { status },
+    signal,
+  })
+}
+
+export type NotificationType = 'application_reviewing' | 'application_shortlisted' | 'application_declined'
+
+export type SkillChainNotification = {
+  id: string
+  recipient_wallet: string
+  notification_type: NotificationType
+  title: string
+  message: string
+  application_id: string | null
+  read_at: string | null
+  created_at: string
+}
+
+export function getNotifications(walletAddress: string, signal?: AbortSignal) {
+  return apiRequest<{ notifications: SkillChainNotification[]; total: number; unread_count: number }>(
+    `/notifications?wallet=${encodeURIComponent(walletAddress)}`,
+    { signal },
+  )
+}
+
+export function markNotificationRead(notificationId: string, walletAddress: string, signal?: AbortSignal) {
+  return apiRequest<SkillChainNotification>(
+    `/notifications/${encodeURIComponent(notificationId)}/read?wallet=${encodeURIComponent(walletAddress)}`,
+    { method: 'PATCH', signal },
+  )
+}
+
+export function markAllNotificationsRead(walletAddress: string, signal?: AbortSignal) {
+  return apiRequest<{ updated: number }>(`/notifications/read-all?wallet=${encodeURIComponent(walletAddress)}`, {
+    method: 'POST',
     signal,
   })
 }
