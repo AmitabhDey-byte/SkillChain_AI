@@ -21,7 +21,15 @@ test('routes API traffic to the backend before the frontend catch-all', () => {
 })
 
 test('restricts browser API connections to the same Vercel origin', () => {
-  const policy = config.headers[0].headers.find((header: { key: string }) => header.key === 'Content-Security-Policy')
+  const securityHeaders = config.headers.find((header: { source: string }) => header.source === '/(.*)')
+  const policy = securityHeaders.headers.find((header: { key: string }) => header.key === 'Content-Security-Policy')
   assert.match(policy.value, /connect-src 'self'/)
   assert.match(policy.value, /frame-src https:\/\/albedo\.link;/)
+})
+
+test('caches immutable Vite assets for repeat visits', () => {
+  const assets = config.headers.find((header: { source: string }) => header.source === '/assets/:path*')
+  const cacheControl = assets.headers.find((header: { key: string }) => header.key === 'Cache-Control')
+
+  assert.equal(cacheControl.value, 'public, max-age=31536000, immutable')
 })
