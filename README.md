@@ -1,41 +1,98 @@
-# SkillChain AI
+<h1 align="center">SkillChain AI</h1>
 
-AI-powered technical skill verification and portable on-chain credentials on Stellar.
+<p align="center">
+  <strong>AI-powered technical skill verification and portable on-chain credentials on Stellar.</strong>
+</p>
 
-[![SkillChain CI/CD](https://github.com/AmitabhDey-byte/SkillChain_AI/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/AmitabhDey-byte/SkillChain_AI/actions/workflows/ci-cd.yml)
+<p align="center">
+  <a href="https://skill-chain-ai-cona.vercel.app/"><img src="https://img.shields.io/badge/Live%20Demo-Vercel-black?logo=vercel&logoColor=white" alt="Live Demo" /></a>
+  <a href="https://stellar.org"><img src="https://img.shields.io/badge/Stellar-Testnet-blue?logo=stellar&logoColor=white" alt="Stellar Testnet" /></a>
+  <a href="https://github.com/AmitabhDey-byte/SkillChain_AI/actions/workflows/ci-cd.yml"><img src="https://github.com/AmitabhDey-byte/SkillChain_AI/actions/workflows/ci-cd.yml/badge.svg" alt="SkillChain CI" /></a>
+  <a href="https://soroban.stellar.org"><img src="https://img.shields.io/badge/Soroban-Smart%20Contracts-yellow" alt="Soroban Smart Contracts" /></a>
+</p>
 
-## Current milestone
+<p align="center">
+  <a href="#project-overview">Overview</a> • <a href="#screenshots">Screenshots</a> • <a href="#product-surfaces">Product</a> • <a href="#stellar-credential-contract">Contract</a> • <a href="#local-development">Setup</a>
+</p>
+
+---
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+  - [Current Milestone](#current-milestone)
+  - [Deployment & Contract](#deployment--contract)
+- [Screenshots](#screenshots)
+- [Demo Video Link](#demo-video-link)
+- [The Users Logged In and Used](#the-users-logged-in-and-used)
+- [Local Development](#local-development)
+- [Environment Variables](#environment-variables)
+- [Backend Foundation](#backend-foundation)
+- [Database](#database)
+- [Continuous Integration](#continuous-integration)
+- [Vercel Deployment](#vercel-deployment)
+- [Product Surfaces](#product-surfaces)
+- [Marketplace](#marketplace)
+- [Albedo Assistant](#albedo-assistant)
+- [GitHub Integration](#github-integration)
+- [AI Assessment](#ai-assessment)
+- [Wallet Authentication](#wallet-authentication)
+- [Stellar Credential Contract](#stellar-credential-contract)
+- [User Onboarding](#user-onboarding)
+- [User Dashboard](#user-dashboard)
+- [Security Controls](#security-controls)
+- [Cost Controls](#cost-controls)
+
+---
+
+## Project Overview
+
+### Current milestone
 
 The application includes role-specific React workspaces, signed Freighter and Albedo wallet sessions, GitHub evidence analysis, Gemini skill assessment, Stellar credentials, a searchable opportunity graph, PostgreSQL-backed profiles and applications, hiring intelligence, and the Albedo blockchain assistant.
 
-## Contract Deployment Address: 
+### Deployment & Contract
 
-CCC5TSRN6WGWE4WPIQTW7NSEXDX3NRW63XW74PDLPRLJXDSJUJGDHSJV
-## Deployed URL:
+| Resource | Value |
+| --- | --- |
+| Contract Deployment Address | `CCC5TSRN6WGWE4WPIQTW7NSEXDX3NRW63XW74PDLPRLJXDSJUJGDHSJV` |
+| Deployed URL | [https://skill-chain-ai-cona.vercel.app/](https://skill-chain-ai-cona.vercel.app/) |
 
-https://skill-chain-ai-cona.vercel.app/
+---
 
-## Screenshots:
+## Screenshots
+
+### Product UI
 
 <img width="1917" height="862" alt="Screenshot 2026-07-21 103917" src="https://github.com/user-attachments/assets/6b0cd245-0aa6-41c4-b045-4897dab69148" />
 <img width="1915" height="967" alt="Screenshot 2026-07-21 103850" src="https://github.com/user-attachments/assets/2f567b4a-57eb-4663-b6e7-4ebdbbab704c" />
 <img width="1917" height="867" alt="Screenshot 2026-07-21 103830" src="https://github.com/user-attachments/assets/7d0b74e7-436d-45e4-a668-691361badd00" />
 <img width="1917" height="867" alt="Screenshot 2026-07-21 103807" src="https://github.com/user-attachments/assets/d6084bb0-15d1-49a6-81b8-87790f9c98f1" />
+
+### Mobile Responsive Design
 <img width="360" height="800" alt="WhatsApp Image 2026-07-21 at 3 18 34 PM (1)" src="https://github.com/user-attachments/assets/84d8ce5c-66f8-428a-8950-000b4c5e3520" />
 <img width="360" height="800" alt="WhatsApp Image 2026-07-21 at 3 18 34 PM" src="https://github.com/user-attachments/assets/50af13d3-80a2-4f25-bab1-5a5f7dcee884" />
 <img width="360" height="800" alt="WhatsApp Image 2026-07-21 at 3 18 33 PM" src="https://github.com/user-attachments/assets/7cdeb23f-50d8-45a0-ae10-4dce0c16d58c" />
+
+### Product UI Continued
+
 <img width="1897" height="865" alt="image" src="https://github.com/user-attachments/assets/2f9bce8f-d70b-4cba-905b-294d6cefe5c2" />
 
+### CI/CD Pipeline
 
-## Demo Video Link:
+---
+
+## Demo Video Link
 
 https://drive.google.com/file/d/1vRIymJ3lND-0kHgibKv5hUBLFTyZ75OR/view?usp=sharing
 
-## The Users Logged in and used
+## The Users Logged In and Used
 
 https://docs.google.com/spreadsheets/d/1oUoptldG3q2xLOB6MRCxIvKnnaoslLS-xJvDXYy84ZE/edit?usp=sharing
 
-## Local development
+---
+
+## Local Development
 
 ```bash
 npm install
@@ -57,7 +114,9 @@ npm run backend:dev
 
 Local development uses `/api/v1` through the Vite proxy when `VITE_API_BASE_URL` is empty. A configured local API URL such as `http://localhost:8000/api/v1` is also supported. Production always uses same-origin `/api/v1`. The Windows development command runs Uvicorn without multiprocessing reload mode for compatibility with Python 3.14.
 
-## Environment variables
+---
+
+## Environment Variables
 
 | Variable | Purpose |
 | --- | --- |
@@ -84,13 +143,17 @@ Local development uses `/api/v1` through the Vite proxy when `VITE_API_BASE_URL`
 | `ALLOWED_HOSTS` | JSON array of exact production hosts accepted by FastAPI |
 | `MAX_REQUEST_BODY_BYTES` | Maximum request body size |
 
-## Backend foundation
+---
+
+## Backend Foundation
 
 The FastAPI service uses typed environment configuration, explicit CORS policy, request correlation IDs, processing-time headers, centralized safe error responses, production-aware API documentation, liveness and readiness probes, and an application factory for isolated testing.
 
 ```bash
 npm run backend:test
 ```
+
+---
 
 ## Database
 
@@ -102,13 +165,17 @@ npm run backend:migrate
 
 Run the migration command manually before each production deployment, including migration `20260721_0004` for persistent application notifications.
 
-## Continuous integration
+---
+
+## Continuous Integration
 
 GitHub Actions runs frontend tests, ESLint, a production frontend build, backend tests, Alembic migration graph validation, and Soroban contract tests for pull requests and pushes to `master` or `main`. The workflow does not deploy, access Vercel, apply database migrations, or require repository secrets.
 
 Deployments remain manual through the Vercel dashboard after the CI checks pass.
 
-## Vercel deployment
+---
+
+## Vercel Deployment
 
 The repository deploys the Vite frontend and complete FastAPI backend as two Vercel Services in one project. `vercel.json` routes `/api/*` to `backend/main.py` and all product routes to the Vite frontend.
 
@@ -139,7 +206,9 @@ https://skill-chain-ai-cona.vercel.app/api/v1/health/live
 https://skill-chain-ai-cona.vercel.app/api/v1/health/ready
 ```
 
-## Product surfaces
+---
+
+## Product Surfaces
 
 - `/` presents the three-dimensional SkillChain Proof OS experience.
 - `/explore` searches 50 clearly marked demo roles, companies, and talent profiles.
@@ -161,7 +230,9 @@ Recruiters can search registered developer and freelancer accounts together with
 | `GET /api/v1/marketplace/applications` | Read recruiter application requests |
 | `PATCH /api/v1/marketplace/applications/{id}` | Update recruiter review status |
 
-## Albedo assistant
+---
+
+## Albedo Assistant
 
 Albedo is available throughout the product. Anonymous visitors receive a curated local blockchain guide that makes no model request. Authenticated users can use the Gemini-powered assistant for role-aware guidance. Server-side guardrails reject secret-recovery requests and the API applies authenticated access and route-specific throttling.
 
@@ -169,7 +240,9 @@ Albedo is available throughout the product. Anonymous visitors receive a curated
 | --- | --- |
 | `POST /api/v1/assistant/chat` | Send a bounded conversation to Albedo |
 
-## GitHub integration
+---
+
+## GitHub Integration
 
 The backend consumes GitHub REST API version `2026-03-10` through a typed server-side client. Public profile and repository endpoints include bounded pagination, normalized response models, rate-limit metadata, timeouts, connection failure handling, and safe upstream errors. An optional server token increases GitHub API limits without exposing credentials to the browser.
 
@@ -184,7 +257,9 @@ The dashboard repository picker consumes these endpoints directly. It includes p
 
 Assessment evidence combines normalized language percentages, an 8,000-character README excerpt, twenty recent commits, contributor counts, repository metadata, and file-tree signals for tests and documentation. Batch collection limits concurrency and returns successful repositories even when another selected repository or optional evidence source fails.
 
-## AI assessment
+---
+
+## AI Assessment
 
 `POST /api/v1/assessments/preview` submits bounded repository evidence to Gemini using a strict structured-output schema. The server applies prompt-injection protections, validates every response, retries transient failures, handles safety blocks, records token usage, and recomputes the final score and level from a transparent rubric.
 
@@ -199,13 +274,17 @@ Assessment evidence combines normalized language percentages, an 8,000-character
 
 The frontend now runs the complete assessment pipeline from the dashboard. It collects evidence for the selected repositories, submits successful evidence to Gemini, displays distinct collection and analysis phases, supports safe retries, persists the validated report locally, and lets returning users reopen results without triggering another model request. Reports expose dimension rationales, cited evidence, skill confidence, repository findings, strengths, limitations, recommendations, methodology, and model usage.
 
-## Wallet authentication
+---
+
+## Wallet Authentication
 
 Freighter sign-in uses the official `@stellar/freighter-api` package and Albedo uses `@albedo-link/intent`. The API creates a short-lived, one-time challenge containing the wallet, network, nonce, issue time, and expiry. The wallet signs that exact message and the server verifies its Ed25519 signature before issuing a bounded bearer session. Sessions are stored in browser session storage and disappear when the tab session ends. Private keys never reach SkillChain.
 
 Protected production routes bind credential issuance, AI assessment, GitHub evidence collection, marketplace applications, user profiles, and admin operations to the signed wallet identity.
 
-## Stellar credential contract
+---
+
+## Stellar Credential Contract
 
 The Soroban credential contract implements issuer-authenticated credential creation, wallet ownership verification, typed skill levels, report hash anchoring, revocation, typed events, and automatic storage TTL renewal. Five unit tests cover initialization, issuance, validation, duplicate prevention, ownership checks, and revocation.
 
@@ -227,17 +306,23 @@ Assessment responses include a server-generated HMAC attestation. Issuance rejec
 
 Completed reports now continue into a responsive issuance experience with transaction progress, safe retry errors, persisted credential details, Stellar Expert links, and copyable credential IDs. Recruiters can verify a credential without connecting a wallet or creating an account at `/verify`.
 
-## User onboarding
+---
+
+## User Onboarding
 
 After wallet authentication, users choose their platform role, create a public professional profile, and link their GitHub identity. Completed profiles are persisted to PostgreSQL and restored by wallet address across devices. Unfinished drafts remain local, GitHub analysis requires explicit consent, and GitHub avatars appear automatically when available.
 
-## User dashboard
+---
+
+## User Dashboard
 
 Completed onboarding routes users into a responsive workspace with trust readiness, evidence sources, assessment status, a visual skill graph, career copilot, opportunity search, credential progress, connected wallet details, public profile data, and recent activity. Recruiters receive a separate hiring command center rather than the talent dashboard.
 
 Secrets such as the Gemini API key will live only in the backend environment and must never use the `VITE_` prefix or be committed to source control.
 
-## Security controls
+---
+
+## Security Controls
 
 - Signed one-time Freighter and Albedo authentication challenges
 - Wallet-bound resource authorization and recruiter role checks
@@ -252,6 +337,8 @@ Secrets such as the Gemini API key will live only in the backend environment and
 
 See `SECURITY.md` for reporting guidance and `docs/PRODUCTION_CHECKLIST.md` for deployment verification.
 
-## Cost controls
+---
+
+## Cost Controls
 
 The redesign uses local CSS, an included generated image asset, Lucide icons, and open-source wallet SDKs. It does not require a paid design plugin or third-party analytics subscription. Anonymous Albedo answers are local. Gemini usage occurs only for authenticated assistant requests and explicit portfolio assessments, so configure a Google AI usage limit and alert before production.
