@@ -100,22 +100,13 @@ PostgreSQL persistence uses SQLAlchemy 2 with async sessions and Alembic migrati
 npm run backend:migrate
 ```
 
-Run the migration command manually for deployments made outside the GitHub workflow. The CI/CD deployment job applies migrations automatically, including migration `20260721_0004` for persistent application notifications.
+Run the migration command manually before each production deployment, including migration `20260721_0004` for persistent application notifications.
 
-## CI/CD pipeline
+## Continuous integration
 
-GitHub Actions runs the frontend tests, ESLint, production build, backend tests, Alembic migration graph validation, and Soroban contract tests for pull requests and pushes to `master` or `main`. A production push deploys to Vercel only after every quality job passes.
+GitHub Actions runs frontend tests, ESLint, a production frontend build, backend tests, Alembic migration graph validation, and Soroban contract tests for pull requests and pushes to `master` or `main`. The workflow does not deploy, access Vercel, apply database migrations, or require repository secrets.
 
-Add these encrypted values in GitHub under **Settings → Secrets and variables → Actions**:
-
-| Repository secret | Purpose |
-| --- | --- |
-| `VERCEL_TOKEN` | Vercel account token used by the deployment job |
-| `VERCEL_ORG_ID` | Vercel team or account identifier |
-| `VERCEL_PROJECT_ID` | Linked SkillChain Vercel project identifier |
-| `DATABASE_URL` | Neon production URL used for automated Alembic migrations |
-
-The deployment job pulls the protected production configuration from Vercel, builds both services, applies database migrations, deploys the prebuilt output, and verifies `/api/v1/health/live`. Until all four GitHub secrets exist, CI still runs and the production deployment step reports that it was skipped. Disable Vercel's parallel Git auto-deployment after activating this workflow to avoid duplicate production deployments.
+Deployments remain manual through the Vercel dashboard after the CI checks pass.
 
 ## Vercel deployment
 
