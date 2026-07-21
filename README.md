@@ -6,7 +6,12 @@ AI-powered technical skill verification and portable on-chain credentials on Ste
 
 The application includes role-specific React workspaces, signed Freighter and Albedo wallet sessions, GitHub evidence analysis, Gemini skill assessment, Stellar credentials, a searchable opportunity graph, PostgreSQL-backed profiles and applications, hiring intelligence, and the Albedo blockchain assistant.
 
-## Contract Deployment Address: CCC5TSRN6WGWE4WPIQTW7NSEXDX3NRW63XW74PDLPRLJXDSJUJGDHSJV
+## Contract Deployment Address: 
+
+CCC5TSRN6WGWE4WPIQTW7NSEXDX3NRW63XW74PDLPRLJXDSJUJGDHSJV
+## Deployed URL:
+
+https://skill-chain-ai-cona.vercel.app/
 
 ## Screenshots:
 
@@ -14,9 +19,11 @@ The application includes role-specific React workspaces, signed Freighter and Al
 <img width="1915" height="967" alt="Screenshot 2026-07-21 103850" src="https://github.com/user-attachments/assets/2f567b4a-57eb-4663-b6e7-4ebdbbab704c" />
 <img width="1917" height="867" alt="Screenshot 2026-07-21 103830" src="https://github.com/user-attachments/assets/7d0b74e7-436d-45e4-a668-691361badd00" />
 <img width="1917" height="867" alt="Screenshot 2026-07-21 103807" src="https://github.com/user-attachments/assets/d6084bb0-15d1-49a6-81b8-87790f9c98f1" />
-<img width="720" height="1600" alt="WhatsApp Image 2026-07-21 at 3 18 34 PM (1)" src="https://github.com/user-attachments/assets/84d8ce5c-66f8-428a-8950-000b4c5e3520" />
-<img width="720" height="1600" alt="WhatsApp Image 2026-07-21 at 3 18 34 PM" src="https://github.com/user-attachments/assets/50af13d3-80a2-4f25-bab1-5a5f7dcee884" />
-<img width="720" height="1600" alt="WhatsApp Image 2026-07-21 at 3 18 33 PM" src="https://github.com/user-attachments/assets/7cdeb23f-50d8-45a0-ae10-4dce0c16d58c" />
+<img width="360" height="800" alt="WhatsApp Image 2026-07-21 at 3 18 34 PM (1)" src="https://github.com/user-attachments/assets/84d8ce5c-66f8-428a-8950-000b4c5e3520" />
+<img width="360" height="800" alt="WhatsApp Image 2026-07-21 at 3 18 34 PM" src="https://github.com/user-attachments/assets/50af13d3-80a2-4f25-bab1-5a5f7dcee884" />
+<img width="360" height="800" alt="WhatsApp Image 2026-07-21 at 3 18 33 PM" src="https://github.com/user-attachments/assets/7cdeb23f-50d8-45a0-ae10-4dce0c16d58c" />
+<img width="1897" height="865" alt="image" src="https://github.com/user-attachments/assets/2f9bce8f-d70b-4cba-905b-294d6cefe5c2" />
+
 
 ## Demo Video Link:
 
