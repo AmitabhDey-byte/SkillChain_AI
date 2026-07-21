@@ -5,6 +5,9 @@ AI-powered technical skill verification and portable on-chain credentials on Ste
 ## Current milestone
 
 The application includes role-specific React workspaces, signed Freighter and Albedo wallet sessions, GitHub evidence analysis, Gemini skill assessment, Stellar credentials, a searchable opportunity graph, PostgreSQL-backed profiles and applications, hiring intelligence, and the Albedo blockchain assistant.
+
+## Contract Deployment Address: CCC5TSRN6WGWE4WPIQTW7NSEXDX3NRW63XW74PDLPRLJXDSJUJGDHSJV
+
 ## Screenshots:
 
 <img width="1917" height="862" alt="Screenshot 2026-07-21 103917" src="https://github.com/user-attachments/assets/6b0cd245-0aa6-41c4-b045-4897dab69148" />
