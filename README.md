@@ -17,6 +17,7 @@ The application includes role-specific React workspaces, signed Freighter and Al
 
 ## Demo Video Link:
 
+https://drive.google.com/file/d/1vRIymJ3lND-0kHgibKv5hUBLFTyZ75OR/view?usp=sharing
 
 ## The Users Logged in and used
 
