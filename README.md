@@ -80,10 +80,18 @@ The application includes role-specific React workspaces, signed Freighter and Al
 
 <img width="1915" height="966" alt="image" src="https://github.com/user-attachments/assets/b160d706-41be-41f5-9da7-f1c4bd51c79c" />
 
+### 📊 User Onboarding Data
+
+<div align="center">
+
+</div>
+
 
 ### CI/CD Pipeline
 
----
+
+<img width="1917" height="872" alt="image" src="https://github.com/user-attachments/assets/4631e5b5-912c-46d6-bf89-c258f34f0a8e" />
+
 
 ## Demo Video Link
 
