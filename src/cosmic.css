@@ -2624,15 +2624,24 @@ body {
 .admin-activity-table th {
   color: #70697b;
   border-color: rgba(216,210,255,.08);
+  font-size: 12px;
+  letter-spacing: .05em;
 }
 
 .admin-activity-table td {
   color: #aaa2b6;
   border-color: rgba(216,210,255,.07);
+  font-size: 14px;
+  line-height: 1.45;
 }
 
 .admin-activity-table code {
   color: var(--cosmic-cyan);
+  font-size: 13px;
+}
+
+.admin-activity-table td small {
+  font-size: 12px;
 }
 
 .feedback-panel {

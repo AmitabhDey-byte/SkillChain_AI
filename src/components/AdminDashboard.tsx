@@ -111,18 +111,19 @@ export function AdminDashboard({ connection, onDisconnect }: AdminDashboardProps
             <div className="card-heading"><div><p className="overline">USER REGISTRY</p><h2>Joined SkillChain members</h2></div><span className="workspace-status workspace-status--complete">{users?.total ?? 0} profiles</span></div>
             <div className="admin-table-wrap">
               <table className="admin-activity-table">
-                <thead><tr><th>Profile</th><th>Role</th><th>GitHub</th><th>Skills</th><th>Joined</th></tr></thead>
+                <thead><tr><th>Profile</th><th>Wallet address</th><th>Role</th><th>GitHub</th><th>Skills</th><th>Joined</th></tr></thead>
                 <tbody>
                   {users?.users.map((user) => (
                     <tr key={user.id}>
                       <td><strong>{user.display_name}</strong><br /><small>{user.headline}</small></td>
+                      <td><code title={user.wallet_address}>{shortenAddress(user.wallet_address)}</code></td>
                       <td><span className="admin-event-status admin-event-status--success">{formatActivityType(user.role)}</span></td>
                       <td>{user.github_username ? `@${user.github_username}` : 'â€”'}</td>
                       <td>{user.skills.length ? user.skills.slice(0, 3).join(', ') : 'â€”'}</td>
                       <td>{formatTimestamp(user.created_at)}</td>
                     </tr>
                   ))}
-                  {!loading && !users?.users.length && <tr><td colSpan={5} className="admin-empty-row">No completed user profiles have been recorded yet.</td></tr>}
+                  {!loading && !users?.users.length && <tr><td colSpan={6} className="admin-empty-row">No completed user profiles have been recorded yet.</td></tr>}
                 </tbody>
               </table>
             </div>
