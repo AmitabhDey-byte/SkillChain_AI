@@ -31,6 +31,7 @@ import { UniversalSearch } from './UniversalSearch'
 import { Avatar } from './Avatar'
 import { InterviewStudio } from './InterviewStudio'
 import { RecruiterAnalytics } from './RecruiterAnalytics'
+import { FeedbackPanel } from './FeedbackPanel'
 
 type RecruiterDashboardProps = {
   profile: OnboardingProfile
@@ -132,6 +133,7 @@ export function RecruiterDashboard({ profile, connection, onOpenWallet, onDiscon
                 <article className="dashboard-card recruiter-quick-verify"><div className="card-heading"><div><p className="overline">QUICK VERIFICATION</p><h2>Check candidate proof</h2></div><ShieldCheck size={20} /></div><CredentialVerifier onVerified={recordVerification} /></article>
                 <article className="dashboard-card recruiter-profile-card"><div className="card-heading"><div><p className="overline">HIRING IDENTITY</p><h2>Your recruiter profile</h2></div></div><div><span>{profile.displayName.slice(0, 2).toUpperCase() || 'HR'}</span><strong>{profile.displayName}</strong><small>{profile.headline}</small></div><dl><div><dt>Organization</dt><dd>{profile.organization}</dd></div><div><dt>Location</dt><dd>{profile.location || 'Not specified'}</dd></div><div><dt>Access</dt><dd className="status-value"><span /> Recruiter</dd></div></dl></article>
               </div>
+              <FeedbackPanel />
             </>
           )}
 

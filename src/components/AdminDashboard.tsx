@@ -1,6 +1,6 @@
-import { Activity, Blocks, Bot, ChevronRight, CircleAlert, Database, KeyRound, LoaderCircle, LogOut, Menu, RefreshCw, ServerCog, ShieldCheck, Users, Wallet, X } from 'lucide-react'
+import { Activity, Blocks, Bot, ChevronRight, CircleAlert, Database, ExternalLink, KeyRound, LoaderCircle, LogOut, Menu, RefreshCw, ServerCog, ShieldCheck, Users, Wallet, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { ApiError, getAdminOverview, getLiveHealth, getReadyHealth, type AdminOverviewResponse, type LiveHealthResponse, type ReadyHealthResponse } from '../lib/api'
+import { ApiError, getAdminFeedback, getAdminOverview, getAdminUsers, getLiveHealth, getReadyHealth, type AdminFeedbackResponse, type AdminOverviewResponse, type AdminUserDirectoryResponse, type LiveHealthResponse, type ReadyHealthResponse } from '../lib/api'
 import { shortenAddress, type WalletConnection } from '../lib/wallet'
 
 type AdminDashboardProps = {
@@ -21,20 +21,26 @@ export function AdminDashboard({ connection, onDisconnect }: AdminDashboardProps
   const [live, setLive] = useState<LiveHealthResponse | null>(null)
   const [ready, setReady] = useState<ReadyHealthResponse | null>(null)
   const [overview, setOverview] = useState<AdminOverviewResponse | null>(null)
+  const [users, setUsers] = useState<AdminUserDirectoryResponse | null>(null)
+  const [feedback, setFeedback] = useState<AdminFeedbackResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const loadDashboard = async (signal?: AbortSignal) => {
     setLoading(true)
     setError(null)
     try {
-      const [liveResult, readyResult, overviewResult] = await Promise.all([
+      const [liveResult, readyResult, overviewResult, usersResult, feedbackResult] = await Promise.all([
         getLiveHealth(signal),
         getReadyHealth(signal),
         getAdminOverview(signal),
+        getAdminUsers(signal),
+        getAdminFeedback(signal),
       ])
       setLive(liveResult)
       setReady(readyResult)
       setOverview(overviewResult)
+      setUsers(usersResult)
+      setFeedback(feedbackResult)
     } catch (caughtError) {
       if (caughtError instanceof DOMException && caughtError.name === 'AbortError') return
       if (caughtError instanceof ApiError && [401, 403].includes(caughtError.status)) {
@@ -101,9 +107,52 @@ export function AdminDashboard({ connection, onDisconnect }: AdminDashboardProps
             </div>
           </article>
 
+          <article className="dashboard-card admin-activity-card">
+            <div className="card-heading"><div><p className="overline">USER REGISTRY</p><h2>Joined SkillChain members</h2></div><span className="workspace-status workspace-status--complete">{users?.total ?? 0} profiles</span></div>
+            <div className="admin-table-wrap">
+              <table className="admin-activity-table">
+                <thead><tr><th>Profile</th><th>Role</th><th>GitHub</th><th>Skills</th><th>Joined</th></tr></thead>
+                <tbody>
+                  {users?.users.map((user) => (
+                    <tr key={user.id}>
+                      <td><strong>{user.display_name}</strong><br /><small>{user.headline}</small></td>
+                      <td><span className="admin-event-status admin-event-status--success">{formatActivityType(user.role)}</span></td>
+                      <td>{user.github_username ? `@${user.github_username}` : 'â€”'}</td>
+                      <td>{user.skills.length ? user.skills.slice(0, 3).join(', ') : 'â€”'}</td>
+                      <td>{formatTimestamp(user.created_at)}</td>
+                    </tr>
+                  ))}
+                  {!loading && !users?.users.length && <tr><td colSpan={5} className="admin-empty-row">No completed user profiles have been recorded yet.</td></tr>}
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <article className="dashboard-card admin-activity-card">
+            <div className="card-heading"><div><p className="overline">PRODUCT FEEDBACK</p><h2>Member feedback feed</h2></div><span className="workspace-status workspace-status--complete">{feedback?.total ?? 0} responses</span></div>
+            <div className="admin-table-wrap">
+              <table className="admin-activity-table">
+                <thead><tr><th>Rating</th><th>Category</th><th>Page</th><th>Feedback</th><th>Received</th></tr></thead>
+                <tbody>
+                  {feedback?.feedback.map((item) => (
+                    <tr key={item.id}>
+                      <td><strong>{item.rating}/5</strong></td>
+                      <td><span className="admin-event-status admin-event-status--success">{formatActivityType(item.category)}</span></td>
+                      <td>{item.page || 'â€”'}</td>
+                      <td title={item.message}>{item.message}</td>
+                      <td>{formatTimestamp(item.created_at)}</td>
+                    </tr>
+                  ))}
+                  {!loading && !feedback?.feedback.length && <tr><td colSpan={5} className="admin-empty-row">No product feedback has been submitted yet.</td></tr>}
+                </tbody>
+              </table>
+            </div>
+          </article>
+
           <div className="admin-operations-grid">
             <article className="dashboard-card"><div className="card-heading"><div><p className="overline">SERVICE READINESS</p><h2>Production dependencies</h2></div><span className={ready?.status === 'ready' ? 'workspace-status workspace-status--complete' : 'workspace-status'}>{ready?.status || 'Loading'}</span></div><div className="admin-dependency-list"><div><Database size={17} /><span><strong>PostgreSQL</strong><small>Application metadata store</small></span><b>{dependencies?.database || 'checking'}</b></div><div><Bot size={17} /><span><strong>Gemini</strong><small>Portfolio evaluation service</small></span><b>{dependencies?.gemini || 'checking'}</b></div><div><ShieldCheck size={17} /><span><strong>Stellar testnet</strong><small>Soroban credential contract</small></span><b>{dependencies?.stellar || 'checking'}</b></div></div></article>
             <article className="dashboard-card"><div className="card-heading"><div><p className="overline">OPERATOR IDENTITY</p><h2>Runtime identity</h2></div><ServerCog size={19} /></div><dl className="admin-runtime-list"><div><dt>API status</dt><dd>{live?.status || 'Loading'}</dd></div><div><dt>Environment</dt><dd>{ready?.environment || 'Loading'}</dd></div><div><dt>Last heartbeat</dt><dd>{live ? formatTimestamp(live.timestamp) : 'Loading'}</dd></div><div><dt>Endpoint</dt><dd>/api/v1/admin/overview</dd></div></dl><div className="admin-security-note"><KeyRound size={16} /><span>Protected by a signed wallet session and the server-side <code>ADMIN_WALLETS</code> allowlist. No admin secret is stored in the browser.</span></div></article>
+            <article className="dashboard-card"><div className="card-heading"><div><p className="overline">ONBOARDING EVIDENCE</p><h2>User interaction spreadsheet</h2></div><Users size={19} /></div><p>Review the submitted wallet-interaction log alongside the live platform registry.</p><a className="card-action card-action--muted" href="https://docs.google.com/spreadsheets/d/1oUoptldG3q2xLOB6MRCxIvKnnaoslLS-xJvDXYy84ZE/edit?usp=sharing" target="_blank" rel="noreferrer">Open interaction spreadsheet <ExternalLink size={16} /></a></article>
           </div>
         </div>
       </section>

@@ -25,6 +25,7 @@
 - [Screenshots](#screenshots)
 - [Demo Video Link](#demo-video-link)
 - [The Users Logged In and Used](#the-users-logged-in-and-used)
+- [User Feedback](#user-feedback)
 - [Local Development](#local-development)
 - [Environment Variables](#environment-variables)
 - [Backend Foundation](#backend-foundation)
@@ -88,7 +89,19 @@ https://drive.google.com/file/d/1vRIymJ3lND-0kHgibKv5hUBLFTyZ75OR/view?usp=shari
 
 ## The Users Logged In and Used
 
-https://docs.google.com/spreadsheets/d/1oUoptldG3q2xLOB6MRCxIvKnnaoslLS-xJvDXYy84ZE/edit?usp=sharing
+[Open the wallet-interaction spreadsheet](https://docs.google.com/spreadsheets/d/1oUoptldG3q2xLOB6MRCxIvKnnaoslLS-xJvDXYy84ZE/edit?usp=sharing)
+
+---
+
+## User Feedback
+
+Signed wallet users can submit a 1–5 rating, topic, message, and page context through the workspace feedback card. Administrators can review submitted feedback and the wallet-interaction spreadsheet from the protected operations dashboard.
+
+| Endpoint | Purpose |
+| --- | --- |
+| `POST /api/v1/feedback` | Submit signed wallet feedback |
+| `GET /api/v1/admin/feedback` | Read submitted feedback as an authorized administrator |
+| `GET /api/v1/admin/users` | Read completed user profiles as an authorized administrator |
 
 ---
 

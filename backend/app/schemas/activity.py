@@ -34,3 +34,23 @@ class AdminOverviewResponse(BaseModel):
     credentials_verified: int
     recent_activity: list[AdminActivityItem]
     recent_transactions: list[AdminActivityItem]
+
+
+class AdminUserItem(BaseModel):
+    id: str
+    wallet_address: str
+    role: str
+    display_name: str
+    headline: str
+    location: str | None
+    organization: str | None
+    avatar_url: str | None
+    github_username: str | None
+    skills: list[str]
+    onboarding_complete: bool
+    created_at: datetime
+
+
+class AdminUserDirectoryResponse(BaseModel):
+    total: int
+    users: list[AdminUserItem]

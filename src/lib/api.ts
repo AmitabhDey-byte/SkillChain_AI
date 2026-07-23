@@ -496,6 +496,71 @@ export function getAdminOverview(signal?: AbortSignal) {
   })
 }
 
+export type AdminUser = {
+  id: string
+  wallet_address: string
+  role: UserProfile['role']
+  display_name: string
+  headline: string
+  location: string | null
+  organization: string | null
+  avatar_url: string | null
+  github_username: string | null
+  skills: string[]
+  onboarding_complete: boolean
+  created_at: string
+}
+
+export type AdminUserDirectoryResponse = {
+  total: number
+  users: AdminUser[]
+}
+
+export function getAdminUsers(signal?: AbortSignal) {
+  return apiRequest<AdminUserDirectoryResponse>('/admin/users?limit=50', {
+    signal,
+  })
+}
+
+export type FeedbackInput = {
+  rating: number
+  category: string
+  message: string
+  page?: string
+}
+
+export type FeedbackResponse = {
+  id: string
+  rating: number
+  category: string
+  message: string
+  page: string | null
+  created_at: string
+}
+
+export type AdminFeedbackItem = FeedbackResponse & {
+  wallet_address: string | null
+}
+
+export type AdminFeedbackResponse = {
+  total: number
+  feedback: AdminFeedbackItem[]
+}
+
+export function submitFeedback(feedback: FeedbackInput, signal?: AbortSignal) {
+  return apiRequest<FeedbackResponse>('/feedback', {
+    method: 'POST',
+    body: feedback,
+    signal,
+  })
+}
+
+export function getAdminFeedback(signal?: AbortSignal) {
+  return apiRequest<AdminFeedbackResponse>('/admin/feedback?limit=50', {
+    signal,
+  })
+}
+
 export type AssistantMessage = {
   role: 'user' | 'assistant'
   content: string

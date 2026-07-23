@@ -38,6 +38,7 @@ import { isTestnet, shortenAddress, type WalletConnection } from '../lib/wallet'
 import { UniversalSearch } from './UniversalSearch'
 import { Avatar } from './Avatar'
 import { NotificationCenter } from './NotificationCenter'
+import { FeedbackPanel } from './FeedbackPanel'
 
 type DashboardProps = {
   profile: OnboardingProfile
@@ -199,6 +200,7 @@ export function Dashboard({ profile, connection, onOpenWallet, onDisconnect }: D
               <div className="activity-list"><div><span><Wallet size={16} /></span><div><strong>Stellar wallet connected</strong><small>Identity ownership established</small></div><time>Today</time></div><div><span><GitBranch size={16} /></span><div><strong>GitHub profile added</strong><small>@{profile.githubUsername || 'not-linked'}</small></div><time>Today</time></div><div><span><PanelLeftClose size={16} /></span><div><strong>Profile created</strong><small>Your SkillChain workspace is live</small></div><time>Today</time></div></div>
             </article>
           </div>
+          <FeedbackPanel />
           </>
           ) : (
             <DashboardSection

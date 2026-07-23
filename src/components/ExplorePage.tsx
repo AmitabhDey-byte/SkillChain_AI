@@ -12,10 +12,11 @@ import {
   UsersRound,
   WalletCards,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { marketplaceCompanies } from '../data/companies'
 import { jobVacancies } from '../data/jobs'
-import { talentProfiles } from '../data/talent'
+import { mergeTalentProfiles } from '../data/talent'
+import { ApiError, getTalentDirectory, type UserProfile } from '../lib/api'
 import type { WalletConnection } from '../lib/wallet'
 import { PublicNav } from './PublicNav'
 
@@ -30,7 +31,24 @@ type ExploreTab = 'jobs' | 'companies' | 'talent'
 export function ExplorePage({ connection, onWallet, onEnter }: ExplorePageProps) {
   const [tab, setTab] = useState<ExploreTab>('jobs')
   const [query, setQuery] = useState('')
+  const [members, setMembers] = useState<UserProfile[]>([])
+  const [directoryError, setDirectoryError] = useState<string | null>(null)
   const normalized = query.trim().toLowerCase()
+  const profiles = useMemo(() => mergeTalentProfiles(members), [members])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    getTalentDirectory(controller.signal)
+      .then((directory) => {
+        setMembers(directory.profiles)
+        setDirectoryError(null)
+      })
+      .catch((error) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+        setDirectoryError(error instanceof ApiError ? error.message : 'Live member profiles could not be loaded.')
+      })
+    return () => controller.abort()
+  }, [])
 
   const results = useMemo(() => {
     if (tab === 'jobs') {
@@ -43,10 +61,10 @@ export function ExplorePage({ connection, onWallet, onEnter }: ExplorePageProps)
         [company.name, company.sector, company.location].join(' ').toLowerCase().includes(normalized),
       )
     }
-    return talentProfiles.filter((talent) =>
+    return profiles.filter((talent) =>
       [talent.name, talent.headline, talent.location, ...talent.skills].join(' ').toLowerCase().includes(normalized),
     )
-  }, [normalized, tab])
+  }, [normalized, profiles, tab])
 
   return (
     <main className="public-shell explore-page">
@@ -60,7 +78,7 @@ export function ExplorePage({ connection, onWallet, onEnter }: ExplorePageProps)
         <div className="explore-orbit">
           <span><strong>50</strong><small>open roles</small></span>
           <span><strong>50</strong><small>teams</small></span>
-          <span><strong>50</strong><small>builders</small></span>
+          <span><strong>{profiles.length}</strong><small>builders</small></span>
         </div>
       </section>
 
@@ -80,7 +98,7 @@ export function ExplorePage({ connection, onWallet, onEnter }: ExplorePageProps)
       <section className="explore-results">
         <div className="explore-results__head">
           <span>{results.length} signals found</span>
-          <small>Demo marketplace data is clearly marked</small>
+          <small>{tab === 'talent' ? `${members.length} live member profiles appear before demo talent` : 'Demo marketplace data is clearly marked'}</small>
         </div>
 
         {tab === 'jobs' && (
@@ -119,10 +137,10 @@ export function ExplorePage({ connection, onWallet, onEnter }: ExplorePageProps)
 
         {tab === 'talent' && (
           <div className="signal-grid">
-            {(results as typeof talentProfiles).slice(0, 24).map((talent) => (
+            {(results as typeof profiles).slice(0, 24).map((talent) => (
               <article className="signal-card signal-card--talent" key={talent.id}>
-                <div className="talent-score"><strong>{talent.score}</strong><span>PROOF SCORE</span></div>
-                <span className="demo-badge">DEMO TALENT</span>
+                <div className="talent-score"><strong>{talent.score ?? 'NEW'}</strong><span>{talent.score === null ? 'MEMBER STATUS' : 'PROOF SCORE'}</span></div>
+                <span className="demo-badge">{talent.source === 'member' ? 'LIVE MEMBER' : 'DEMO TALENT'}</span>
                 <div className="talent-identity"><span>{talent.initials}</span><div><h2>{talent.name}</h2><small>{talent.role} · {talent.location}</small></div></div>
                 <p>{talent.headline}</p>
                 <div className="signal-pills">{talent.skills.map((skill) => <span key={skill}>{skill}</span>)}</div>
@@ -132,6 +150,7 @@ export function ExplorePage({ connection, onWallet, onEnter }: ExplorePageProps)
           </div>
         )}
 
+        {directoryError && tab === 'talent' && <div className="explore-empty"><UsersRound size={26} /><strong>Live member directory is reconnecting</strong><span>{directoryError}</span></div>}
         {results.length === 0 && <div className="explore-empty"><Search size={26} /><strong>No matching signal</strong><span>Try a broader technology, location, or role.</span></div>}
       </section>
     </main>
