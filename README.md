@@ -106,6 +106,8 @@ The following consent-based onboarding records demonstrate real Stellar wallet c
 | 23 Jul 2026, 00:05 | Sandipan Singh | `GDYIHXTUKLCPZHWGGD5B5ZPJZINZ3WUNC3PJCDAYEB4XY4LT2XNTQHTX` | Pretty good—keep scaling it. |
 | 23 Jul 2026, 13:06 | ankita barman | `GCV5X5CKYUAPQLE3OYQS3PDXKX4TRV767YUCJ66PWWGZD2BXE744T276` | Good. |
 
+For the User Validation form: https://docs.google.com/forms/d/e/1FAIpQLSc2hSXyNt_CCiMmWwtXP9lqwrRi4rpVwewcMvleGUFOyDLtFQ/viewform?usp=header
+
 For the original evidence record, see the [wallet-interaction spreadsheet](https://docs.google.com/spreadsheets/d/1oUoptldG3q2xLOB6MRCxIvKnnaoslLS-xJvDXYy84ZE/edit?usp=sharing).
 
 
