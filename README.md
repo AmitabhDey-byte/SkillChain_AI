@@ -82,9 +82,31 @@ The application includes role-specific React workspaces, signed Freighter and Al
 
 ### 📊 User Onboarding Data
 
-<div align="center">
+The following consent-based onboarding records demonstrate real Stellar wallet connections and early product feedback. Contact details are intentionally excluded from this public repository.
 
-</div>
+| Joined (IST) | Participant | Stellar Testnet Wallet | Product Feedback |
+| --- | --- | --- | --- |
+| 18 Jul 2026, 22:41 | Debansh Tiwari | `GA4SXARZZ4RPF6N7VOAH3B5OKMFAP3FGY6M6TO3DZJL4TMU2KOVBHCIY` | The overall experience is smooth. Liked the product! |
+| 18 Jul 2026, 22:46 | Souvik Mandal | `GDDO6MEIVRZTXCJWLPPQAKTIWTD6CLOTGLJBQY63KMOIYASKXNU6WXN5` | Liked the idea and UI/UX; requested a walkthrough or user guide. |
+| 18 Jul 2026, 22:46 | Ansh Raj | `GA3EHDIPTPLQTQESCNR4TSJYBSERD57KERCNFHGWEJ5OX2XSWTMJO424` | It is really good. |
+| 19 Jul 2026, 13:19 | pritam dev | `GATJMD6BGNK4FQYNFWB354N7RP4XHA2R74GNSYM472ALNLJFX7NXBS3X` | Awesome product. |
+| 20 Jul 2026, 00:27 | Lohit Mishra | `GDYWYDOBPPM2XFQS2N7OA2XYO66C24OSBDGASSYAU7V3V4UHFIQYWCRL` | UI is great; reported opportunity-server errors. |
+| 20 Jul 2026, 17:46 | Sk Jishan Uddin | `GAVVOOVYGE7QEJWQO2BZZBGYYSFQPBC3QAYWRC6AFP7E3UMCWFT6YC4U` | Very user-friendly; unlike any website they had seen. |
+| 21 Jul 2026, 12:52 | Ritesh Gupta | `GDFSDPEEBZYQVG5JPPTJUOH4FID4M5XV45BKTWCIEIRYMCWJ6DQADBMB` | Yup. |
+| 21 Jul 2026, 13:16 | Priyanka Mondal | `GCKMODNZEAI4X6AL6SL77PNJLUUJAQAWECXDTXJZGXBOSSSF7THC3XH6` | Better product than others in the market. |
+| 21 Jul 2026, 13:17 | Ritam Saha | `GACMLTEWZ23NGJ5WZ2THYGLODFYTEKECB7J2U33H3DCSW2PEAQUEIZED` | Good. |
+| 21 Jul 2026, 15:17 | Elijah Negasi | `GAXCXDDP44VRDTL2PJI22WJU6H4CMRMI2CHRJGPJ3S3L4R323ETDOCAL` | Amazing! |
+| 21 Jul 2026, 16:17 | Rishikesh Singh | `GCO222KICSTS24BWPBEOSYQG5L3RAN4KHII7CE2CW36HRHRXQQPC6OCB` | Liked the UI and credential hashing. |
+| 21 Jul 2026, 16:25 | Nitin Raj | `GARRE4DTEUJIQSXRACCL6X55RH42S7WBO32F5HB4DU32MT6IL5TL3B3N` | Clean UI, smooth workflow, and promising AI-assisted learning platform. |
+| 21 Jul 2026, 17:30 | Sadiya Mulani | `GBTCGV43NLHEEBMCA5DWFZT6GOJYYCPHXNOEALTBQ7TREIQKQQAVLYT4` | AI-verified, wallet-owned credentials solve a real trust problem. |
+| 21 Jul 2026, 18:54 | Ankush Shaw | `GBBIG4HLPGTLG6BH6YREVWJXEQ4NX74HTD444JD6A6XYS7DOFL2J6DEI` | Liked the clean, simple UI. |
+| 21 Jul 2026, 20:06 | Subhadip Dutta | `GAVNLCS3GSWLKXSLZ3ITSL7QNB5IGHEOELXAF6QTYACDLEJ7XRQKBBNO` | Very nice UI and innovative idea. |
+| 21 Jul 2026, 22:13 | Arya Bhagat | `GCNZDOHRGJLUKX53TR5PETCO7Q3BKKWVS5K5GQ3NPFZYQ4MKY2BK6A32` | A good project to start with. |
+| 21 Jul 2026, 23:05 | Aditya Jha | `GAG3SUKHIF7VAWGTDRH52XETMLZXXNXBAZLLXHSLXAQPOBBCN43YLKR4` | Liked the product; suggested more UI polish. |
+| 23 Jul 2026, 00:05 | Sandipan Singh | `GDYIHXTUKLCPZHWGGD5B5ZPJZINZ3WUNC3PJCDAYEB4XY4LT2XNTQHTX` | Pretty good—keep scaling it. |
+| 23 Jul 2026, 13:06 | ankita barman | `GCV5X5CKYUAPQLE3OYQS3PDXKX4TRV767YUCJ66PWWGZD2BXE744T276` | Good. |
+
+For the original evidence record, see the [wallet-interaction spreadsheet](https://docs.google.com/spreadsheets/d/1oUoptldG3q2xLOB6MRCxIvKnnaoslLS-xJvDXYy84ZE/edit?usp=sharing).
 
 
 ### CI/CD Pipeline
