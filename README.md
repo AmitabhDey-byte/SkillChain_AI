@@ -75,9 +75,11 @@ The application includes role-specific React workspaces, signed Freighter and Al
 <img width="360" height="800" alt="WhatsApp Image 2026-07-21 at 3 18 34 PM" src="https://github.com/user-attachments/assets/50af13d3-80a2-4f25-bab1-5a5f7dcee884" />
 <img width="360" height="800" alt="WhatsApp Image 2026-07-21 at 3 18 33 PM" src="https://github.com/user-attachments/assets/7cdeb23f-50d8-45a0-ae10-4dce0c16d58c" />
 
-### Product UI Continued
+### Admin Panel
 
-<img width="1897" height="865" alt="image" src="https://github.com/user-attachments/assets/2f9bce8f-d70b-4cba-905b-294d6cefe5c2" />
+
+<img width="1915" height="966" alt="image" src="https://github.com/user-attachments/assets/b160d706-41be-41f5-9da7-f1c4bd51c79c" />
+
 
 ### CI/CD Pipeline
 
