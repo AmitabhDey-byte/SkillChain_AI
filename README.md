@@ -214,9 +214,23 @@ Run the migration command manually before each production deployment, including 
 
 ## Continuous Integration
 
-GitHub Actions runs frontend tests, ESLint, a production frontend build, backend tests, Alembic migration graph validation, and Soroban contract tests for pull requests and pushes to `master` or `main`. The workflow does not deploy, access Vercel, apply database migrations, or require repository secrets.
+GitHub Actions runs a gated delivery pipeline for pull requests and protected-branch pushes:
 
-Deployments remain manual through the Vercel dashboard after the CI checks pass.
+1. **Test and lint** — frontend tests, ESLint, production build, backend tests, Alembic migration validation, Rust formatting, Clippy, and Soroban contract tests.
+2. **Build contract** — produces the optimized credential-contract Wasm after all contract checks pass.
+3. **Deploy contract** — a maintainer can manually run the workflow with **Deploy a new credential contract to Stellar testnet** enabled. The pipeline deploys and initializes the contract, records its ID in the workflow summary, and synchronizes `STELLAR_CONTRACT_ID` into Vercel Production.
+4. **Deploy Vercel** — successful pushes to `master` or `main` automatically build and deploy the full Vercel Services application. Pull requests never receive production secrets or trigger production deployments.
+
+Add these GitHub Actions repository secrets before enabling delivery:
+
+| Secret | Purpose |
+| --- | --- |
+| `VERCEL_TOKEN` | Vercel access token with deployment access |
+| `VERCEL_ORG_ID` | Vercel team or personal account ID |
+| `VERCEL_PROJECT_ID` | Linked Vercel project ID |
+| `STELLAR_DEPLOYER_SECRET` | Funded Stellar **testnet** deployer secret used only by the manual contract deployment job |
+
+Use **Actions → SkillChain Delivery Pipeline → Run workflow** to deploy a fresh testnet contract. Keep **Deploy Vercel** enabled to publish the app with that contract ID. If Vercel's Git integration is also enabled, disable its automatic deployments to avoid duplicate deployments.
 
 ---
 

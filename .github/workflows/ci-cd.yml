@@ -1,4 +1,4 @@
-name: SkillChain CI
+name: SkillChain Delivery Pipeline
 
 on:
   push:
@@ -10,12 +10,23 @@ on:
       - master
       - main
   workflow_dispatch:
+    inputs:
+      deploy_contract:
+        description: Deploy a new credential contract to Stellar testnet
+        required: true
+        default: false
+        type: boolean
+      deploy_vercel:
+        description: Deploy the verified application to Vercel production
+        required: true
+        default: true
+        type: boolean
 
 permissions:
   contents: read
 
 concurrency:
-  group: skillchain-${{ github.workflow }}-${{ github.ref }}
+  group: skillchain-delivery-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -24,7 +35,7 @@ env:
 
 jobs:
   frontend:
-    name: Frontend quality
+    name: Frontend test and lint
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -45,7 +56,7 @@ jobs:
         run: npm run build
 
   backend:
-    name: Backend quality
+    name: Backend test and migration validation
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -66,7 +77,7 @@ jobs:
         run: python -m alembic -c backend/alembic.ini heads
 
   contracts:
-    name: Soroban contracts
+    name: Contract test, lint, and build
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -74,6 +85,9 @@ jobs:
         uses: actions/checkout@v4
       - name: Configure Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32v1-none
+          components: rustfmt, clippy
       - name: Cache Cargo dependencies
         uses: actions/cache@v4
         with:
@@ -84,5 +98,105 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('contracts/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
+      - name: Check contract formatting
+        run: cargo fmt --manifest-path contracts/Cargo.toml -- --check
+      - name: Run contract lint checks
+        run: cargo clippy --manifest-path contracts/Cargo.toml --all-targets -- -D warnings
       - name: Test credential contract
         run: cargo test --manifest-path contracts/Cargo.toml --locked
+      - name: Install Stellar CLI
+        uses: stellar/stellar-cli@v26.1.0
+      - name: Build optimized contract artifact
+        run: stellar contract build --manifest-path contracts/Cargo.toml --package skillchain-credential --optimize
+
+  contract-deploy:
+    name: Deploy credential contract to Stellar testnet
+    needs: contracts
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: stellar-testnet
+    outputs:
+      contract_id: ${{ steps.deploy.outputs.contract_id }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Configure Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32v1-none
+      - name: Install Stellar CLI
+        uses: stellar/stellar-cli@v26.1.0
+      - name: Build optimized contract artifact
+        run: stellar contract build --manifest-path contracts/Cargo.toml --package skillchain-credential --optimize
+      - name: Deploy and initialize contract
+        id: deploy
+        env:
+          STELLAR_DEPLOYER_SECRET: ${{ secrets.STELLAR_DEPLOYER_SECRET }}
+        run: |
+          contract_id="$(stellar --quiet contract deploy \
+            --wasm contracts/target/wasm32v1-none/release/skillchain_credential.wasm \
+            --source-account "$STELLAR_DEPLOYER_SECRET" \
+            --network testnet)"
+          issuer_address="$(stellar keys address "$STELLAR_DEPLOYER_SECRET")"
+          stellar contract invoke \
+            --id "$contract_id" \
+            --source-account "$STELLAR_DEPLOYER_SECRET" \
+            --network testnet \
+            -- initialize --issuer "$issuer_address"
+          echo "contract_id=$contract_id" >> "$GITHUB_OUTPUT"
+          echo "### Stellar testnet deployment" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Contract ID: \`$contract_id\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Issuer: \`$issuer_address\`" >> "$GITHUB_STEP_SUMMARY"
+
+  vercel-deploy:
+    name: Deploy verified build to Vercel
+    needs:
+      - frontend
+      - backend
+      - contracts
+      - contract-deploy
+    if: >-
+      always() &&
+      needs.frontend.result == 'success' &&
+      needs.backend.result == 'success' &&
+      needs.contracts.result == 'success' &&
+      (needs.contract-deploy.result == 'success' || needs.contract-deploy.result == 'skipped') &&
+      ((github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')) ||
+      (github.event_name == 'workflow_dispatch' && inputs.deploy_vercel))
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      CONTRACT_ID: ${{ needs.contract-deploy.outputs.contract_id }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Update deployed contract ID
+        if: env.CONTRACT_ID != ''
+        run: |
+          vercel env rm STELLAR_CONTRACT_ID production --yes --token="$VERCEL_TOKEN" || true
+          printf '%s' "$CONTRACT_ID" | vercel env add STELLAR_CONTRACT_ID production --token="$VERCEL_TOKEN"
+      - name: Pull Vercel production configuration
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+      - name: Build Vercel deployment artifact
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+      - name: Deploy verified production artifact
+        id: deploy
+        run: |
+          deployment_url="$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")"
+          echo "url=$deployment_url" >> "$GITHUB_OUTPUT"
+      - name: Publish deployment summary
+        run: |
+          echo "### Vercel production deployment" >> "$GITHUB_STEP_SUMMARY"
+          echo "- URL: ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
