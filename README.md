@@ -112,6 +112,7 @@ For the original evidence record, see the [wallet-interaction spreadsheet](https
 
 
 ### CI/CD Pipeline
+<img width="1907" height="927" alt="Screenshot 2026-07-24 193500" src="https://github.com/user-attachments/assets/54c99cda-76dd-46c2-b3e6-cdce451c54f0" />
 
 
 <img width="1917" height="872" alt="image" src="https://github.com/user-attachments/assets/4631e5b5-912c-46d6-bf89-c258f34f0a8e" />
