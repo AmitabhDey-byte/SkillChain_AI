@@ -221,7 +221,7 @@ GitHub Actions runs a gated delivery pipeline for pull requests and protected-br
 1. **Test and lint** — frontend tests, ESLint, production build, backend tests, Alembic migration validation, Rust formatting, Clippy, and Soroban contract tests.
 2. **Build contract** — produces the optimized credential-contract Wasm after all contract checks pass.
 3. **Deploy contract** — a maintainer can manually run the workflow with **Deploy a new credential contract to Stellar testnet** enabled. The pipeline deploys and initializes the contract, records its ID in the workflow summary, and synchronizes `STELLAR_CONTRACT_ID` into Vercel Production.
-4. **Deploy Vercel** — successful pushes to `master` or `main` automatically build and deploy the full Vercel Services application. Pull requests never receive production secrets or trigger production deployments.
+4. **Deploy Vercel** — successful pushes to `master` or `main` automatically deploy the full Vercel Services application. The verified source is built by Vercel so its Services runtime can create both the Vite frontend and FastAPI backend. Pull requests never receive production secrets or trigger production deployments.
 
 Add these GitHub Actions repository secrets before enabling delivery:
 

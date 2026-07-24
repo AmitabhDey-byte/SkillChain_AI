@@ -187,14 +187,10 @@ jobs:
         run: |
           vercel env rm STELLAR_CONTRACT_ID production --yes --token="$VERCEL_TOKEN" || true
           printf '%s' "$CONTRACT_ID" | vercel env add STELLAR_CONTRACT_ID production --token="$VERCEL_TOKEN"
-      - name: Pull Vercel production configuration
-        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-      - name: Build Vercel deployment artifact
-        run: vercel build --prod --token="$VERCEL_TOKEN"
-      - name: Deploy verified production artifact
+      - name: Deploy validated source to Vercel
         id: deploy
         run: |
-          deployment_url="$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")"
+          deployment_url="$(vercel deploy --prod --yes --token="$VERCEL_TOKEN")"
           echo "url=$deployment_url" >> "$GITHUB_OUTPUT"
       - name: Publish deployment summary
         run: |
