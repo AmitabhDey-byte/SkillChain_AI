@@ -145,7 +145,10 @@ class StellarCheckinService:
         transaction = envelope.transaction
         if transaction.source.account_id.upper() != wallet_address.upper():
             raise AppError("The check-in transaction belongs to another wallet.", "stellar_checkin_wallet_mismatch", 403)
-        time_bounds = transaction.preconditions.time_bounds
+        preconditions = transaction.preconditions
+        if preconditions is None:
+            raise AppError("The check-in transaction settings were altered.", "stellar_checkin_blueprint_invalid", 422)
+        time_bounds = preconditions.time_bounds
         if (
             transaction.fee != 100
             or not isinstance(transaction.memo, TextMemo)
