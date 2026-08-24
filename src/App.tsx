@@ -25,6 +25,7 @@ import { AlbedoAssistant } from './components/AlbedoAssistant'
 import { Dashboard } from './components/Dashboard'
 import { ExplorePage } from './components/ExplorePage'
 import { OnboardingFlow } from './components/OnboardingFlow'
+import { OnchainCheckin } from './components/OnchainCheckin'
 import { PublicNav } from './components/PublicNav'
 import { PublicVerification } from './components/PublicVerification'
 import { RecruiterDashboard } from './components/RecruiterDashboard'
@@ -243,6 +244,7 @@ function App() {
       '/': 'SkillChain AI — The Proof OS',
       '/explore': 'Explore Opportunities — SkillChain AI',
       '/trust': 'Trust Center — SkillChain AI',
+      '/check-in': 'On-chain Check-in — SkillChain AI',
       '/verify': 'Verify Credential — SkillChain AI',
       '/recruiters': 'Hiring Intelligence — SkillChain AI',
       '/dashboard': 'Talent Proof OS — SkillChain AI',
@@ -295,6 +297,7 @@ function App() {
 
   const continueFromWallet = () => {
     setWalletModalOpen(false)
+    if (location.pathname === '/check-in') return
     if (isAdminWallet(wallet.connection?.address)) navigate('/admin')
     else if (onboardingComplete) navigate(dashboardPath(profile))
     else setOnboardingOpen(true)
@@ -336,6 +339,7 @@ function App() {
 
   let page
   if (location.pathname === '/verify') page = <PublicVerification />
+  else if (location.pathname === '/check-in') page = <OnchainCheckin {...sharedPageProps} />
   else if (location.pathname === '/recruiters') page = <RecruiterPortal />
   else if (location.pathname === '/explore') page = <ExplorePage {...sharedPageProps} />
   else if (location.pathname === '/trust') page = <TrustCenter {...sharedPageProps} />

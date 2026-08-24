@@ -27,6 +27,7 @@ export function PublicNav({ connection, onWallet, onEnter }: PublicNavProps) {
       <nav className={open ? 'cosmic-nav__links cosmic-nav__links--open' : 'cosmic-nav__links'} aria-label="Primary navigation">
         <button type="button" onClick={() => go('/explore')}>Explore</button>
         <button type="button" onClick={() => go('/recruiters')}>For teams</button>
+        <button type="button" onClick={() => go('/check-in')}>Check in</button>
         <button type="button" onClick={() => go('/verify')}><ShieldCheck size={14} /> Verify proof</button>
         <button type="button" onClick={() => go('/trust')}>Trust center</button>
       </nav>

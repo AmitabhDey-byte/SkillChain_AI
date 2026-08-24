@@ -16,6 +16,7 @@ class InteractionType(str, Enum):
     MESSAGE_SIGNED = "message_signed"
     CREDENTIAL_ISSUED = "credential_issued"
     CREDENTIAL_VERIFIED = "credential_verified"
+    ONCHAIN_CHECKIN = "onchain_checkin"
     PAYMENT_FUNDED = "payment_funded"
     PAYMENT_RELEASED = "payment_released"
 

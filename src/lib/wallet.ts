@@ -1,5 +1,5 @@
 import albedo from '@albedo-link/intent'
-import { getNetwork, requestAccess, signMessage } from '@stellar/freighter-api'
+import { getNetwork, requestAccess, signMessage, signTransaction } from '@stellar/freighter-api'
 import {
   clearAuthSession,
   createAuthChallenge,
@@ -155,4 +155,34 @@ export function isTestnet(network: string) {
 export function shortenAddress(address: string) {
   if (address.length < 14) return address
   return `${address.slice(0, 6)}…${address.slice(-5)}`
+}
+
+export async function signCheckinTransaction(connection: WalletConnection, transactionXdr: string) {
+  if (!isTestnet(connection.network)) {
+    throw new Error('Switch your wallet to Stellar Testnet before checking in.')
+  }
+
+  if (connection.walletType === 'albedo') {
+    const result = await albedo.tx({
+      xdr: transactionXdr,
+      pubkey: connection.address,
+      network: 'testnet',
+      submit: false,
+      description: 'Sign your SkillChain on-chain check-in',
+    })
+    if (!result.signed_envelope_xdr) throw new Error('Albedo did not return a signed transaction.')
+    return result.signed_envelope_xdr
+  }
+
+  const result = await signTransaction(transactionXdr, {
+    address: connection.address,
+    networkPassphrase: connection.networkPassphrase,
+  })
+  if (result.error || !result.signedTxXdr) {
+    throw new Error(getErrorMessage(result.error, 'The check-in signature was declined.'))
+  }
+  if (result.signerAddress && result.signerAddress.toUpperCase() !== connection.address.toUpperCase()) {
+    throw new Error('Freighter signed with a different wallet. Reconnect the intended account.')
+  }
+  return result.signedTxXdr
 }

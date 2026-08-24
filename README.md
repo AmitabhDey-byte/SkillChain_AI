@@ -38,6 +38,7 @@
 - [GitHub Integration](#github-integration)
 - [AI Assessment](#ai-assessment)
 - [Wallet Authentication](#wallet-authentication)
+- [On-chain Check-in](#on-chain-check-in)
 - [Stellar Credential Contract](#stellar-credential-contract)
 - [User Onboarding](#user-onboarding)
 - [User Dashboard](#user-dashboard)
@@ -50,7 +51,7 @@
 
 ### Current milestone
 
-The application includes role-specific React workspaces, signed Freighter and Albedo wallet sessions, GitHub evidence analysis, Gemini skill assessment, Stellar credentials, a searchable opportunity graph, PostgreSQL-backed profiles and applications, hiring intelligence, and the Albedo blockchain assistant.
+The application includes role-specific React workspaces, signed Freighter and Albedo wallet sessions, GitHub evidence analysis, Gemini skill assessment, Stellar credentials, GitHub-free on-chain check-ins, a searchable opportunity graph, PostgreSQL-backed profiles and applications, hiring intelligence, and the Albedo blockchain assistant.
 
 ### Deployment & Contract
 
@@ -178,6 +179,8 @@ Local development uses `/api/v1` through the Vite proxy when `VITE_API_BASE_URL`
 | `AUTH_CHALLENGE_MINUTES` | One-time wallet challenge lifetime |
 | `ADMIN_WALLETS` | JSON array of production administrator wallet addresses |
 | `GEMINI_API_KEY` | Server-only Gemini credential |
+| `STELLAR_HORIZON_URL` | Optional Horizon override; defaults to the configured Stellar network |
+| `STELLAR_FRIENDBOT_URL` | Testnet account funding service used by the check-in flow |
 | `GEMINI_MODEL` | Gemini model used for assessments |
 | `CORS_ORIGINS` | JSON array of permitted frontend origins |
 | `GITHUB_CLIENT_ID` | GitHub OAuth application identifier |
@@ -343,6 +346,18 @@ The frontend now runs the complete assessment pipeline from the dashboard. It co
 Freighter sign-in uses the official `@stellar/freighter-api` package and Albedo uses `@albedo-link/intent`. The API creates a short-lived, one-time challenge containing the wallet, network, nonce, issue time, and expiry. The wallet signs that exact message and the server verifies its Ed25519 signature before issuing a bounded bearer session. Sessions are stored in browser session storage and disappear when the tab session ends. Private keys never reach SkillChain.
 
 Protected production routes bind credential issuance, AI assessment, GitHub evidence collection, marketplace applications, user profiles, and admin operations to the signed wallet identity.
+
+---
+
+## On-chain Check-in
+
+`/check-in` lets a connected Freighter or Albedo user create a genuine Stellar testnet transaction without supplying a GitHub profile. The wallet signs a constrained `ManageData` operation containing a role, timestamp, nonce, and hashed participation reason. The backend verifies the wallet, operation, fee, memo, expiry, and signature before submitting it to Horizon and recording the resulting transaction hash in admin activity.
+
+| Endpoint | Purpose |
+| --- | --- |
+| `POST /api/v1/activity/check-ins/prepare` | Build a short-lived transaction for the signed wallet |
+| `POST /api/v1/activity/check-ins/submit` | Verify, submit, and record the signed transaction |
+| `POST /api/v1/activity/check-ins/fund` | Fund an unfunded testnet wallet through Friendbot |
 
 ---
 

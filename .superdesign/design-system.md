@@ -22,9 +22,9 @@ SkillChain should feel like a credible, quietly ambitious professional product�
 | Slate | `#69717D` | Secondary text |
 | Cobalt | `#3E4EDB` | Primary action and proof state |
 | Signal | `#DD5E39` | Rare alert/active accent |
-| Verified | `#2C7A60` | Positive status only |
+| Verified | `#2F6FD0` | Positive and verified status |
 
-Use solid colour fields and thin rules. Cobalt is the only primary accent. Never use rainbow, purple-cyan, or pink gradients.
+Use solid colour fields and thin rules. Cobalt is the only primary accent. Never use green or acid-lime shades, rainbow, purple-cyan, or pink gradients.
 
 ## Typography
 
@@ -32,7 +32,7 @@ Use solid colour fields and thin rules. Cobalt is the only primary accent. Never
 - **Interface:** Manrope for all navigation, labels, controls, and body text.
 - **Data:** DM Mono for wallet addresses, timestamps, scores, and proof references.
 - Headlines are large but compact, with readable line-height; do not stack several stylized headings.
-- Body text must be at least 15px desktop / 14px mobile. Utility labels must be at least 11px.
+- Body text must be at least 15px desktop / 14px mobile. Utility labels must be at least 12px, form controls at least 14px, and metadata at least 12px.
 
 ## Layout
 
@@ -48,7 +48,7 @@ Use solid colour fields and thin rules. Cobalt is the only primary accent. Never
 - Cards are paper surfaces with 1px ink/line borders, minimal shadows, and generous padding.
 - Metrics appear as typographic facts in a strip or table—not floating HUD chips.
 - Use the real SkillChain mark in all logo positions. Never replace it with initials or a generic glyph.
-- Add subtle motion only for state changes, hover, and progress; respect reduced-motion preferences.
+- Add subtle Framer Motion transitions for route entry, section reveal, card hover, modals, and state changes. Use 180–450ms durations, small 8–18px offsets, spring easing for interactive surfaces, and respect reduced-motion preferences.
 
 ## Landing-page hierarchy
 

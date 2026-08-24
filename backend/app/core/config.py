@@ -48,6 +48,8 @@ class Settings(BaseSettings):
     github_api_version: str = "2026-03-10"
     stellar_network: Literal["testnet", "mainnet"] = "testnet"
     stellar_rpc_url: str = "https://soroban-testnet.stellar.org"
+    stellar_horizon_url: str | None = None
+    stellar_friendbot_url: str = "https://friendbot.stellar.org"
     stellar_contract_id: str | None = None
     stellar_issuer_secret: SecretStr | None = None
     stellar_transaction_timeout_seconds: int = 45
@@ -74,6 +76,14 @@ class Settings(BaseSettings):
     @property
     def security_enforced(self) -> bool:
         return self.environment in {"staging", "production"}
+
+    @property
+    def resolved_stellar_horizon_url(self) -> str:
+        if self.stellar_horizon_url:
+            return self.stellar_horizon_url.rstrip("/")
+        if self.stellar_network == "mainnet":
+            return "https://horizon.stellar.org"
+        return "https://horizon-testnet.stellar.org"
 
     @model_validator(mode="after")
     def validate_production_security(self) -> "Settings":

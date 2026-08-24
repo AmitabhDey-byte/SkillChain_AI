@@ -1205,3 +1205,136 @@ h1, h2, h3, .dashboard-brand, .brand { font-family: 'Space Grotesk', sans-serif;
   .albedo-trigger { width: 48px; justify-content: center; padding: 0; }
   .albedo-panel { height: calc(100vh - 82px); }
 }
+
+.checkin-page {
+  min-height: 100vh;
+  color: #171a20;
+  background: #f2efe8;
+}
+
+.checkin-page .cosmic-nav {
+  color: #fcfbf8;
+  border-color: #3a3e47;
+  background: #222733;
+}
+
+.checkin-page .cosmic-nav__links button { color: #c8cdd7; }
+.checkin-page .cosmic-nav__links button:hover { color: #fff; }
+.checkin-page .nav-wallet { color: #fff; border-color: #66708a; background: #3e4edb; }
+.checkin-page .wallet-dot { background: #c9d0ff; box-shadow: none; }
+.checkin-page .nav-enter { color: #dce0ff; }
+
+.checkin-layout {
+  width: min(100% - 56px, 1344px);
+  display: grid;
+  grid-template-columns: minmax(0, .78fr) minmax(580px, 1.22fr);
+  align-items: start;
+  gap: clamp(54px, 7vw, 105px);
+  margin: 0 auto;
+  padding: 70px 0 84px;
+}
+
+.checkin-intro { position: sticky; top: 48px; }
+.checkin-kicker { display: flex; align-items: center; gap: 12px; color: #3e4edb; font-size: 12px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+.checkin-kicker span { width: 40px; height: 1px; background: #3e4edb; }
+.checkin-intro h1 { max-width: 610px; color: #171a20; font-family: 'Instrument Serif', serif; font-size: clamp(58px, 5vw, 76px); font-weight: 400; line-height: .96; letter-spacing: -.035em; margin-top: 30px; }
+.checkin-lead { max-width: 580px; color: #59616d; font-size: 17px; line-height: 1.85; margin: 28px 0 0; }
+.checkin-principles { list-style: none; border-top: 1px solid #c7c1b7; border-bottom: 1px solid #c7c1b7; padding: 26px 0; margin: 36px 0 0; }
+.checkin-principles li { display: grid; grid-template-columns: 38px 1fr; gap: 13px; }
+.checkin-principles li + li { margin-top: 22px; }
+.checkin-principles li > span { color: #3e4edb; font-family: 'DM Mono', monospace; font-size: 12px; }
+.checkin-principles strong { font-size: 15px; }
+.checkin-principles p { color: #69717d; font-size: 14px; line-height: 1.65; margin: 5px 0 0; }
+
+.checkin-card { overflow: hidden; border: 1px solid #beb8ae; border-radius: 18px; background: #fcfbf8; box-shadow: 0 24px 80px rgba(34,39,51,.1); animation: checkin-rise .45s ease-out both; }
+.checkin-card__header { display: flex; align-items: center; justify-content: space-between; gap: 22px; border-bottom: 1px solid #d5d0c6; padding: 25px 32px; }
+.checkin-card__header p { color: #69717d; font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; margin: 0; }
+.checkin-card__header h2 { font-size: 25px; letter-spacing: -.035em; margin: 7px 0 0; }
+.checkin-wallet-state { display: inline-flex; align-items: center; gap: 7px; color: #835324; border: 1px solid #e1c49f; border-radius: 999px; background: #fff4e5; padding: 7px 11px; font-family: 'DM Mono', monospace; font-size: 12px; }
+.checkin-wallet-state--ready { color: #3342bd; border-color: #aeb8ff; background: #eef0ff; }
+.checkin-form { padding: 32px; }
+.checkin-progress { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 29px; }
+.checkin-progress span { height: 6px; border-radius: 8px; background: #d5d0c6; }
+.checkin-progress span:first-child, .checkin-progress span:nth-child(2) { background: #3e4edb; }
+.checkin-form fieldset { border: 0; padding: 0; margin: 0; }
+.checkin-form legend, .checkin-intent > span { font-size: 14px; font-weight: 800; }
+.checkin-form fieldset > p { color: #69717d; font-size: 13px; line-height: 1.55; margin: 5px 0 0; }
+.checkin-roles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+.checkin-roles button { min-height: 88px; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; border: 1px solid #d5d0c6; border-radius: 9px; color: #171a20; background: #fff; padding: 14px 12px; font-size: 13px; font-weight: 800; transition: border-color .2s ease, transform .2s ease, background .2s ease; }
+.checkin-roles button:hover:not(:disabled) { border-color: #838a97; transform: translateY(-2px); }
+.checkin-roles button.active { color: #2938b7; border: 2px solid #3e4edb; background: #eef0ff; }
+.checkin-roles button:disabled { cursor: wait; opacity: .65; }
+.checkin-intent { display: grid; gap: 10px; margin-top: 25px; }
+.checkin-intent > div { min-height: 50px; display: flex; align-items: center; border: 1px solid #c7c1b7; border-radius: 9px; background: #fff; padding: 0 14px; }
+.checkin-intent > div:focus-within { border-color: #3e4edb; box-shadow: 0 0 0 3px #dde1ff; }
+.checkin-intent input { min-width: 0; flex: 1; border: 0; outline: 0; color: #171a20; background: transparent; font: inherit; font-size: 14px; }
+.checkin-intent small { color: #8a919c; font-family: 'DM Mono', monospace; font-size: 12px; }
+.checkin-preview { border: 1px solid #c9c3b9; border-radius: 12px; background: #f5f2ec; padding: 19px; margin-top: 24px; }
+.checkin-preview > div { display: flex; justify-content: space-between; gap: 16px; }
+.checkin-preview strong { font-size: 14px; }
+.checkin-preview > div > span { color: #69717d; font-family: 'DM Mono', monospace; font-size: 12px; }
+.checkin-preview dl { display: grid; gap: 14px; margin: 19px 0 0; }
+.checkin-preview dl > div { display: flex; justify-content: space-between; gap: 20px; font-size: 13px; }
+.checkin-preview dt { color: #69717d; }
+.checkin-preview dd { overflow: hidden; font-family: 'DM Mono', monospace; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; margin: 0; }
+.checkin-message { display: flex; align-items: center; gap: 9px; color: #8b3d31; border: 1px solid #e4b9af; border-radius: 9px; background: #fff0ec; padding: 12px 13px; margin-top: 17px; font-size: 13px; line-height: 1.45; }
+.checkin-message svg { flex: 0 0 auto; }
+.checkin-message--fund { color: #7d4b1d; border-color: #e1c49f; background: #fff4e5; }
+.checkin-message button { flex: 0 0 auto; border: 1px solid currentColor; border-radius: 7px; color: inherit; background: transparent; padding: 7px 9px; font-size: 12px; font-weight: 800; }
+.checkin-submit-row { display: flex; align-items: center; gap: 16px; margin-top: 24px; }
+.checkin-submit { min-height: 52px; flex: 1; display: flex; align-items: center; justify-content: center; gap: 9px; border: 0; border-radius: 9px; color: #fff; background: #3e4edb; padding: 0 20px; font-size: 15px; font-weight: 800; box-shadow: 0 8px 24px rgba(62,78,219,.22); transition: transform .2s ease, background .2s ease; }
+.checkin-submit:hover:not(:disabled) { background: #303fc5; transform: translateY(-2px); }
+.checkin-submit:disabled { cursor: wait; opacity: .72; }
+.checkin-submit-row > span { max-width: 135px; display: flex; align-items: center; gap: 7px; color: #69717d; font-size: 12px; line-height: 1.45; }
+.checkin-submit-row > span svg { flex: 0 0 auto; }
+.checkin-card__footer { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; border-top: 1px solid #d5d0c6; background: #d5d0c6; }
+.checkin-card__footer div { display: flex; flex-direction: column; gap: 5px; background: #f7f5f0; padding: 18px 21px; }
+.checkin-card__footer span { color: #69717d; font-size: 12px; }
+.checkin-card__footer strong { font-size: 14px; }
+
+.checkin-receipt { padding: 42px 32px 38px; text-align: center; }
+.checkin-receipt__icon { width: 64px; height: 64px; display: grid; place-items: center; color: #fff; border-radius: 50%; background: #3e4edb; margin: 0 auto 20px; box-shadow: 0 12px 35px rgba(62,78,219,.24); }
+.checkin-receipt > p { color: #3e4edb; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; margin: 0; }
+.checkin-receipt > h2 { font-family: 'Instrument Serif', serif; font-size: 42px; font-weight: 400; letter-spacing: -.03em; margin: 10px 0 26px; }
+.checkin-receipt__hash { display: grid; justify-items: start; gap: 9px; border: 1px solid #c9c3b9; border-radius: 11px; background: #f5f2ec; padding: 17px; text-align: left; }
+.checkin-receipt__hash > span { color: #69717d; font-size: 12px; }
+.checkin-receipt__hash code { width: 100%; overflow-wrap: anywhere; color: #222733; font-family: 'DM Mono', monospace; font-size: 12px; line-height: 1.7; }
+.checkin-receipt__hash button { display: inline-flex; align-items: center; gap: 6px; border: 0; color: #3e4edb; background: transparent; padding: 0; font-size: 12px; font-weight: 800; }
+.checkin-receipt__facts { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #d5d0c6; border-bottom: 1px solid #d5d0c6; margin: 25px 0; }
+.checkin-receipt__facts div { min-width: 0; display: flex; flex-direction: column; gap: 6px; padding: 15px 8px; }
+.checkin-receipt__facts dt { color: #69717d; font-size: 12px; }
+.checkin-receipt__facts dd { overflow: hidden; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 600; text-overflow: ellipsis; text-transform: capitalize; white-space: nowrap; margin: 0; }
+.checkin-receipt__actions { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.checkin-receipt__actions a, .checkin-receipt__actions button { min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border-radius: 8px; padding: 0 16px; font-size: 13px; font-weight: 800; }
+.checkin-receipt__actions a { color: #fff; background: #3e4edb; }
+.checkin-receipt__actions button { border: 1px solid #bdb7ad; color: #222733; background: transparent; }
+
+@keyframes checkin-rise { from { opacity: 0; transform: translateY(16px); } }
+
+@media (max-width: 1050px) {
+  .checkin-layout { grid-template-columns: 1fr; }
+  .checkin-intro { position: static; }
+  .checkin-intro h1, .checkin-lead { max-width: 760px; }
+  .checkin-principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .checkin-principles li, .checkin-principles li + li { margin: 0; }
+}
+
+@media (max-width: 700px) {
+  .checkin-layout { width: min(100% - 28px, 640px); padding: 44px 0 68px; }
+  .checkin-intro h1 { font-size: 50px; }
+  .checkin-lead { font-size: 15px; }
+  .checkin-principles { grid-template-columns: 1fr; }
+  .checkin-card__header { align-items: flex-start; flex-direction: column; padding: 22px; }
+  .checkin-form, .checkin-receipt { padding: 24px 20px 28px; }
+  .checkin-roles { grid-template-columns: repeat(2, 1fr); }
+  .checkin-submit-row { align-items: stretch; flex-direction: column; }
+  .checkin-submit-row > span { max-width: none; }
+  .checkin-card__footer { grid-template-columns: 1fr; }
+  .checkin-receipt__facts { grid-template-columns: repeat(2, 1fr); }
+  .checkin-receipt__actions { align-items: stretch; flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checkin-card { animation: none; }
+  .checkin-roles button, .checkin-submit { transition: none; }
+}

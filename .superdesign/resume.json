@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "targets": {
+    "/check-in": {
+      "targetKind": "new-ui",
+      "projectId": "c4183964-e539-47a3-b0ae-33000a5984c2",
+      "activeDraftId": "1dd31a30-aff1-47a5-8bd1-cf537b474d17",
+      "designSystemPath": ".superdesign/design-system.md",
+      "contextFiles": [
+        ".superdesign/design-system.md",
+        "src/components/OnchainCheckin.tsx",
+        "src/components/PublicNav.tsx",
+        "src/styles.css:1209"
+      ],
+      "fingerprints": {
+        ".superdesign/design-system.md": "D5EDA7AD1D2A9A4171FB6AED770E9D8F7275A7B75EE74F05C2232061DFD0C691",
+        "src/components/OnchainCheckin.tsx": "5B50FC20A43F1673AAB160B2A71CEA8A1ECE067402AF9AFDBCB38EA555197574",
+        "src/components/PublicNav.tsx": "2550A46D62B40F1E38ABCEEC2F48EEF1B1BF286DEBAB83D0942F34158724189E",
+        "src/styles.css": "517146A0BBDA8C54CB4E6DFDDEC54133DEFF538BBBB7A3E67E769D8144A88127"
+      },
+      "drafts": {
+        "1dd31a30-aff1-47a5-8bd1-cf537b474d17": {
+          "title": "On-chain Check-in",
+          "visualDirection": "editorial proof infrastructure",
+          "currentVersion": 1
+        }
+      },
+      "updatedAt": "2026-08-24T15:56:00+05:30"
+    }
+  }
+}

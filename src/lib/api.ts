@@ -469,6 +469,65 @@ export function recordWalletConnection(walletAddress: string, network: string) {
   })
 }
 
+export type CheckinRole = 'developer' | 'freelancer' | 'student' | 'recruiter'
+
+export type CheckinPrepareResponse = {
+  transaction_xdr: string
+  wallet_address: string
+  network: string
+  role: CheckinRole
+  intent: string
+  data_key: string
+  data_value: string
+  estimated_fee_xlm: string
+  expires_at: string
+}
+
+export type CheckinReceipt = {
+  wallet_address: string
+  role: CheckinRole
+  intent: string
+  network: string
+  transaction_hash: string
+  ledger_sequence: number
+  checked_in_at: string
+  explorer_url: string
+}
+
+export function prepareOnchainCheckin(walletAddress: string, role: CheckinRole, intent: string, signal?: AbortSignal) {
+  return apiRequest<CheckinPrepareResponse>('/activity/check-ins/prepare', {
+    method: 'POST',
+    body: { wallet_address: walletAddress, role, intent },
+    signal,
+  })
+}
+
+export function submitOnchainCheckin(
+  walletAddress: string,
+  role: CheckinRole,
+  intent: string,
+  signedTransactionXdr: string,
+  signal?: AbortSignal,
+) {
+  return apiRequest<CheckinReceipt>('/activity/check-ins/submit', {
+    method: 'POST',
+    body: {
+      wallet_address: walletAddress,
+      role,
+      intent,
+      signed_transaction_xdr: signedTransactionXdr,
+    },
+    signal,
+  })
+}
+
+export function fundCheckinWallet(walletAddress: string, signal?: AbortSignal) {
+  return apiRequest<{ wallet_address: string; network: 'testnet'; funded: boolean; transaction_hash: string | null }>(
+    '/activity/check-ins/fund',
+    { method: 'POST', body: { wallet_address: walletAddress }, signal },
+  )
+}
+
 export type AdminActivityItem = {
   id: string
   wallet_address: string
