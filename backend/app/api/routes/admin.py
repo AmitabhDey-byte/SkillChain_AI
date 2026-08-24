@@ -81,15 +81,35 @@ def serialize_feedback(entry: Feedback) -> AdminFeedbackItem:
     dependencies=[Depends(require_admin_key)],
     summary="Read private platform activity metrics",
 )
-async def admin_overview(session: AsyncSession = Depends(get_database_session)) -> AdminOverviewResponse:
+async def admin_overview(
+    activity_limit: int = Query(default=200, ge=1, le=500),
+    transaction_limit: int = Query(default=200, ge=1, le=500),
+    session: AsyncSession = Depends(get_database_session),
+) -> AdminOverviewResponse:
     unique_wallets = await session.scalar(
-        select(func.count(func.distinct(WalletInteraction.wallet_address))).where(
-            WalletInteraction.interaction_type == InteractionType.WALLET_CONNECTED
+        select(func.count(func.distinct(WalletInteraction.wallet_address)))
+    )
+    registered_users = await session.scalar(
+        select(func.count()).select_from(User).where(User.status == UserStatus.ACTIVE)
+    )
+    completed_profiles = await session.scalar(
+        select(func.count()).select_from(User).where(
+            User.status == UserStatus.ACTIVE,
+            User.onboarding_complete.is_(True),
         )
     )
     wallet_connections = await session.scalar(
         select(func.count()).select_from(WalletInteraction).where(
             WalletInteraction.interaction_type == InteractionType.WALLET_CONNECTED
+        )
+    )
+    total_interactions = await session.scalar(select(func.count()).select_from(WalletInteraction))
+    onchain_transactions = await session.scalar(
+        select(func.count()).select_from(WalletInteraction).where(WalletInteraction.transaction_hash.is_not(None))
+    )
+    onchain_checkins = await session.scalar(
+        select(func.count()).select_from(WalletInteraction).where(
+            WalletInteraction.interaction_type == InteractionType.ONCHAIN_CHECKIN
         )
     )
     credentials_issued = await session.scalar(
@@ -103,18 +123,23 @@ async def admin_overview(session: AsyncSession = Depends(get_database_session)) 
         )
     )
     activity_result = await session.scalars(
-        select(WalletInteraction).order_by(WalletInteraction.created_at.desc()).limit(50)
+        select(WalletInteraction).order_by(WalletInteraction.created_at.desc()).limit(activity_limit)
     )
     transaction_result = await session.scalars(
         select(WalletInteraction)
         .where(WalletInteraction.transaction_hash.is_not(None))
         .order_by(WalletInteraction.created_at.desc())
-        .limit(50)
+        .limit(transaction_limit)
     )
 
     return AdminOverviewResponse(
         unique_wallets=unique_wallets or 0,
+        registered_users=registered_users or 0,
+        completed_profiles=completed_profiles or 0,
         wallet_connections=wallet_connections or 0,
+        total_interactions=total_interactions or 0,
+        onchain_transactions=onchain_transactions or 0,
+        onchain_checkins=onchain_checkins or 0,
         credentials_issued=credentials_issued or 0,
         credentials_verified=credentials_verified or 0,
         recent_activity=[serialize_activity(item) for item in activity_result.all()],
@@ -126,16 +151,13 @@ async def admin_overview(session: AsyncSession = Depends(get_database_session)) 
     "/users",
     response_model=AdminUserDirectoryResponse,
     dependencies=[Depends(require_admin_key)],
-    summary="List completed platform user profiles",
+    summary="List active platform user profiles",
 )
 async def list_admin_users(
-    limit: int = Query(default=50, ge=1, le=200),
+    limit: int = Query(default=200, ge=1, le=500),
     session: AsyncSession = Depends(get_database_session),
 ) -> AdminUserDirectoryResponse:
-    statement = select(User).where(
-        User.status == UserStatus.ACTIVE,
-        User.onboarding_complete.is_(True),
-    )
+    statement = select(User).where(User.status == UserStatus.ACTIVE)
     total = await session.scalar(select(func.count()).select_from(statement.subquery()))
     users = await session.scalars(statement.order_by(User.created_at.desc()).limit(limit))
     return AdminUserDirectoryResponse(total=total or 0, users=[serialize_user(user) for user in users.all()])

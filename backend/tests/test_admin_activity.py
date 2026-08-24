@@ -27,7 +27,7 @@ class FakeScalarCollection:
 
 class FakeAdminSession:
     def __init__(self) -> None:
-        self.counts = iter([2, 3, 1, 4])
+        self.counts = iter([65, 61, 11, 34, 168, 100, 100, 0, 0])
         self.activity = SimpleNamespace(
             id=uuid4(),
             wallet_address=OWNER,
@@ -132,13 +132,18 @@ class AdminActivityRouteTests(unittest.TestCase):
         response = self.client.get("/api/v1/admin/overview", headers={"X-Admin-Key": ADMIN_KEY})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["unique_wallets"], 2)
-        self.assertEqual(response.json()["wallet_connections"], 3)
-        self.assertEqual(response.json()["credentials_issued"], 1)
-        self.assertEqual(response.json()["credentials_verified"], 4)
+        self.assertEqual(response.json()["unique_wallets"], 65)
+        self.assertEqual(response.json()["registered_users"], 61)
+        self.assertEqual(response.json()["completed_profiles"], 11)
+        self.assertEqual(response.json()["wallet_connections"], 34)
+        self.assertEqual(response.json()["total_interactions"], 168)
+        self.assertEqual(response.json()["onchain_transactions"], 100)
+        self.assertEqual(response.json()["onchain_checkins"], 100)
+        self.assertEqual(response.json()["credentials_issued"], 0)
+        self.assertEqual(response.json()["credentials_verified"], 0)
         self.assertEqual(response.json()["recent_transactions"][0]["transaction_hash"], "b" * 64)
 
-    def test_admin_users_lists_completed_profiles(self) -> None:
+    def test_admin_users_lists_active_profiles(self) -> None:
         self.client.app.dependency_overrides[get_database_session] = fake_user_session
 
         response = self.client.get("/api/v1/admin/users", headers={"X-Admin-Key": ADMIN_KEY})
@@ -183,7 +188,7 @@ class AdminConfigurationTests(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["unique_wallets"], 2)
+        self.assertEqual(response.json()["unique_wallets"], 65)
 
 
 if __name__ == "__main__":

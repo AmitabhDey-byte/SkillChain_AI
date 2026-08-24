@@ -79,7 +79,12 @@ class AdminActivityItem(BaseModel):
 
 class AdminOverviewResponse(BaseModel):
     unique_wallets: int
+    registered_users: int
+    completed_profiles: int
     wallet_connections: int
+    total_interactions: int
+    onchain_transactions: int
+    onchain_checkins: int
     credentials_issued: int
     credentials_verified: int
     recent_activity: list[AdminActivityItem]

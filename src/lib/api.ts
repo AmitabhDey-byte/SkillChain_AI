@@ -542,7 +542,12 @@ export type AdminActivityItem = {
 
 export type AdminOverviewResponse = {
   unique_wallets: number
+  registered_users: number
+  completed_profiles: number
   wallet_connections: number
+  total_interactions: number
+  onchain_transactions: number
+  onchain_checkins: number
   credentials_issued: number
   credentials_verified: number
   recent_activity: AdminActivityItem[]
@@ -550,7 +555,7 @@ export type AdminOverviewResponse = {
 }
 
 export function getAdminOverview(signal?: AbortSignal) {
-  return apiRequest<AdminOverviewResponse>('/admin/overview', {
+  return apiRequest<AdminOverviewResponse>('/admin/overview?activity_limit=500&transaction_limit=500', {
     signal,
   })
 }
@@ -576,7 +581,7 @@ export type AdminUserDirectoryResponse = {
 }
 
 export function getAdminUsers(signal?: AbortSignal) {
-  return apiRequest<AdminUserDirectoryResponse>('/admin/users?limit=50', {
+  return apiRequest<AdminUserDirectoryResponse>('/admin/users?limit=500', {
     signal,
   })
 }

@@ -137,7 +137,7 @@ Signed wallet users can submit a 1–5 rating, topic, message, and page context 
 | --- | --- |
 | `POST /api/v1/feedback` | Submit signed wallet feedback |
 | `GET /api/v1/admin/feedback` | Read submitted feedback as an authorized administrator |
-| `GET /api/v1/admin/users` | Read completed user profiles as an authorized administrator |
+| `GET /api/v1/admin/users` | Read active user profiles, including wallet-only onboarding records |
 
 ---
 

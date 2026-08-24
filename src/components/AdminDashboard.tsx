@@ -60,7 +60,7 @@ export function AdminDashboard({ connection, onDisconnect }: AdminDashboardProps
   }, [])
 
   const dependencies = ready?.dependencies
-  const explorerBase = ready?.environment === 'production' ? 'https://stellar.expert/explorer/testnet/tx/' : 'https://stellar.expert/explorer/testnet/tx/'
+  const explorerUrl = (network: string, transactionHash: string) => `https://stellar.expert/explorer/${network}/tx/${transactionHash}`
 
   return (
     <main className="dashboard-layout admin-dashboard">
@@ -80,14 +80,18 @@ export function AdminDashboard({ connection, onDisconnect }: AdminDashboardProps
           <div className="dashboard-welcome"><div><p className="overline">PLATFORM OPERATIONS</p><h1>Admin control center.</h1><p>Monitor connected wallets, credential events, transaction IDs, and production health.</p></div><button className="button button--primary" type="button" onClick={() => void loadDashboard()} disabled={loading}>{loading ? <LoaderCircle className="spin" size={17} /> : <RefreshCw size={17} />} Refresh data</button></div>
           {error && <div className="credential-error"><CircleAlert size={18} /><div><strong>Admin data unavailable</strong><span>{error}</span></div></div>}
           <div className="metric-grid">
-            <article><div className="metric-icon metric-icon--green"><Users size={19} /></div><div><span>Unique wallets</span><strong>{overview?.unique_wallets ?? '—'}</strong><small>Connected users</small></div></article>
+            <article><div className="metric-icon metric-icon--green"><Users size={19} /></div><div><span>Registered users</span><strong>{overview?.registered_users ?? '—'}</strong><small>Active database records</small></div></article>
+            <article><div className="metric-icon metric-icon--blue"><Users size={19} /></div><div><span>Completed profiles</span><strong>{overview?.completed_profiles ?? '—'}</strong><small>Finished onboarding</small></div></article>
+            <article><div className="metric-icon metric-icon--amber"><Wallet size={19} /></div><div><span>Unique wallets</span><strong>{overview?.unique_wallets ?? '—'}</strong><small>All interaction types</small></div></article>
             <article><div className="metric-icon metric-icon--blue"><Wallet size={19} /></div><div><span>Wallet logins</span><strong>{overview?.wallet_connections ?? '—'}</strong><small>Connection events</small></div></article>
+            <article><div className="metric-icon metric-icon--violet"><Activity size={19} /></div><div><span>Total activity</span><strong>{overview?.total_interactions ?? '—'}</strong><small>Database audit events</small></div></article>
+            <article><div className="metric-icon metric-icon--green"><Database size={19} /></div><div><span>Transactions</span><strong>{overview?.onchain_transactions ?? '—'}</strong><small>{overview?.onchain_checkins ?? '—'} on-chain check-ins</small></div></article>
             <article><div className="metric-icon metric-icon--amber"><ShieldCheck size={19} /></div><div><span>Credentials issued</span><strong>{overview?.credentials_issued ?? '—'}</strong><small>Stellar submissions</small></div></article>
             <article><div className="metric-icon metric-icon--violet"><Activity size={19} /></div><div><span>Verifications</span><strong>{overview?.credentials_verified ?? '—'}</strong><small>Recruiter checks</small></div></article>
           </div>
 
           <article className="dashboard-card admin-activity-card">
-            <div className="card-heading"><div><p className="overline">AUDIT TRAIL</p><h2>Recent platform activity</h2></div><span className="workspace-status workspace-status--complete">{overview?.recent_activity.length ?? 0} events</span></div>
+            <div className="card-heading"><div><p className="overline">AUDIT TRAIL</p><h2>Platform activity</h2></div><span className="workspace-status workspace-status--complete">{overview?.total_interactions ?? 0} events</span></div>
             <div className="admin-table-wrap">
               <table className="admin-activity-table">
                 <thead><tr><th>Event</th><th>Wallet</th><th>Proof ID</th><th>Transaction ID</th><th>Time</th></tr></thead>
@@ -97,7 +101,7 @@ export function AdminDashboard({ connection, onDisconnect }: AdminDashboardProps
                       <td><span className={item.success ? 'admin-event-status admin-event-status--success' : 'admin-event-status'}>{formatActivityType(item.interaction_type)}</span></td>
                       <td><code title={item.wallet_address}>{shortenAddress(item.wallet_address)}</code></td>
                       <td><code title={item.id}>{item.id.slice(0, 8)}…</code></td>
-                      <td>{item.transaction_hash ? <a href={`${explorerBase}${item.transaction_hash}`} target="_blank" rel="noreferrer" title={item.transaction_hash}>{item.transaction_hash.slice(0, 10)}…</a> : '—'}</td>
+                      <td>{item.transaction_hash ? <a href={explorerUrl(item.network, item.transaction_hash)} target="_blank" rel="noreferrer" title={item.transaction_hash}>{item.transaction_hash.slice(0, 10)}…</a> : '—'}</td>
                       <td>{formatTimestamp(item.created_at)}</td>
                     </tr>
                   ))}
@@ -108,22 +112,44 @@ export function AdminDashboard({ connection, onDisconnect }: AdminDashboardProps
           </article>
 
           <article className="dashboard-card admin-activity-card">
+            <div className="card-heading"><div><p className="overline">STELLAR LEDGER</p><h2>On-chain transactions</h2></div><span className="workspace-status workspace-status--complete">{overview?.onchain_transactions ?? 0} transactions</span></div>
+            <div className="admin-table-wrap">
+              <table className="admin-activity-table">
+                <thead><tr><th>Event</th><th>Wallet address</th><th>Transaction hash</th><th>Ledger</th><th>Confirmed</th></tr></thead>
+                <tbody>
+                  {overview?.recent_transactions.map((item) => (
+                    <tr key={`transaction-${item.id}`}>
+                      <td><span className="admin-event-status admin-event-status--success">{formatActivityType(item.interaction_type)}</span></td>
+                      <td><code title={item.wallet_address}>{shortenAddress(item.wallet_address)}</code></td>
+                      <td><a href={explorerUrl(item.network, item.transaction_hash!)} target="_blank" rel="noreferrer" title={item.transaction_hash!}>{item.transaction_hash}</a></td>
+                      <td>{item.ledger_sequence ?? 'Confirmed'}</td>
+                      <td>{formatTimestamp(item.created_at)}</td>
+                    </tr>
+                  ))}
+                  {!loading && !overview?.recent_transactions.length && <tr><td colSpan={5} className="admin-empty-row">No on-chain transactions have been recorded yet.</td></tr>}
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <article className="dashboard-card admin-activity-card">
             <div className="card-heading"><div><p className="overline">USER REGISTRY</p><h2>Joined SkillChain members</h2></div><span className="workspace-status workspace-status--complete">{users?.total ?? 0} profiles</span></div>
             <div className="admin-table-wrap">
               <table className="admin-activity-table">
-                <thead><tr><th>Profile</th><th>Wallet address</th><th>Role</th><th>GitHub</th><th>Skills</th><th>Joined</th></tr></thead>
+                <thead><tr><th>Profile</th><th>Wallet address</th><th>Role</th><th>Status</th><th>GitHub</th><th>Skills</th><th>Joined</th></tr></thead>
                 <tbody>
                   {users?.users.map((user) => (
                     <tr key={user.id}>
                       <td><strong>{user.display_name}</strong><br /><small>{user.headline}</small></td>
                       <td><code title={user.wallet_address}>{shortenAddress(user.wallet_address)}</code></td>
                       <td><span className="admin-event-status admin-event-status--success">{formatActivityType(user.role)}</span></td>
-                      <td>{user.github_username ? `@${user.github_username}` : 'â€”'}</td>
-                      <td>{user.skills.length ? user.skills.slice(0, 3).join(', ') : 'â€”'}</td>
+                      <td><span className={user.onboarding_complete ? 'admin-event-status admin-event-status--success' : 'admin-event-status'}>{user.onboarding_complete ? 'Complete' : 'Wallet only'}</span></td>
+                      <td>{user.github_username ? `@${user.github_username}` : '—'}</td>
+                      <td>{user.skills.length ? user.skills.slice(0, 3).join(', ') : '—'}</td>
                       <td>{formatTimestamp(user.created_at)}</td>
                     </tr>
                   ))}
-                  {!loading && !users?.users.length && <tr><td colSpan={6} className="admin-empty-row">No completed user profiles have been recorded yet.</td></tr>}
+                  {!loading && !users?.users.length && <tr><td colSpan={7} className="admin-empty-row">No active user profiles have been recorded yet.</td></tr>}
                 </tbody>
               </table>
             </div>
@@ -139,7 +165,7 @@ export function AdminDashboard({ connection, onDisconnect }: AdminDashboardProps
                     <tr key={item.id}>
                       <td><strong>{item.rating}/5</strong></td>
                       <td><span className="admin-event-status admin-event-status--success">{formatActivityType(item.category)}</span></td>
-                      <td>{item.page || 'â€”'}</td>
+                      <td>{item.page || '—'}</td>
                       <td title={item.message}>{item.message}</td>
                       <td>{formatTimestamp(item.created_at)}</td>
                     </tr>
