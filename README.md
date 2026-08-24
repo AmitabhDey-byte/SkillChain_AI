@@ -24,6 +24,7 @@
   - [Deployment & Contract](#deployment--contract)
 - [Screenshots](#screenshots)
 - [Demo Video Link](#demo-video-link)
+- [PPT / Pitch Deck](#ppt--pitch-deck)
 - [The Users Logged In and Used](#the-users-logged-in-and-used)
 - [User Feedback](#user-feedback)
 - [Local Development](#local-development)
@@ -182,6 +183,10 @@ For the original evidence record, see the [wallet-interaction spreadsheet](https
 ## Demo Video Link
 
 https://drive.google.com/file/d/1vRIymJ3lND-0kHgibKv5hUBLFTyZ75OR/view?usp=sharing
+
+## PPT / Pitch Deck
+
+[Open the SkillChain AI pitch deck](https://docs.google.com/presentation/d/1zLDN-qGgmrmTjXQNA_tj4DLQ6HBj-hPs/edit?usp=sharing&ouid=102106863247037205601&rtpof=true&sd=true)
 
 ## The Users Logged In and Used
 
