@@ -24,7 +24,9 @@ test('restricts browser API connections to the same Vercel origin', () => {
   const securityHeaders = config.headers.find((header: { source: string }) => header.source === '/(.*)')
   const policy = securityHeaders.headers.find((header: { key: string }) => header.key === 'Content-Security-Policy')
   assert.match(policy.value, /connect-src 'self'/)
-  assert.match(policy.value, /frame-src https:\/\/albedo\.link;/)
+  assert.match(policy.value, /script-src 'self' https:\/\/vercel\.live;/)
+  assert.match(policy.value, /script-src-elem 'self' https:\/\/vercel\.live;/)
+  assert.match(policy.value, /frame-src https:\/\/albedo\.link https:\/\/vercel\.live;/)
 })
 
 test('caches immutable Vite assets for repeat visits', () => {
