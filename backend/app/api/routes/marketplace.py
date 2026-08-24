@@ -64,7 +64,7 @@ async def list_talent(
     statement = (
         select(User)
         .where(
-            User.role.in_((UserRole.TALENT, UserRole.FREELANCER)),
+            User.role.in_((UserRole.TALENT, UserRole.DEVELOPER, UserRole.FREELANCER)),
             User.status == UserStatus.ACTIVE,
             User.onboarding_complete.is_(True),
         )

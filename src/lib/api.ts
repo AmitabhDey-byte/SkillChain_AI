@@ -150,7 +150,7 @@ export function getAuthIdentity(signal?: AbortSignal) {
 export type UserProfile = {
   id: string
   wallet_address: string
-  role: 'talent' | 'freelancer' | 'recruiter'
+  role: 'talent' | 'developer' | 'freelancer' | 'recruiter'
   display_name: string
   headline: string
   location: string | null

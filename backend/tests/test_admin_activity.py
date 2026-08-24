@@ -55,7 +55,7 @@ class FakeUserSession:
         self.user = SimpleNamespace(
             id=uuid4(),
             wallet_address=OWNER,
-            role=UserRole.TALENT,
+            role=UserRole.DEVELOPER,
             display_name="Ada Lovelace",
             headline="Proof-first protocol engineer",
             location="London",
@@ -151,7 +151,7 @@ class AdminActivityRouteTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["total"], 1)
         self.assertEqual(response.json()["users"][0]["display_name"], "Ada Lovelace")
-        self.assertEqual(response.json()["users"][0]["role"], "talent")
+        self.assertEqual(response.json()["users"][0]["role"], "developer")
 
     def test_admin_feedback_lists_member_feedback(self) -> None:
         self.client.app.dependency_overrides[get_database_session] = fake_feedback_session

@@ -12,6 +12,7 @@ from backend.app.db.models.mixins import TimestampMixin
 
 class UserRole(str, Enum):
     TALENT = "talent"
+    DEVELOPER = "developer"
     FREELANCER = "freelancer"
     RECRUITER = "recruiter"
 

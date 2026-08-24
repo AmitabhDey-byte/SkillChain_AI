@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 class UserRoleValue(str, Enum):
     TALENT = "talent"
+    DEVELOPER = "developer"
     FREELANCER = "freelancer"
     RECRUITER = "recruiter"
 

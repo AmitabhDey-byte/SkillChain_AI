@@ -139,7 +139,7 @@ class MarketplaceApplicationRouteTests(unittest.TestCase):
             User(
                 id=uuid4(),
                 wallet_address=OWNER,
-                role=UserRole.TALENT,
+                role=UserRole.DEVELOPER,
                 display_name="Live Builder",
                 headline="Stellar protocol developer",
                 location="Remote",
@@ -155,6 +155,7 @@ class MarketplaceApplicationRouteTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["total"], 1)
         self.assertEqual(response.json()["profiles"][0]["display_name"], "Live Builder")
+        self.assertEqual(response.json()["profiles"][0]["role"], "developer")
 
 
 if __name__ == "__main__":

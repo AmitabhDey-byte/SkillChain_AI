@@ -1,7 +1,7 @@
 export const ONBOARDING_DRAFT_KEY = 'skillchain.onboarding.draft'
 export const ONBOARDING_COMPLETE_KEY = 'skillchain.onboarding.complete'
 
-export type UserRole = 'talent' | 'freelancer' | 'recruiter'
+export type UserRole = 'talent' | 'developer' | 'freelancer' | 'recruiter'
 
 export type OnboardingProfile = {
   role: UserRole | null
