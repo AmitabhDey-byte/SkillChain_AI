@@ -56,7 +56,7 @@ The application includes role-specific React workspaces, signed Freighter and Al
 
 | Resource | Value |
 | --- | --- |
-| Contract Deployment Address | `CCC5TSRN6WGWE4WPIQTW7NSEXDX3NRW63XW74PDLPRLJXDSJUJGDHSJV` |
+| Contract Deployment Address | `CCQ73TUQ3P5QBV3MJHRFDWI2LLHY3GQEKWLRHIOTRZAXNVQEEB57HVWI` |
 | Deployed URL | [https://skill-chain-ai-cona.vercel.app/](https://skill-chain-ai-cona.vercel.app/) |
 
 ---
