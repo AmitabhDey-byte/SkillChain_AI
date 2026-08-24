@@ -81,31 +81,91 @@ The application includes role-specific React workspaces, signed Freighter and Al
 
 <img width="1915" height="966" alt="image" src="https://github.com/user-attachments/assets/b160d706-41be-41f5-9da7-f1c4bd51c79c" />
 
+### Screenshots of analytics or transaction activity
+
+#### Analytics overview
+
+![SkillChain admin analytics overview](docs/screenshots/admin-analytics-overview.png)
+
+#### Transaction activity
+
+![SkillChain Stellar testnet transaction activity](docs/screenshots/admin-transaction-activity.png)
+
 ### 📊 User Onboarding Data
 
-The following consent-based onboarding records demonstrate real Stellar wallet connections and early product feedback. Contact details are intentionally excluded from this public repository.
+The following 69 consent-based onboarding records demonstrate real Stellar wallet connections and early product feedback. 50 entries include independently verifiable Stellar testnet transaction proofs. Email addresses and phone numbers are intentionally excluded from this public repository.
 
-| Joined (IST) | Participant | Stellar Testnet Wallet | Product Feedback |
-| --- | --- | --- | --- |
-| 18 Jul 2026, 22:41 | Debansh Tiwari | `GA4SXARZZ4RPF6N7VOAH3B5OKMFAP3FGY6M6TO3DZJL4TMU2KOVBHCIY` | The overall experience is smooth. Liked the product! |
-| 18 Jul 2026, 22:46 | Souvik Mandal | `GDDO6MEIVRZTXCJWLPPQAKTIWTD6CLOTGLJBQY63KMOIYASKXNU6WXN5` | Liked the idea and UI/UX; requested a walkthrough or user guide. |
-| 18 Jul 2026, 22:46 | Ansh Raj | `GA3EHDIPTPLQTQESCNR4TSJYBSERD57KERCNFHGWEJ5OX2XSWTMJO424` | It is really good. |
-| 19 Jul 2026, 13:19 | pritam dev | `GATJMD6BGNK4FQYNFWB354N7RP4XHA2R74GNSYM472ALNLJFX7NXBS3X` | Awesome product. |
-| 20 Jul 2026, 00:27 | Lohit Mishra | `GDYWYDOBPPM2XFQS2N7OA2XYO66C24OSBDGASSYAU7V3V4UHFIQYWCRL` | UI is great; reported opportunity-server errors. |
-| 20 Jul 2026, 17:46 | Sk Jishan Uddin | `GAVVOOVYGE7QEJWQO2BZZBGYYSFQPBC3QAYWRC6AFP7E3UMCWFT6YC4U` | Very user-friendly; unlike any website they had seen. |
-| 21 Jul 2026, 12:52 | Ritesh Gupta | `GDFSDPEEBZYQVG5JPPTJUOH4FID4M5XV45BKTWCIEIRYMCWJ6DQADBMB` | Yup. |
-| 21 Jul 2026, 13:16 | Priyanka Mondal | `GCKMODNZEAI4X6AL6SL77PNJLUUJAQAWECXDTXJZGXBOSSSF7THC3XH6` | Better product than others in the market. |
-| 21 Jul 2026, 13:17 | Ritam Saha | `GACMLTEWZ23NGJ5WZ2THYGLODFYTEKECB7J2U33H3DCSW2PEAQUEIZED` | Good. |
-| 21 Jul 2026, 15:17 | Elijah Negasi | `GAXCXDDP44VRDTL2PJI22WJU6H4CMRMI2CHRJGPJ3S3L4R323ETDOCAL` | Amazing! |
-| 21 Jul 2026, 16:17 | Rishikesh Singh | `GCO222KICSTS24BWPBEOSYQG5L3RAN4KHII7CE2CW36HRHRXQQPC6OCB` | Liked the UI and credential hashing. |
-| 21 Jul 2026, 16:25 | Nitin Raj | `GARRE4DTEUJIQSXRACCL6X55RH42S7WBO32F5HB4DU32MT6IL5TL3B3N` | Clean UI, smooth workflow, and promising AI-assisted learning platform. |
-| 21 Jul 2026, 17:30 | Sadiya Mulani | `GBTCGV43NLHEEBMCA5DWFZT6GOJYYCPHXNOEALTBQ7TREIQKQQAVLYT4` | AI-verified, wallet-owned credentials solve a real trust problem. |
-| 21 Jul 2026, 18:54 | Ankush Shaw | `GBBIG4HLPGTLG6BH6YREVWJXEQ4NX74HTD444JD6A6XYS7DOFL2J6DEI` | Liked the clean, simple UI. |
-| 21 Jul 2026, 20:06 | Subhadip Dutta | `GAVNLCS3GSWLKXSLZ3ITSL7QNB5IGHEOELXAF6QTYACDLEJ7XRQKBBNO` | Very nice UI and innovative idea. |
-| 21 Jul 2026, 22:13 | Arya Bhagat | `GCNZDOHRGJLUKX53TR5PETCO7Q3BKKWVS5K5GQ3NPFZYQ4MKY2BK6A32` | A good project to start with. |
-| 21 Jul 2026, 23:05 | Aditya Jha | `GAG3SUKHIF7VAWGTDRH52XETMLZXXNXBAZLLXHSLXAQPOBBCN43YLKR4` | Liked the product; suggested more UI polish. |
-| 23 Jul 2026, 00:05 | Sandipan Singh | `GDYIHXTUKLCPZHWGGD5B5ZPJZINZ3WUNC3PJCDAYEB4XY4LT2XNTQHTX` | Pretty good—keep scaling it. |
-| 23 Jul 2026, 13:06 | ankita barman | `GCV5X5CKYUAPQLE3OYQS3PDXKX4TRV767YUCJ66PWWGZD2BXE744T276` | Good. |
+| Joined (IST) | Participant | Stellar Testnet Wallet | Product Feedback | Testnet Transaction |
+| --- | --- | --- | --- | --- |
+| 7/18/2026 22:41:34 | Debansh Tiwari | `GA4SXARZZ4RPF6N7VOAH3B5OKMFAP3FGY6M6TO3DZJL4TMU2KOVBHCIY` | The overall experience is smooth. Liked the product! | — |
+| 7/18/2026 22:46:13 | Souvik Mandal | `GDDO6MEIVRZTXCJWLPPQAKTIWTD6CLOTGLJBQY63KMOIYASKXNU6WXN5` | Liked the idea. Amazing UI/UX. Make a walkthrough or documentation of user guide that will be very helpful for new user. 👍 | — |
+| 7/18/2026 22:46:38 | Ansh Raj | `GA3EHDIPTPLQTQESCNR4TSJYBSERD57KERCNFHGWEJ5OX2XSWTMJO424` | its really good | — |
+| 7/19/2026 13:19:54 | pritam dev | `GATJMD6BGNK4FQYNFWB354N7RP4XHA2R74GNSYM472ALNLJFX7NXBS3X` | awesome product | — |
+| 7/20/2026 0:27:56 | Lohit Mishra | `GDYWYDOBPPM2XFQS2N7OA2XYO66C24OSBDGASSYAU7V3V4UHFIQYWCRL` | Ui is great on opportunity server error are occurring | — |
+| 7/20/2026 17:46:57 | Sk Jishan Uddin | `GAVVOOVYGE7QEJWQO2BZZBGYYSFQPBC3QAYWRC6AFP7E3UMCWFT6YC4U` | Very Very Good , I have not seen any kind of website before , very user friendly to use | — |
+| 7/21/2026 12:52:57 | Ritesh Gupta | `GDFSDPEEBZYQVG5JPPTJUOH4FID4M5XV45BKTWCIEIRYMCWJ6DQADBMB` | yup | — |
+| 7/21/2026 13:16:51 | Priyanka Mondal | `GCKMODNZEAI4X6AL6SL77PNJLUUJAQAWECXDTXJZGXBOSSSF7THC3XH6` | better product than other in market | — |
+| 7/21/2026 13:17:59 | Ritam Saha | `GACMLTEWZ23NGJ5WZ2THYGLODFYTEKECB7J2U33H3DCSW2PEAQUEIZED` | Good | — |
+| 7/21/2026 15:17:52 | Elijah Negasi | `GAXCXDDP44VRDTL2PJI22WJU6H4CMRMI2CHRJGPJ3S3L4R323ETDOCAL` | amazing! | — |
+| 7/21/2026 16:17:51 | Rishikesh Singh | `GCO222KICSTS24BWPBEOSYQG5L3RAN4KHII7CE2CW36HRHRXQQPC6OCB` | I really like the ui and credential hashing | — |
+| 7/21/2026 16:25:01 | Nitin Raj | `GARRE4DTEUJIQSXRACCL6X55RH42S7WBO32F5HB4DU32MT6IL5TL3B3N` | Great experience! Clean UI, easy to use, and a promising platform for AI-assisted learning. The interface is easy to navigate, and the overall workflow feels smooth and engaging. | — |
+| 7/21/2026 17:30:33 | Sadiya Mulani | `GBTCGV43NLHEEBMCA5DWFZT6GOJYYCPHXNOEALTBQ7TREIQKQQAVLYT4` | Cool concept. AI-verified, wallet-owned skill credentials on Stellar tackles a real trust problem in a fresh way. | — |
+| 7/21/2026 18:54:32 | Ankush Shaw | `GBBIG4HLPGTLG6BH6YREVWJXEQ4NX74HTD444JD6A6XYS7DOFL2J6DEI` | the main feature i liked was ui, how clean it looks and everything is so simple | — |
+| 7/21/2026 20:06:28 | Subhadip Dutta | `GAVNLCS3GSWLKXSLZ3ITSL7QNB5IGHEOELXAF6QTYACDLEJ7XRQKBBNO` | Very nice ui and the idea is quite innovative | — |
+| 7/21/2026 22:13:03 | Arya Bhagat | `GCNZDOHRGJLUKX53TR5PETCO7Q3BKKWVS5K5GQ3NPFZYQ4MKY2BK6A32` | its a good project to start with | — |
+| 7/21/2026 23:05:03 | Aditya Jha | `GAG3SUKHIF7VAWGTDRH52XETMLZXXNXBAZLLXHSLXAQPOBBCN43YLKR4` | I like the product its nice. But needed more work on UI. | — |
+| 7/23/2026 0:05:02 | Sandipan Singh | `GDYIHXTUKLCPZHWGGD5B5ZPJZINZ3WUNC3PJCDAYEB4XY4LT2XNTQHTX` | Its pretty good, like it.. keep it up scale it | — |
+| 7/23/2026 13:06:47 | ankita barman | `GCV5X5CKYUAPQLE3OYQS3PDXKX4TRV767YUCJ66PWWGZD2BXE744T276` | Good | — |
+| 8/22/2026 12:39:05 | Anirban Chakraborty | `GAFA2O72V23LV7WMTT774EHLBGLV7ETLOSG63TLJ6RWZT7FGUV4TM7ZZ` | bhai tui to kore cholechish. keep it up | [`845f3cbac42942212070c3a8c15f5f3ebc667a5f7c55df78634dfb95f7bf6f7c`](https://stellar.expert/explorer/testnet/tx/845f3cbac42942212070c3a8c15f5f3ebc667a5f7c55df78634dfb95f7bf6f7c) |
+| 8/23/2026 13:22:15 | Swastika Chatterjee | `GB5YELQUQHJQHSGQP4FD6DC6YTGBT4LF7DHXAHU6GCAHKU4MAX2GOZPT` | dammn...it looks good but need to have more companies | [`cd568412107aa05870cfa767d6d7ee1c1c980e48036c18045862512199c78bc3`](https://stellar.expert/explorer/testnet/tx/cd568412107aa05870cfa767d6d7ee1c1c980e48036c18045862512199c78bc3) |
+| 8/23/2026 13:39:25 | Vikramaditya Rathore | `GAEW6JOC64EP3QZWZDNR32SFVZTRX7FGXEG2L5FAUS3IED4ON6FK3C4S` | good | [`4adf15f098008f07d36bee4190f1cdbaa674efb7c44694c0d764bf48724651d0`](https://stellar.expert/explorer/testnet/tx/4adf15f098008f07d36bee4190f1cdbaa674efb7c44694c0d764bf48724651d0) |
+| 8/23/2026 13:42:32 | Debabrata Banerjee | `GAQDZOG6EWIWWPYSE6KZ4KFS4I5P6CRRGHBM7ZMPYJLKOMSMP2T6QFJ2` | ui is clean | [`b243db6beb055bdf5aa6b15d9266290b69bbfa1a4ead782e71270164c0f275a0`](https://stellar.expert/explorer/testnet/tx/b243db6beb055bdf5aa6b15d9266290b69bbfa1a4ead782e71270164c0f275a0) |
+| 8/23/2026 14:29:55 | Lopamudra Sengupta | `GCJPBUOKWUI3NLBEYMU2YV2VM7BAC5ZDNPZNUTYYDXUN6DKFZZSMNK23` | baah daarun | [`e3321be37ed98ded62c73b3ee28e8aadbadb08e1d17a2d9325390bb2a35c91d4`](https://stellar.expert/explorer/testnet/tx/e3321be37ed98ded62c73b3ee28e8aadbadb08e1d17a2d9325390bb2a35c91d4) |
+| 8/23/2026 14:31:07 | Aditya Varma | `GBAEZMTWFG3PMMTVGVF24VMAUMNBCF2JQC6MLAKF3O6RICNFPM3JUND2` | It is very good and is quite fast | [`7446eb723352f448cda8fa3b660ae2b8b800b2b5001afe58df653c1eeed48fae`](https://stellar.expert/explorer/testnet/tx/7446eb723352f448cda8fa3b660ae2b8b800b2b5001afe58df653c1eeed48fae) |
+| 8/23/2026 14:34:18 | Soumyajit Mukherjee | `GBO3F5XHMASTIOZJR4VMLJVY5QKXKWQPVE6RMO3WOZLNCVJINAOSWYDG` | the ai got guardrails i think nice work | [`e52b2b228a774264af7856e0d5721ce76ac87748c3e65a9629d32d9c013a4fb8`](https://stellar.expert/explorer/testnet/tx/e52b2b228a774264af7856e0d5721ce76ac87748c3e65a9629d32d9c013a4fb8) |
+| 8/23/2026 14:40:30 | Paramita Roy | `GBEZOCC7WBZN7A63Y6CMMFEWIXO36Q35FI4O3PCPIWYSRMZH5C4LXC74` | good | [`1ea1b924c299d928dc0eba289ce3d7689ac3a98e7b6d1a50564a14690973be29`](https://stellar.expert/explorer/testnet/tx/1ea1b924c299d928dc0eba289ce3d7689ac3a98e7b6d1a50564a14690973be29) |
+| 8/23/2026 14:41:42 | Rohan Kulkarni | `GCX7RT3RNOJ4SIYVPALPXKJFSTWOOGWXCPSM7E4VLSD6AITB3BOXUMPI` | mumbai kab aaoge bade bhai | [`c29dd434f97d3236df21031e9ffcfcc626b350125cf469b7826bfe0e22116faa`](https://stellar.expert/explorer/testnet/tx/c29dd434f97d3236df21031e9ffcfcc626b350125cf469b7826bfe0e22116faa) |
+| 8/23/2026 14:42:50 | Sayan Ganguly | `GB6CLWWEWKGR5W4HW427T6OTZQS6MVJBF332GUKVR6YS5L6YU7IVG4RJ` | amazing work | [`152266186c16e9954a0bbeebc5cca8b62944a72203c06f41312b9be91e0d2a8d`](https://stellar.expert/explorer/testnet/tx/152266186c16e9954a0bbeebc5cca8b62944a72203c06f41312b9be91e0d2a8d) |
+| 8/23/2026 14:44:00 | Deboleena Mitra | `GCIP56RVQO32UXIY36FZPFECYZPAJOBXEPIKY4GEXCZC3TAPP6XQ6CPL` | great job but the syncing is taking time | [`d083e3c2f12a2526b1ea71c8b7944dcbe44842c3ea6b444396610316d45b8ea6`](https://stellar.expert/explorer/testnet/tx/d083e3c2f12a2526b1ea71c8b7944dcbe44842c3ea6b444396610316d45b8ea6) |
+| 8/23/2026 14:41:10 | Arvind Swaminathan | `GBOTQIBQNALA477UGNHFS5P556RBR7GWRKIGO5HDVTATBYTUFE5ULYUC` | ai is a bit slow | [`187e5b5b1ccfed99388f9335879b5c7a96a22fc064dbdcd3a17fd89afed9b40e`](https://stellar.expert/explorer/testnet/tx/187e5b5b1ccfed99388f9335879b5c7a96a22fc064dbdcd3a17fd89afed9b40e) |
+| 8/23/2026 15:20:20 | Subhashis Ray | `GCEZ6KUXIHFTTAW6IJYLE4NXC33R5OCCBHUFZCY3SXFBEMHHFK3PUE36` | great | [`8942bbafc3203a60e4492a85d18702f52a1ae3a00b7a7ef58f75be07ada9288b`](https://stellar.expert/explorer/testnet/tx/8942bbafc3203a60e4492a85d18702f52a1ae3a00b7a7ef58f75be07ada9288b) |
+| 8/23/2026 15:20:39 | sreelekha ghoshal | `GCAXARZO2FBLTSMSQXAWIJOCGG7FRVWBNXSGJ3IUSPVWJITTOY6XIASQ` | the ui is amazing | [`d9c0c22ee1ce1a6abe8188ec551aa3912b4ea66fb5ab330dc417b9e37e3d362e`](https://stellar.expert/explorer/testnet/tx/d9c0c22ee1ce1a6abe8188ec551aa3912b4ea66fb5ab330dc417b9e37e3d362e) |
+| 8/23/2026 15:21:41 | siddharth nair | `GCGRMP4WDOJBAFULBH4QLDV7M7MCLAJQK3UUUE7XKCZIUAXDFCSCA7ZS` | its been so long since u made something good | [`4e75024e0880fd4d279737a11a36657163c75141a72414eb34930717b4eb5ccc`](https://stellar.expert/explorer/testnet/tx/4e75024e0880fd4d279737a11a36657163c75141a72414eb34930717b4eb5ccc) |
+| 8/23/2026 15:30:50 | Ritwik Ghosh | `GAE6BRA5FIJT2LFZ3CCWFOKSGXFZJ6JEITZDQCNSC7RUUJRT6M26WDWN` | dekh bhai transaction o korlam | [`f9614cbc1713d70cf9af2d9a6338478751466661d30be60d2c94da9e8c629a0e`](https://stellar.expert/explorer/testnet/tx/f9614cbc1713d70cf9af2d9a6338478751466661d30be60d2c94da9e8c629a0e) |
+| 8/23/2026 19:22:00 | Suchismita Pal | `GCBIQMO3REVQADHJU33MB3XR6MUSIEFBRAS366OVOZP7GCYQNADFYBC4` | done bro good work | [`bd3e32c7f371670eb1d55bcb55c8f7f187a62f82bcdac299a3301eade47966d8`](https://stellar.expert/explorer/testnet/tx/bd3e32c7f371670eb1d55bcb55c8f7f187a62f82bcdac299a3301eade47966d8) |
+| 8/23/2026 19:40:10 | Kunal Deshmukh | `GAX66KG6Q7DSTAGLR6CVOX7SYX5DIMSNKIED4W45B3BLZJHU6NWWIFWI` | good | [`474e72af216abe3395f232167b312b63ceb4f3fd760fad2f2e9de84481a47301`](https://stellar.expert/explorer/testnet/tx/474e72af216abe3395f232167b312b63ceb4f3fd760fad2f2e9de84481a47301) |
+| 8/23/2026 19:41:59 | Aritra das | `GACIXSJ46473TMPJNBXD7HEINX2VAT63LQBE5QYC7Y5JFJWAZARAG7W2` | nice ui | [`25004a78cbe2bac472740548ffe6d54eef82c208a3bfe574c112a81a570374b9`](https://stellar.expert/explorer/testnet/tx/25004a78cbe2bac472740548ffe6d54eef82c208a3bfe574c112a81a570374b9) |
+| 8/23/2026 19:42:30 | Jhumpa Biswas | `GDKQTZAMJCQBPDPH6BGXWGKRMPL3ZLSBBJVKOPR547SNKRNH23V5SVSU` | great job brother | [`465197dca6f96078c6f89d4e734fbc8c2bc6a634336c74442310ab520a43f26b`](https://stellar.expert/explorer/testnet/tx/465197dca6f96078c6f89d4e734fbc8c2bc6a634336c74442310ab520a43f26b) |
+| 8/23/2026 19:42:48 | Pradeep Sharma | `GBEPUQGJA6JHNWIRLEUULGY5OC4YTJDQUVLT5IJF6VASLBRLJH5632QK` | the idea is really amazing and innovative | [`dba307ea46739fdaabe398d2d5ed291a8aaf523e9bc9c386811182ce397d7975`](https://stellar.expert/explorer/testnet/tx/dba307ea46739fdaabe398d2d5ed291a8aaf523e9bc9c386811182ce397d7975) |
+| 8/23/2026 19:42:55 | Indranil sen | `GBHFTOQVLUG4AGRHSP5CPWU55TY7TOCILCDFICJTQVENYBBSJB56HQ5T` | i tried it tbh it is still not production grade | [`386b31fb1e765e58fac6c8efbccdb35732b20c94fa6efe53e34ad4a836c2e6aa`](https://stellar.expert/explorer/testnet/tx/386b31fb1e765e58fac6c8efbccdb35732b20c94fa6efe53e34ad4a836c2e6aa) |
+| 8/23/2026 21:48:24 | Suparna Nandi | `GD7SJQORGGMS3L4LHOWV4CKAHVXRSZUYRV6NMXWLNP3QNLFIBPDPE5PJ` | nice ui and design | [`a3edbafe531c7b0e9c76a68af9cd31d6c54f7ef62d87900badfb2c8ba457391c`](https://stellar.expert/explorer/testnet/tx/a3edbafe531c7b0e9c76a68af9cd31d6c54f7ef62d87900badfb2c8ba457391c) |
+| 8/23/2026 22:00:58 | Varun Joshi | `GB56VCMQT77RWTGNMQO6LBZ6SLKWFKXME5WYNKXWOVK66IM7AVBPNH2D` | could be more better though the product is not so ba | [`ce4856e7546990d4e8be5942a98cafe59996e7a77cb6f9fd16ddcbe7825a47e7`](https://stellar.expert/explorer/testnet/tx/ce4856e7546990d4e8be5942a98cafe59996e7a77cb6f9fd16ddcbe7825a47e7) |
+| 8/23/2026 22:05:10 | tanmoy Bosu | `GAOJHVLA2UQMGMENRHH44P4U6NAEUPPZ2WYQKJ3NZCXDDXTTDFG35JNH` | nice | [`24e81690cd90e56ca0ae144420a0891ef917952f11bd1b1eecdab14581d01998`](https://stellar.expert/explorer/testnet/tx/24e81690cd90e56ca0ae144420a0891ef917952f11bd1b1eecdab14581d01998) |
+| 8/23/2026 22:40:01 | Priyanka Chaudhuri | `GDOFIIWPEN6NLAB2YJY3XOKNWMX7GIVO76GNHHOEEAPOPDPDDYNBNASU` | good website | [`0e0224afa2c02ddf2d95e699c137f73d65df6022843da65c009d1631961383ae`](https://stellar.expert/explorer/testnet/tx/0e0224afa2c02ddf2d95e699c137f73d65df6022843da65c009d1631961383ae) |
+| 8/23/2026 22:43:55 | Tenzing Norbu | `GCAFCCR7NQJA7V546XDX5DFAZ5GSU6QEN6BITPQ2O76XFQVUJZZQKI5S` | albedo is having some issues | [`bfe2c1c899c0fa3f87d10131de2eaf4812f074d7fd37ade11c8c330fe38198ff`](https://stellar.expert/explorer/testnet/tx/bfe2c1c899c0fa3f87d10131de2eaf4812f074d7fd37ade11c8c330fe38198ff) |
+| 8/24/2026 11:44:05 | Prosenjit Dutta | `GCTDDLUMBDOSFCMGVH3W7Y3OBB3FEUI4UIMDD4YISC4HIX4GZPPW3YBC` | the website looks cool | [`0b967b01e8fdaad84711ac0275ac2aa9a3f5d34fa0265706a5ab5faae391113a`](https://stellar.expert/explorer/testnet/tx/0b967b01e8fdaad84711ac0275ac2aa9a3f5d34fa0265706a5ab5faae391113a) |
+| 8/24/2026 11:44:15 | Arundhati Bhowmick | `GDTCQRZ3MKLZIKCMDKQSEUNZI2BEO25K2PVCP5XICIBAEDH4F4OOJ6QM` | khub daarun | [`737b1905e9e85452503ce838445ce5f08bb11f12657b770b9e4c48d6af59266f`](https://stellar.expert/explorer/testnet/tx/737b1905e9e85452503ce838445ce5f08bb11f12657b770b9e4c48d6af59266f) |
+| 8/24/2026 11:46:31 | Harshvardhan | `GCAKX6MKRC34JN6YP653XJPGFERMQZUM3YIFPFHYJC5FU4OD2XHCPHRJ` | its really nice | [`6e21a426f22739b10999940ecca7b4cf67661e2fd9255f7e27086fc317e3dc69`](https://stellar.expert/explorer/testnet/tx/6e21a426f22739b10999940ecca7b4cf67661e2fd9255f7e27086fc317e3dc69) |
+| 8/24/2026 11:59:20 | Agnibha Roy | `GAGQJDUFT7BYB4WJKJTDEUDXTVGHV6Z2ZKDSJGIMN75757BXGFAPNDDW` | good work | [`8729a3838a013e6b4f97dfab0579d548c3200f467119ddd9fe37be2aa7de33eb`](https://stellar.expert/explorer/testnet/tx/8729a3838a013e6b4f97dfab0579d548c3200f467119ddd9fe37be2aa7de33eb) |
+| 8/24/2026 12:10:45 | Modhu | `GDI6BXPHUQFXURCUMQORUTWOYTMWJ5RVDVTSHCS3632ZBZ5BCCMMOMFT` | nice nice nice | [`662f1f2761edc255b768e9a1f3d60afb041289ae507712f1528609db3f929e1e`](https://stellar.expert/explorer/testnet/tx/662f1f2761edc255b768e9a1f3d60afb041289ae507712f1528609db3f929e1e) |
+| 8/24/2026 12:30:01 | raghuveer reddy | `GBNHJYJJVL63GZ7IW7JBG75S5KVX5RIEC4L4XXFPCAUPYTCRX7GIOTKX` | not satisfied needs improvement ai is not working | [`a0361f765ca2876c3bdd2d98e25ca39a37df7e134cb745c97c0b14fdf5b60c82`](https://stellar.expert/explorer/testnet/tx/a0361f765ca2876c3bdd2d98e25ca39a37df7e134cb745c97c0b14fdf5b60c82) |
+| 8/24/2026 12:45:05 | Koushik Bhattacharya | `GDGMPZCD6ANI2UO4QPXK7OEWB7O6DVOCKZRZCCITI7E3PS2VH452BWSP` | very good website | [`b8f345094e6f69db635ab61caf070b30424682f67af710f66c41d3d780f5c5f1`](https://stellar.expert/explorer/testnet/tx/b8f345094e6f69db635ab61caf070b30424682f67af710f66c41d3d780f5c5f1) |
+| 8/25/2026 13:40:40 | Kakali Sarkar | `GDJVC4R42U5AT4BJXG3NQZ3Q6CWJUEVV4PTNE5Y7M6NYPX3BS37KZQSW` | good | [`d64fc3f999c3d6b7654f1f51aa46f01f793bb1b020d4a3a41c70cb0c4a8d1793`](https://stellar.expert/explorer/testnet/tx/d64fc3f999c3d6b7654f1f51aa46f01f793bb1b020d4a3a41c70cb0c4a8d1793) |
+| 8/24/2026 19:45:35 | Rintaro | `GASWJJS6ZGUTW3U2PF66DXSKE7UETIWH4LDGBWOK7ZMGNAMK5SUVNQ23` | good | [`5a64fd0fb51d26c005f67e0c68902cd0ba9745929629129c66d449580115468b`](https://stellar.expert/explorer/testnet/tx/5a64fd0fb51d26c005f67e0c68902cd0ba9745929629129c66d449580115468b) |
+| 8/24/2026 19:45:40 | Nilanjan Majumdar | `GDZICGWBWRD2YPYWQ4KEMK5KTOLDDXDI7VCGXFMSNB6HFUKKBYGWTMDS` | nice work | [`21c6163e6fdd998d882cf5088c7e4475cfb6cdd873e88d092877910124c296c9`](https://stellar.expert/explorer/testnet/tx/21c6163e6fdd998d882cf5088c7e4475cfb6cdd873e88d092877910124c296c9) |
+| 8/24/2026 19:46:56 | Srinwanti Kar | `GALGGCLBTNDTM2FMPMZI2FTPKWI4SUAZKIFZUDLR24NRTXYHBQIPKCPK` | great and awesome specially the landing page | [`abfcb3cb798ad605cc50cb09ecc3e65e147685f289fa72f7c0c7ec9b99c94b76`](https://stellar.expert/explorer/testnet/tx/abfcb3cb798ad605cc50cb09ecc3e65e147685f289fa72f7c0c7ec9b99c94b76) |
+| 8/24/2026 19:47:10 | Ananya Hegde | `GD7MXNTHHCPXFFKTHCZPKIRILUUVJZF5EPDTXD4Z2732ACNI7QW4RIBQ` | the app looks good | [`87d9076148d94c8369bfa42e6121d374972430b0c845b294cfde2d12f6858ec5`](https://stellar.expert/explorer/testnet/tx/87d9076148d94c8369bfa42e6121d374972430b0c845b294cfde2d12f6858ec5) |
+| 8/24/2026 19:47:26 | Tathagata Guha | `GAV4OONA2FR27GKZXDD3SNVPYH44MQN5GTGFWUCS24CBEIDNCYA3W2FI` | you should add more like freighter | [`22ef4fe9f86902439fafca21358aba08074ebdcfe1956267e029b0d2dfa6272a`](https://stellar.expert/explorer/testnet/tx/22ef4fe9f86902439fafca21358aba08074ebdcfe1956267e029b0d2dfa6272a) |
+| 8/24/2026 19:48:36 | Sneha Iyer | `GBVNXXTGFSF3ZK6QF5EHWU6NKY7Z7DIZTRRPL4OVKFQRKSHCOD57QFXF` | nice work | [`7ccdfa0d477ee3e7e7e4aa2840884b21025878f30884b5ac91df05ac72f49e5d`](https://stellar.expert/explorer/testnet/tx/7ccdfa0d477ee3e7e7e4aa2840884b21025878f30884b5ac91df05ac72f49e5d) |
+| 8/24/2026 21:00:20 | Kavya Menon | `GCYX25F52SFDKGY7WSAE7SLATKN25ZKCYYAQ4I4JGW7BIKTHYSM6NL5E` | really useful if it spreads more | [`5d1e7d835d25f9e8bce82ec052d29c1e0cf0d6c98ca24c58637cb263487184c7`](https://stellar.expert/explorer/testnet/tx/5d1e7d835d25f9e8bce82ec052d29c1e0cf0d6c98ca24c58637cb263487184c7) |
+| 8/24/2026 21:02:56 | Meera Rao | `GCCBXKAU2BZX5CHBDW3TPR3NYX7BAZPDIZFVAOVYQGTKMNXVGGCGFSKC` | not good | [`cc0bdf30f6e2805beecda9575ec5dd681f4610fde2dd56fcd2be99547fc7818d`](https://stellar.expert/explorer/testnet/tx/cc0bdf30f6e2805beecda9575ec5dd681f4610fde2dd56fcd2be99547fc7818d) |
+| 8/24/2026 21:18:06 | Krishna Merchant | `GD7QFNWWBHYJKBKFIRHJIFSFZRH2BCAZ7LIVZHG6AEZ4GURLUD44HOPO` | need improvement | [`b0df279f6003d76183748130b54ce240cb18c12b496e67024418447d0c25fd40`](https://stellar.expert/explorer/testnet/tx/b0df279f6003d76183748130b54ce240cb18c12b496e67024418447d0c25fd40) |
+| 8/24/2026 21:30:16 | Priya Kapoor | `GCXHPXT45FE3O55RZTECBQQ3IWOUHQOU3GHNIGGU3Q7CKUX7ULIXVP4K` | good ui | [`c0a8eb0a007a43807753786a918f6c8ff2e96d55c743b5a15dcbac310d4ae892`](https://stellar.expert/explorer/testnet/tx/c0a8eb0a007a43807753786a918f6c8ff2e96d55c743b5a15dcbac310d4ae892) |
+| 8/24/2026 21:45:57 | Shreya Agarwal | `GB5CRKDHZ2PCZKTTH3HPKAPIKUBIPAAEW66A3YSTZZFQM53J4QEGZUMG` | not so helpful for non techies | [`b64ac92f3e9434c897634653230315bd9c1fe990668ecfd175ffee962faf6d5a`](https://stellar.expert/explorer/testnet/tx/b64ac92f3e9434c897634653230315bd9c1fe990668ecfd175ffee962faf6d5a) |
+| 8/24/2026 21:47:36 | Pooja Gowda | `GC7DECKZ6GEOI3XGGZG5D3NZIOYRLNP77J7LEALDPIPWHU6DNCLND4RL` | wow | [`18a9474269211c8f9bd287de63aa287f0db3a8e7cc5067dfcacc161ee78e7cac`](https://stellar.expert/explorer/testnet/tx/18a9474269211c8f9bd287de63aa287f0db3a8e7cc5067dfcacc161ee78e7cac) |
+| 8/24/2026 22:47:51 | Ishita Mehta | `GD5VMIJR247PGGHES76I4PXP73G7UTXZRYH6BXI3YF5G5HCKJ6NR4ELL` | its really awesome | [`b54c1d3cc01c2bd67f7daed4a5af141c2a4015bf080f374c22f529e8dc19e473`](https://stellar.expert/explorer/testnet/tx/b54c1d3cc01c2bd67f7daed4a5af141c2a4015bf080f374c22f529e8dc19e473) |
+| 8/24/2026 22:50:01 | neha shekhawat | `GCKHZK6HQ4MXJXVKOYJZXKMTDNZYRXIFG4DZSBUSI6Z5F7Q3WWAJFCQM` | the structure looks good | [`fc70374f8e0685b6bd7d5f9a1fc1644e5400f47b84dc61443c8a123816ae414d`](https://stellar.expert/explorer/testnet/tx/fc70374f8e0685b6bd7d5f9a1fc1644e5400f47b84dc61443c8a123816ae414d) |
+| 8/24/2026 22:41:16 | Diksha Borah | `GDZ2LJXLRTS2GMSIQVXXDVLAT6FJZ7FORSYTKXJZICLICW3L7KUNEC6F` | nice | [`9605d2c6d59a0bb53173ed1e451b500dbb7455194903c5e133fb7722affe33cb`](https://stellar.expert/explorer/testnet/tx/9605d2c6d59a0bb53173ed1e451b500dbb7455194903c5e133fb7722affe33cb) |
 
 For the User Validation form: https://docs.google.com/forms/d/e/1FAIpQLSc2hSXyNt_CCiMmWwtXP9lqwrRi4rpVwewcMvleGUFOyDLtFQ/viewform?usp=header
 
@@ -138,6 +198,21 @@ Signed wallet users can submit a 1–5 rating, topic, message, and page context 
 | `POST /api/v1/feedback` | Submit signed wallet feedback |
 | `GET /api/v1/admin/feedback` | Read submitted feedback as an authorized administrator |
 | `GET /api/v1/admin/users` | Read active user profiles, including wallet-only onboarding records |
+
+## User Feedback Iteration
+
+The latest product iteration responds directly to onboarding feedback about readability, visual consistency, operational transparency, reliability, and security. The work focused on making SkillChain easier to scan during demos while ensuring administrative evidence remains protected and independently verifiable.
+
+| Feedback theme | Changes implemented | Result |
+| --- | --- | --- |
+| Text was difficult to read in parts of the application | Increased important font sizes, strengthened text contrast, widened dense data areas, and improved spacing across dashboards and tables | Profiles, metrics, wallet addresses, and transaction evidence are easier to read on desktop and mobile |
+| Some surfaces still used the older green visual treatment | Unified the interface around the darker violet, indigo, cyan, and blue system while retaining green only for meaningful success states | The product now has a more consistent visual identity and clearer status hierarchy |
+| The admin experience needed clearer proof of platform usage | Added prominent metric cards for registered users, completed profiles, unique wallets, logins, total activity, transactions, credentials, and verifications | Reviewers can understand adoption and on-chain activity without inspecting the database manually |
+| Transaction and user evidence was difficult to review | Added larger scrollable activity, transaction, user, and feedback tables with sticky headers and direct Stellar Explorer transaction links | Operators can audit wallet activity and transaction hashes from one protected interface |
+| Registered developers and complete Neon activity were missing from admin views | Added the persisted `developer` role, included developers in talent discovery, removed restrictive result limits, and aligned admin metrics with the live database | The admin dashboard now returns all active users and the complete requested activity set |
+| Direct dashboard links returned deployment errors | Added generated SPA entrypoints for the public, candidate, recruiter, and admin routes | Refreshing or directly opening `/dashboard`, `/recruiter-dashboard`, or `/admin` works after deployment |
+| Security controls needed stronger production boundaries | Kept admin authorization behind signed wallet sessions and the server-side `ADMIN_WALLETS` allowlist, retained strict CORS and trusted-host checks, request throttling, body-size limits, secure response headers, and no browser-stored admin secret | Administrative data remains inaccessible to ordinary candidate or recruiter sessions |
+| Vercel toolbar resources were blocked by the strict Content Security Policy | Narrowly allowlisted `https://vercel.live` only for the script, font, image, connection, and frame directives it requires while preserving restrictive defaults for every other origin | Vercel feedback tooling works without weakening the wider CSP boundary |
 
 ---
 
